@@ -309,7 +309,7 @@ define(["react", "../common/buttonLoading", "../lib/utils", "../services/seguros
 
         var resultado = segurosOnlineService.getImprimirAltasTempranas(Solicitud).then(function (data) {
           var fileManager = new FileManager();
-          var resultDownload = fileManager.downloadPDF(data, filename);
+          var resultDownload = fileManagerPDF(data, filename);
 
           return resultDownload;
         });

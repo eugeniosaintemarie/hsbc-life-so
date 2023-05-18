@@ -72,7 +72,7 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
               if (data) {
                 var filename = "SolicitudVC - " + _this.state.listChecked[i].NRO_DOC;
                 var fileManager = new FileManager();
-                var resultDownload = fileManager.downloadPDF(data, filename);
+                var resultDownload = fileManagerPDF(data, filename);
                 if (!resultDownload) {
                   _this.setState({
                     showModalSuccess: true,
@@ -204,7 +204,7 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
             var blob = new Blob(["\uFEFF", csv]);
             var url = URL.createObjectURL(blob);
             downloadLink.href = url;
-            downloadLink.download = "ReporteVC-" + ramo + ".csv";
+            downloadLink = "ReporteVC-" + ramo + ".csv";
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);

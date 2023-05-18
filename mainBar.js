@@ -85,7 +85,7 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
               if (data) {
                 var filename = detalle.NROPOLIZA + ".pdf";
                 var fileManager = new FileManager();
-                var resultDownload = fileManager.downloadPDF(data, filename);
+                var resultDownload = fileManagerPDF(data, filename);
                 if (!resultDownload) {
                   _this._handleCopyServiceError();
                 }

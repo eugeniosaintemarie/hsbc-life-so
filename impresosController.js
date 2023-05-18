@@ -60,7 +60,7 @@ define(['react', '../lib/utils', "../common/fileManager", "../services/segurosOn
                             "CIAASCOD": param.CIAASCOD
                         }).then(function (data) {
                             if (data && data instanceof Blob && data.size > 0) {
-                                _this2.downloadPDF(data, periodoFecha);
+                                _this2PDF(data, periodoFecha);
                             } else {
                                 $(document).trigger("ErrorImpresos", 'No data');
                             }
@@ -82,7 +82,7 @@ define(['react', '../lib/utils', "../common/fileManager", "../services/segurosOn
                             }
                         }).then(function (data) {
                             if (data && data instanceof Blob && data.size > 0) {
-                                _this2.downloadPDF(data, periodoFecha);
+                                _this2PDF(data, periodoFecha);
                             } else {
                                 _this2.replyImpresosPeriodos(periodo, param);
                             }
@@ -106,7 +106,7 @@ define(['react', '../lib/utils', "../common/fileManager", "../services/segurosOn
                             }
                         }).then(function (data) {
                             if (data && data instanceof Blob && data.size > 0) {
-                                _this2.downloadPDF(data, periodoFecha);
+                                _this2PDF(data, periodoFecha);
                             } else {
                                 _this2.replyImpresosPeriodos(periodo, param);
                             }
@@ -133,7 +133,7 @@ define(['react', '../lib/utils', "../common/fileManager", "../services/segurosOn
             value: function downloadPDF(data, periodoFecha) {
                 var fileManager = new FileManager();
 
-                fileManager.downloadPDF(data, "Semestral-" + periodoFecha + ".pdf");
+                fileManagerPDF(data, "Semestral-" + periodoFecha + ".pdf");
             }
         }]);
 

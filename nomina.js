@@ -108,7 +108,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
           var filename = 'nomina de asegurados.pdf';
           var fileManager = new FileManager();
 
-          var resultDownload = fileManager.downloadPDF(data, filename);
+          var resultDownload = fileManagerPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({
@@ -202,7 +202,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
                 }).then(function (data) {
                   var filename = 'Certificado Incorporacion - ' + detalle.NROPOLIZA + '.pdf';
                   var fileManager = new FileManager();
-                  if (fileManager.downloadPDF(data, filename)) {
+                  if (fileManagerPDF(data, filename)) {
                     resolve();
                   } else _this._downloadFailed();
                 });
@@ -244,7 +244,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
           var filename = detalle.NROPOLIZA + '.pdf';
           var fileManager = new FileManager();
 
-          var resultDownload = fileManager.downloadPDF(data, filename);
+          var resultDownload = fileManagerPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({

@@ -62,7 +62,7 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
           if (dat === "") {
             _this.controller.imprimirCertIncorp(pdfReq, function (data) {
               var filename = 'Certificado Incorporacion - ' + _this.props.product.NROPOLIZA + '.pdf';
-              var resultDownload = _this.fileManager.downloadPDF(data, filename);
+              var resultDownload = _this.fileManagerPDF(data, filename);
 
               if (!resultDownload) {
                 _this.setState({
@@ -121,7 +121,7 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
 
         _this.controller.imprimirCertCober(pdfReq, function (data) {
           var filename = 'Certificado Cobertura - ' + _this.props.product.NROPOLIZA + '.pdf';
-          var resultDownload = _this.fileManager.downloadPDF(data, filename);
+          var resultDownload = _this.fileManagerPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({

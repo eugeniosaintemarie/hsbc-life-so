@@ -1,14 +1,15 @@
-const staticDevCoffee = "hsbc-life-so"
+const staticHSBCSO = "hsbc-life-so"
 const assets = [
     "/",
     "/index.html",
     "/style.css",
+    "/app.js",
     "/logo.png",
 ]
 
 self.addEventListener("install", installEvent => {
     installEvent.waitUntil(
-        caches.open(staticDevCoffee).then(cache => {
+        caches.open(staticHSBCSO).then(cache => {
             cache.addAll(assets)
         })
     )

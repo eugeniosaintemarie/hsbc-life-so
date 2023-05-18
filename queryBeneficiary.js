@@ -87,7 +87,7 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                   if (data) {
                     var filename = "SolicitudBen- " + _this.state.listChecked[i].NRO_DOC + ".pdf";
                     var fileManager = new FileManager();
-                    var resultDownload = fileManager.downloadPDF(data, filename);
+                    var resultDownload = fileManagerPDF(data, filename);
                     if (!resultDownload) {
                       _this.setState({
                         showModalSuccess: true,

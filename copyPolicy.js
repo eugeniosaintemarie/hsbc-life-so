@@ -422,7 +422,7 @@ define(["react", "../common/datepicker", "../services/segurosOnlineService", "..
         var filename = detalle.NROPOLIZA + ".pdf";
         var fileManager = new FileManager();
 
-        var resultDownload = fileManager.downloadPDF(data, filename);
+        var resultDownload = fileManagerPDF(data, filename);
 
         if (!resultDownload) {
           _this3.setState({
