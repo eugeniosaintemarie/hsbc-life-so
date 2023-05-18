@@ -1,10 +1,10 @@
 const staticHSBCSO = "hsbc-life-so"
 const assets = [
     "/",
-    "/index.html",
-    "/style.css",
-    "/app.js",
-    "/logo.png",
+    "/hsbc-life-so/index.html",
+    "/hsbc-life-so/style.css",
+    "/hsbc-life-so/app.js",
+    "/hsbc-life-so/logo.png",
 ]
 
 self.addEventListener("install", installEvent => {

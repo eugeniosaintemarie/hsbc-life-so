@@ -25,7 +25,7 @@ requirejs(["react", "react-dom", "react-redux", "../dist/segurosOnline/container
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
-      .register("/serviceWorker.js")
+      .register("/hsbc-life-so/serviceWorker.js")
       .then(res => console.log("service worker registered"))
       .catch(err => console.log("service worker not registered", err))
   })
