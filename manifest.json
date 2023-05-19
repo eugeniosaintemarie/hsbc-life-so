@@ -1,6 +1,6 @@
 {
     "name": "HSBC Seguros Online",
-    "short_name": "HSBC-SO",
+    "short_name": "Seguros Online",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#0000",
