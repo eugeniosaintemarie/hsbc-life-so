@@ -9,9 +9,7 @@ requirejs(["react", "react-dom", "react-redux", "../dist/segurosOnline/container
     var body = document.getElementsByTagName("body")[0];
     body.classList.remove("backFixed");
   };
-  //funcionalidad de salto de página al iniciar el proyecto, existe también en el component login
   Utils.checkCurrentPage();
-  //ReactDOM lo utilizamos sólo una vez qué es por dónde entra react al DOM , evitar llamar la librería dentros de otros componentes
   ReactDOM.render(React.createElement(
     ReactRedux.Provider,
     { store: Store },
@@ -23,9 +21,9 @@ requirejs(["react", "react-dom", "react-redux", "../dist/segurosOnline/container
 });
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
+  window.addEventListener("load", function () {
     navigator.serviceWorker
-      .register("/hsbc-life-so/serviceWorker.js")
+      .register("https://eugeniosaintemarie.github.io/hsbc-life-so/serviceWorker.js")
       .then(res => console.log("service worker registered"))
       .catch(err => console.log("service worker not registered", err))
   })

@@ -1,44 +1,52 @@
 {
-    "name": "HSBC Seguros Online",
-    "short_name": "Seguros Online",
-    "start_url": "index.html",
-    "display": "standalone",
-    "background_color": "#0000",
-    "theme_color": "#db0011",
-    "orientation": "portrait-primary",
-    "icons": [
-      {
-        "src": "/hsbc-life-so/image/icon/icon-72x72.png",
-        "type": "image/png", "sizes": "72x72"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-96x96.png",
-        "type": "image/png", "sizes": "96x96"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-128x128.png",
-        "type": "image/png","sizes": "128x128"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-144x144.png",
-        "type": "image/png", "sizes": "144x144"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-152x152.png",
-        "type": "image/png", "sizes": "152x152"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-192x192.png",
-        "type": "image/png", "sizes": "192x192"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-384x384.png",
-        "type": "image/png", "sizes": "384x384"
-      },
-      {
-        "src": "/hsbc-life-so/image/icon/icon-512x512.png",
-        "type": "image/png", "sizes": "512x512"
-      }
-    ]   
-    
-  }
+  "name": "HSBC Seguros Online",
+  "short_name": "Seguros Online",
+  "description": "",
+  "start_url": "/hsbc-life-so/",
+  "display": "standalone",
+  "background_color": "#0000",
+  "theme_color": "#db0011",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-72x72.png",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-128x128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-144x144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-152x152.png",
+      "type": "image/png",
+      "sizes": "152x152"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-384x384.png",
+      "type": "image/png",
+      "sizes": "384x384"
+    },
+    {
+      "src": "https://eugeniosaintemarie.github.io/hsbc-life-so/image/icon/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

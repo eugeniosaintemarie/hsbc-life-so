@@ -1,6 +1,6 @@
 const staticHSBCSO = "hsbc-life-so"
 const assets = [
-    "/",
+    /*"/",*/
     "/hsbc-life-so/index.html",
     "/hsbc-life-so/style.css",
     "/hsbc-life-so/app.js",
