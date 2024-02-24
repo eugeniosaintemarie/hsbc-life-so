@@ -47,7 +47,7 @@ define(["react", "../common/inputvalidation", "../common/loader"], function (Rea
             React.createElement(
               "h5",
               { className: "form-title", id: "titleLogin" },
-              "Ingreso a HSBC Seguros On line"
+              "Ingreso a HSBC Seguros Online"
             ),
             React.createElement(
               "p",
