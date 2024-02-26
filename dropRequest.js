@@ -299,7 +299,7 @@ define(["react", "../services/segurosOnlineService", "../redux/store", "../commo
                                 ),
                                 React.createElement(
                                     "a",
-                                    { href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/retiro_rescate_PESOS_TOFILL.pdf", rel: "noreferrer", download: true, target: "_blank" },
+                                    { href: "/seguros-gateway/getPDF/retiro_rescate_PESOS_TOFILL.pdf", rel: "noreferrer", download: true, target: "_blank" },
                                     React.createElement(
                                         "button",
                                         { "class": "btn  btn-hsbc" },
@@ -317,7 +317,7 @@ define(["react", "../services/segurosOnlineService", "../redux/store", "../commo
                                 ),
                                 React.createElement(
                                     "a",
-                                    { href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/retiro_rescate_USD_PESOS_TOFILL.pdf", rel: "noreferrer", download: true, target: "_blank" },
+                                    { href: "/seguros-gateway/getPDF/retiro_rescate_USD_PESOS_TOFILL.pdf", rel: "noreferrer", download: true, target: "_blank" },
                                     React.createElement(
                                         "button",
                                         { "class": "btn  btn-hsbc" },

@@ -72,7 +72,7 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
               if (data) {
                 var filename = "SolicitudVC - " + _this.state.listChecked[i].NRO_DOC;
                 var fileManager = new FileManager();
-                var resultDownload = fileManagerPDF(data, filename);
+                var resultDownload = fileManager.downloadPDF(data, filename);
                 if (!resultDownload) {
                   _this.setState({
                     showModalSuccess: true,
@@ -203,8 +203,9 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
             var downloadLink = document.createElement("a");
             var blob = new Blob(["\uFEFF", csv]);
             var url = URL.createObjectURL(blob);
+
             downloadLink.href = url;
-            downloadLink = "ReporteVC-" + ramo + ".csv";
+            downloadLink.download = "ReporteVC-" + ramo + ".csv";
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
@@ -440,7 +441,27 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
                     React.createElement(
                       "th",
                       null,
+                      "Fecha"
+                    ),
+                    React.createElement(
+                      "th",
+                      null,
+                      "Grupo"
+                    ),
+                    React.createElement(
+                      "th",
+                      null,
                       "Estado de solicitud"
+                    ),
+                    React.createElement(
+                      "th",
+                      null,
+                      "Tipo de solicitud"
+                    ),
+                    React.createElement(
+                      "th",
+                      null,
+                      "Tipo de modicacion"
                     )
                   )
                 ),
@@ -470,8 +491,28 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
                       ),
                       React.createElement(
                         "td",
+                        { className: "contenidoTabla align-middle" },
+                        Utils.dateToString(new Date(item.FEC_ACT))
+                      ),
+                      React.createElement(
+                        "td",
+                        { className: "contenidoTabla align-middle" },
+                        item.DES_GRU
+                      ),
+                      React.createElement(
+                        "td",
                         { className: "contenidoTabla" },
                         _this2.state.stateList[i]
+                      ),
+                      React.createElement(
+                        "td",
+                        { className: "contenidoTabla align-middle" },
+                        item.TIP_SOL === "A" ? "Alta" : "Modificacion"
+                      ),
+                      React.createElement(
+                        "td",
+                        { className: "contenidoTabla align-middle" },
+                        item.TIP_MOD === "SN" ? "Adhirio Conyuge" : item.TIP_MOD === "NS" ? "Modifico Multiplo/Suma" : item.TIP_MOD === "SS" ? "Adhirio Conyuge/Modifico Multiplo/Suma" : ""
                       )
                     );
                   })

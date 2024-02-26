@@ -55,48 +55,74 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
         var segurosOnlineService = new SegurosOnlineService();
         var today = Utils.formatFechaNumber(Utils.dateToString(new Date()));
 
-        segurosOnlineService.getDetalleEndoso({
-          FECHADDE: today - 100000, // 10 años antes al dia actual
-          FECHAHTA: today,
-          RAMOPCOD: detalle.RAMOPCOD,
-          POLIZANN: detalle.POLIZANN,
-          POLIZSEC: detalle.POLIZSEC,
-          CERTIPOL: detalle.CERTIPOL,
-          CERTIANN: detalle.CERTIANN,
-          CERTISEC: detalle.CERTISEC,
-          CIAASCOD: detalle.CIAASCOD,
-          SUPLENUM: detalle.SUPLENUM
-        }).then(function (endorsementData) {
-          _this.setState({
-            currentPoliza: _this.props.currentProduct.polizaComp
-          });
-          if (endorsementData && endorsementData.length > 0 && typeof endorsementData[0].ENDOSO == "number" && endorsementData[0].IMPRESO === "S") {
-            segurosOnlineService.getImprimirCertificado({
-              RAMOPCOD: detalle.RAMOPCOD,
-              POLIZANN: detalle.POLIZANN,
-              POLIZSEC: detalle.POLIZSEC,
-              CERTIPOL: detalle.CERTIPOL,
-              CERTIANN: detalle.CERTIANN,
-              CERTISEC: detalle.CERTISEC,
-              CIAASCOD: detalle.CIAASCOD,
-              SUPLENUM: detalle.SUPLENUM,
-              ENDOSO: endorsementData[0].ENDOSO
-            }).then(function (data) {
-              if (data) {
-                var filename = detalle.NROPOLIZA + ".pdf";
-                var fileManager = new FileManager();
-                var resultDownload = fileManagerPDF(data, filename);
-                if (!resultDownload) {
-                  _this._handleCopyServiceError();
-                }
-              } else {
+        if (e.target.id === "impClausulado") {
+          segurosOnlineService.getImprimirClausulado({
+            RAMOPCOD: detalle.RAMOPCOD,
+            POLIZANN: detalle.POLIZANN,
+            POLIZSEC: detalle.POLIZSEC,
+            CERTIPOL: detalle.CERTIPOL,
+            CERTIANN: detalle.CERTIANN,
+            CERTISEC: detalle.CERTISEC,
+            CIAASCOD: detalle.CIAASCOD
+          }).then(function (data) {
+            if (data) {
+              var filename = detalle.NROPOLIZA + "_clausulado" + ".pdf";
+              var fileManager = new FileManager();
+              var resultDownload = fileManager.downloadPDF(data, filename);
+
+              if (!resultDownload) {
                 _this._handleCopyServiceError();
               }
+            } else {
+              _this._handleCopyServiceError();
+            }
+          });
+        } else {
+          segurosOnlineService.getDetalleEndoso({
+            FECHADDE: today - 100000, // 10 años antes al dia actual
+            FECHAHTA: today,
+            RAMOPCOD: detalle.RAMOPCOD,
+            POLIZANN: detalle.POLIZANN,
+            POLIZSEC: detalle.POLIZSEC,
+            CERTIPOL: detalle.CERTIPOL,
+            CERTIANN: detalle.CERTIANN,
+            CERTISEC: detalle.CERTISEC,
+            CIAASCOD: detalle.CIAASCOD,
+            SUPLENUM: detalle.SUPLENUM
+          }).then(function (endorsementData) {
+            _this.setState({
+              currentPoliza: _this.props.currentProduct.polizaComp
             });
-          } else {
-            _this._handleInvalidPolicy();
-          }
-        });
+
+            if (endorsementData && endorsementData.length > 0 && typeof endorsementData[0].ENDOSO == "number" && endorsementData[0].IMPRESO === "S") {
+              segurosOnlineService.getImprimirCertificado({
+                RAMOPCOD: detalle.RAMOPCOD,
+                POLIZANN: detalle.POLIZANN,
+                POLIZSEC: detalle.POLIZSEC,
+                CERTIPOL: detalle.CERTIPOL,
+                CERTIANN: detalle.CERTIANN,
+                CERTISEC: detalle.CERTISEC,
+                CIAASCOD: detalle.CIAASCOD,
+                SUPLENUM: detalle.SUPLENUM,
+                ENDOSO: endorsementData[0].ENDOSO
+              }).then(function (data) {
+                if (data) {
+                  var filename = detalle.NROPOLIZA + ".pdf";
+                  var fileManager = new FileManager();
+                  var resultDownload = fileManager.downloadPDF(data, filename);
+
+                  if (!resultDownload) {
+                    _this._handleCopyServiceError();
+                  }
+                } else {
+                  _this._handleCopyServiceError();
+                }
+              });
+            } else {
+              _this._handleInvalidPolicy();
+            }
+          });
+        }
       };
 
       _this._handleModalIsOpen = function () {
@@ -119,7 +145,8 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
       _this._handleModalApplicationWeb = function () {
         var current = _this.state.modal.show;
         _this.setState({
-          modal: { show: !current,
+          modal: {
+            show: !current,
             component: null,
             contentHTML: "La solicitud ya fue enviada",
             html: true,
@@ -157,15 +184,16 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
         var itsMyForms = isAppointBeneficiary || itsAdditionRequest || itsAdditionRequestColectivo;
         var user = this.state.user;
 
+
         var detalle = this.props.currentProduct ? this.props.currentProduct.detalle ? this.props.currentProduct.detalle : this.props.currentProduct.cup : null;
 
         var currentProduct = this.props.currentProduct ? this.props.currentProduct : null;
         // Habilitaciones
 
         // Menus para mis formularios
-        var gMnuMFoBen = isAppointBeneficiary;
         var gMnuMFoRCo = itsAdditionRequest;
         var gMnuMFoVCo = itsAdditionRequestColectivo;
+
         // Menus
         var gMnuHitEnd = !itsMyForms;
         var gMnuAccSta = false;
@@ -180,14 +208,23 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
         var gMnuRCoAdh = false;
         var gMnuEndoso = false;
         var gMnuSalRet = false;
+        var gMnuDesBen = false;
+        var gMnuAdhWeb = false;
+        var gMnuConAlT = false;
+
         // Botones
         var gBtnMasInf = !itsMyForms;
         var gBtnPagCon = !itsMyForms;
         var gBtnSinCon = false;
         var gBtnResCon = false;
         var gBtnImpPol = !itsMyForms;
-        // Nombre Botones
-        var gBtnDrpRqt = void 0;
+        var gBtnImpCla = false;
+        var gBtnDesBen = false;
+        var gBtnAdhWeb = false;
+
+        // Nombres Botones
+        var gLeyDrpRqt = void 0;
+        var gLeyAdhWeb = void 0;
 
         if (detalle) {
           if (detalle.TIPOPRODU) {
@@ -196,17 +233,18 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
             }
             if (detalle.TIPOPRODU === "C") {
               gMnuResFon = true;
-              gMnuEndoso = true;
             }
             if (detalle.TIPOPRODU === "R") {
+              gMnuEndoso = true;
               gMnuSalRet = true;
               gMnuDrpRqt = true;
-              gBtnDrpRqt = "Solicitud de Rescates";
+              gLeyDrpRqt = "Solicitud de Rescates";
             }
             if (detalle.TIPOPRODU === "C" || detalle.TIPOPRODU === "M") {
+              gMnuEndoso = true;
               gBtnSinCon = true;
               gMnuDrpRqt = true;
-              gBtnDrpRqt = "Solicitud de baja";
+              gLeyDrpRqt = "Solicitud de baja";
             }
             if (detalle.TIPOPRODU === "R" || detalle.TIPOPRODU === "O") {
               gBtnResCon = true;
@@ -216,7 +254,7 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                 gMnuRCoAdh = false;
               } else {
                 gMnuDrpRqt = true;
-                gBtnDrpRqt = "Solicitud de Rescates";
+                gLeyDrpRqt = "Solicitud de Rescates";
               }
               gMnuSalRet = true;
               gBtnPagCon = false;
@@ -230,10 +268,15 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                   gMnuNomSeg = true;
                   gMnuVCoAdh = true;
                   gMnuDrpRqt = true;
-                  gBtnDrpRqt = "Solicitud de baja";
+                  gLeyDrpRqt = "Solicitud de baja";
+                  gBtnImpCla = false;
                 } else {
                   gMnuBenNom = true;
                   gMenConBen = true;
+
+                  if (currentProduct.ramopcod === "CO10") {
+                    gMnuConAlT = true;
+                  }
                 }
               }
               if (currentProduct.TIPOPRODU === "X") {
@@ -251,13 +294,29 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                 if (currentProduct.certisec === 0) {
                   gMnuRCoAdh = false;
                   gMnuDrpRqt = true;
-                  gBtnDrpRqt = "Solicitud de baja";
+                  gLeyDrpRqt = "Solicitud de baja";
                 }
-
                 gMnuAccSta = true;
                 gMnuSalRet = true;
                 gBtnPagCon = false;
                 gBtnResCon = true;
+              }
+
+              if (currentProduct.detalle) {
+                if (currentProduct.detalle.MAR_ADH && currentProduct.detalle.MAR_ADH === "S") {
+                  gMnuAdhWeb = true;
+                  //gBtnAdhWeb = true;
+                  if (currentProduct.detalle.TIP_SOL && currentProduct.detalle.TIP_SOL === "M") {
+                    gLeyAdhWeb = "Modificación de p\xF3liza";
+                  } else {
+                    gLeyAdhWeb = "Datos de adhesión";
+                  }
+                }
+
+                if (currentProduct.detalle.MAR_DBE && currentProduct.detalle.MAR_DBE === "S") {
+                  gMnuDesBen = true;
+                  //gBtnDesBen = true;
+                }
               }
             }
           }
@@ -309,15 +368,6 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                       onClick: this.props.handleShowAccountState
                     },
                     "Estado de cuenta"
-                  ),
-                  gMnuMFoBen && React.createElement(
-                    "button",
-                    {
-                      className: "dropdown-item",
-                      href: "#",
-                      onClick: this.props.handleShowDdbenCrudMenu
-                    },
-                    "Modificar beneficiario"
                   ),
                   gMnuDocXMa && React.createElement(
                     "button",
@@ -438,8 +488,59 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                       href: "#",
                       onClick: this.props.handleShowDropRequest
                     },
-                    gBtnDrpRqt
+                    gLeyDrpRqt
+                  ),
+                  gMnuConAlT && React.createElement(
+                    "button",
+                    {
+                      className: "dropdown-item",
+                      href: "#",
+                      onClick: this.props.handleShowConstAltasTempranas
+                    },
+                    "Constancia de Altas Tempranas"
+                  ),
+                  gMnuDesBen && React.createElement(
+                    "button",
+                    {
+                      className: "dropdown-item",
+                      href: "#",
+                      onClick: this.props.handleShowAppointBeneficiary
+                    },
+                    "Designaci\xF3n de beneficiarios"
+                  ),
+                  gMnuAdhWeb && React.createElement(
+                    "button",
+                    {
+                      className: "dropdown-item",
+                      href: "#",
+                      onClick: this.props.handleShowAdditionRequestColectivo
+                    },
+                    gLeyAdhWeb
                   )
+                )
+              ),
+              React.createElement(
+                "div",
+                null,
+                gBtnDesBen && React.createElement(
+                  "button",
+                  {
+                    onClick: this.props.handleShowAppointBeneficiary,
+                    className: "btn btn-light"
+                  },
+                  "Designaci\xF3n de beneficiarios"
+                )
+              ),
+              React.createElement(
+                "div",
+                null,
+                gBtnAdhWeb && React.createElement(
+                  "button",
+                  {
+                    onClick: this.props.handleShowAdditionRequestColectivo,
+                    className: "btn btn-light"
+                  },
+                  gLeyAdhWeb
                 )
               ),
               React.createElement(
@@ -506,6 +607,24 @@ define(["react", "react-redux", "../lib/utils", "../services/userService", "../s
                   "Imprimir copia",
                   React.createElement("br", null),
                   "de p\xF3liza"
+                )
+              ),
+              gBtnImpCla && React.createElement(
+                "div",
+                null,
+                React.createElement(
+                  "button",
+                  {
+                    id: "impClausulado",
+                    className: "btn btn-light py-0",
+                    style: { maxHeight: "46px" },
+                    onClick: function onClick(e) {
+                      _this2._handleClickPrint(e, detalle);
+                    }
+                  },
+                  "Imprimir ",
+                  React.createElement("br", null),
+                  "clausulado"
                 )
               )
             ),

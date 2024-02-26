@@ -6,7 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../../controller/retiroNominaController", "../../controller/nominaController", "../../controller/beneficiariosController", "../../common/fileManager", "../../services/segurosOnlineService", "../../common/modalReactBootstrap", "../../lib/utils"], function (React, AdhesionController, NominaController, BeneficiariosController, FileManager, SegurosOnlineService, ModalReactBootstrap, Utils) {
+define(["react", "../../controller/retiroNominaController", "../../controller/nominaController", "../../controller/beneficiariosController", "../../common/fileManager", "../../services/segurosOnlineService", "../../common/modalReactBootstrap", "../../lib/utils", "../nominas/paginatedView"], function (React, AdhesionController, NominaController, BeneficiariosController, FileManager, SegurosOnlineService, ModalReactBootstrap, Utils, PaginatedView) {
   var QueryBeneficiary = function (_React$Component) {
     _inherits(QueryBeneficiary, _React$Component);
 
@@ -28,6 +28,51 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
         _this.setState({
           showModalSuccess: !current
         });
+      };
+
+      _this._handlerPages = function (e) {
+        var pageNumber = Number(e.target.value) !== 0 ? Number(e.target.value) : 1;
+
+        _this.setState({
+          page: pageNumber
+        });
+
+        _this._getPage(pageNumber.toString(), _this.state.rows);
+
+        if (pageNumber !== _this.state.page) {
+          _this.setState({
+            cont: 2
+          });
+
+          _this.handleSelectAll("pagination");
+        }
+      };
+
+      _this._handlerRows = function (e) {
+        _this.setState({
+          rows: Number(e.target.value),
+          page: 1
+        });
+
+        _this._getPage(1, e.target.value);
+      };
+
+      _this._getPage = function (pag, amount, list) {
+        if (pag > 0) {
+          var lista = void 0;
+
+          if (list !== undefined) {
+            lista = list.slice((pag - 1) * amount, (pag - 1) * amount + amount);
+          } else {
+            lista = _this.state.stateList.slice((pag - 1) * amount, (pag - 1) * amount + amount);
+          }
+
+          _this.setState({
+            paginaShow: lista,
+            rows: Number(amount),
+            page: Number(pag)
+          });
+        }
       };
 
       _this.handleRepeatZero = function (polAnn, polSec) {
@@ -78,6 +123,7 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
 
       _this.handleClickSearch = function () {
         var completado = 0;
+
         if (_this.state.listChecked.length != 0) {
           var _loop = function _loop(i, p) {
             var nroPol = _this.handleRepeatZero(_this.state.listChecked[i].POL_ANN, _this.state.listChecked[i].POL_SEC),
@@ -87,7 +133,7 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                   if (data) {
                     var filename = "SolicitudBen- " + _this.state.listChecked[i].NRO_DOC + ".pdf";
                     var fileManager = new FileManager();
-                    var resultDownload = fileManagerPDF(data, filename);
+                    var resultDownload = fileManager.downloadPDF(data, filename);
                     if (!resultDownload) {
                       _this.setState({
                         showModalSuccess: true,
@@ -98,7 +144,8 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                           size: "md",
                           html: true,
                           contentHTML: "Hubo inconvenientes en la descarga del pdf, por favor intente luego",
-                          textClose: "Entendido"
+                          textClose: "Entendido",
+                          hiddenButtonClose: false
                         }
                       });
                     } else {
@@ -115,7 +162,8 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                         size: "md",
                         html: true,
                         contentHTML: "Hubo inconvenientes al generar el pdf",
-                        textClose: "Entendido"
+                        textClose: "Entendido",
+                        hiddenButtonClose: false
                       }
                     });
                   }
@@ -136,7 +184,8 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
               size: "md",
               html: true,
               contentHTML: "El estado del beneficiario que seleccione debe ser 'COMPLETO'",
-              textClose: "Entendido"
+              textClose: "Entendido",
+              hiddenButtonClose: false
             }
           });
         }
@@ -150,7 +199,6 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
       };
 
       _this._handlePendientesBoolean = function (e) {
-        debugger;
         var current = _this.state.pendienteBoolean;
         _this.setState({
           pendienteBoolean: !current
@@ -166,11 +214,11 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
 
       _this.handleSelectAll = function (e) {
         var datos = document.getElementsByClassName("contenidoTabla");
-        if (_this.state.cont == 1) {
+        if (_this.state.cont == 1 && e === undefined) {
           if (_this.state.listChecked.length !== 0) {
             _this.state.listChecked = [];
           }
-          _this.state.stateList.forEach(function (element, i) {
+          _this.state.paginaShow.forEach(function (element, i) {
             var input = document.getElementById("" + i);
             if (element.COD_EST == "E") {
               input.checked = true;
@@ -190,12 +238,16 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
           for (var indice = 0; indice < datos.length; indice++) {
             datos["" + indice].style.backgroundColor = "white";
           }
-          for (var i = 0; i < _this.state.stateList.length; i++) {
+
+          for (var i = 0; i < _this.state.paginaShow.length; i++) {
             var input = document.getElementById("" + i);
             input.checked = false;
             input.disabled = false;
           }
-          _this.setState({ cont: 1 });
+
+          if (e !== "pagination") {
+            _this.setState({ cont: 1 });
+          }
         }
       };
 
@@ -219,14 +271,69 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                   size: "md",
                   html: true,
                   contentHTML: "Ocurrio un error al enviar el recordatorio a los pendientes.",
-                  textClose: "Entendido"
+                  textClose: "Entendido",
+                  hiddenButtonClose: false
+                }
+              });
+            } else {
+              var recordEnviados = localStorage.getItem("recordatoriosEnviados");
+              var fecha = new Date();
+              var fechaHabilitada = new Date(fecha.getTime() + 24 * 60 * 60 * 1000);
+              var polizas;
+
+              if (recordEnviados !== null) {
+                polizas = JSON.parse(recordEnviados);
+
+                var polizasObj = {
+                  nroPoliza: _this.props.product.NROPOLIZA,
+                  fechaHabilitacion: fechaHabilitada
+                };
+
+                if (_this.state.noEnviado) {
+                  polizas = polizas.filter(function (obj) {
+                    return obj.nroPoliza !== _this.props.product.NROPOLIZA;
+                  });
+
+                  polizas.push(polizasObj);
+
+                  _this.setState({
+                    noEnviado: false
+                  });
+                }
+              } else if (_this.state.noEnviado) {
+                polizas = [{
+                  nroPoliza: _this.props.product.NROPOLIZA,
+                  fechaHabilitacion: fechaHabilitada
+                }];
+
+                _this.setState({
+                  noEnviado: false
+                });
+              }
+
+              localStorage.setItem("recordatoriosEnviados", JSON.stringify(polizas));
+
+              _this.setState({ generarBoton: false });
+
+              _this.setState({
+                showModalSuccess: true,
+                recordatoriosEnviados: polizas,
+                modal: {
+                  title: "",
+                  component: null,
+                  size: "md",
+                  html: true,
+                  contentHTML: "¡Recordatorio enviado!",
+                  hiddenButtonClose: true
                 }
               });
             }
           });
+
           _this.handleModalPendienteIsOpen();
         } else {
           _this.handleModalPendienteIsOpen();
+
           _this.setState({
             showModalSuccess: true,
             modal: {
@@ -235,22 +342,45 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
               size: "md",
               html: true,
               contentHTML: "No hay designaciones pendientes.",
-              textClose: "Entendido"
+              textClose: "Entendido",
+              hiddenButtonClose: false
             }
           });
         }
       };
 
       _this.handleTest = function (e) {
-        if (_this.state.stateList[e.target.id].COD_EST == "E" && e.target.checked) {
-          _this.state.listChecked.push(_this.state.stateList[e.target.id]);
-        } else if (!e.target.checked && _this.state.stateList[e.target.id].COD_EST == "E") {
-          var eliminar = _this.state.stateList[e.target.id].NRO_DOC;
-          var aEliminar = _this.state.listChecked.find(function (element) {
+        var _this$state = _this.state,
+            page = _this$state.page,
+            rows = _this$state.rows,
+            stateList = _this$state.stateList,
+            listChecked = _this$state.listChecked;
+
+
+        var checkId = Number(e.target.id);
+
+        if (page > 1) {
+          var realPage = page - 1;
+
+          if (rows === 100) {
+            checkId = Number(realPage.toString() + checkId);
+          } else {
+            var realIndex = rows * realPage;
+
+            checkId = Number(realIndex + checkId);
+          }
+        }
+
+        if (stateList[checkId].COD_EST == "E" && e.target.checked) {
+          listChecked.push(stateList[checkId]);
+        } else if (!e.target.checked && stateList[checkId].COD_EST == "E") {
+          var eliminar = stateList[checkId].NRO_DOC;
+          var aEliminar = listChecked.find(function (element) {
             return element.NRO_DOC == eliminar;
           });
-          var eliminado = _this.state.listChecked.indexOf(aEliminar); // obtenemos el indice que no coincide con la posicion en el array
-          _this.state.listChecked.splice(eliminado, 1);
+          var eliminado = listChecked.indexOf(aEliminar); // obtenemos el indice que no coincide con la posicion en el array
+
+          listChecked.splice(eliminado, 1);
         }
       };
 
@@ -264,10 +394,18 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
         recoverPayrollEmployees: {},
         loadButton: false,
         showForm: false,
+        noEnviado: true,
+        generarBoton: true,
+        recordatoriosEnviados: [],
         cont: 1,
         idEmployee: 0,
         showModal: false,
         showModalPendiente: false,
+        paginaShow: [],
+        stateListLength: undefined,
+        selected: 0,
+        rows: 100,
+        page: 1,
         modalPendiente: {
           component: null,
           contentHTML: "",
@@ -285,7 +423,8 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
           title: "",
           size: "md",
           accept: null,
-          disBtnAccept: true
+          disBtnAccept: true,
+          hiddenButtonClose: false
         },
         pendienteBoolean: false
 
@@ -301,6 +440,10 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
       _this.nominaController = new NominaController();
       return _this;
     }
+
+    //Paginado de la Tabla
+
+    //Fin del  Paginado
 
     _createClass(QueryBeneficiary, [{
       key: "render",
@@ -335,7 +478,7 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                 },
                 "Descargar seleccionados"
               ),
-              React.createElement(
+              this.state.generarBoton ? React.createElement(
                 "button",
                 {
                   type: "button",
@@ -343,10 +486,10 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                   onClick: this.handleClickPendientes
                 },
                 "Enviar recordatorio a pendientes"
-              )
+              ) : ""
             ),
             React.createElement(
-              "form",
+              "div",
               { className: "col-md-12 remove-left-padding" },
               React.createElement(
                 "h5",
@@ -393,7 +536,7 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                 React.createElement(
                   "tbody",
                   null,
-                  this.state.stateList.map(function (item, i) {
+                  this.state.paginaShow.map(function (item, i) {
                     return React.createElement(
                       "tr",
                       { key: i },
@@ -426,7 +569,14 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
                       )
                     );
                   })
-                )
+                ),
+                this.state.stateListLength ? React.createElement(PaginatedView, {
+                  setrows: this._handlerRows,
+                  activepage: this.state.page,
+                  selectpage: this._handlerPages,
+                  rows: this.state.rows,
+                  total: this.state.stateListLength
+                }) : ""
               ) : ""
             ),
             this.state.showForm ? React.createElement(
@@ -459,7 +609,8 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
             component: this.state.modal.component,
             html: this.state.modal.html,
             contentHTML: this.state.modal.contentHTML,
-            textClose: this.state.modal.textClose
+            textClose: this.state.modal.textClose,
+            hiddenButtonClose: this.state.modal.hiddenButtonClose
           }),
           React.createElement(ModalReactBootstrap, {
             title: this.state.modalPendiente.title,
@@ -483,13 +634,45 @@ define(["react", "../../controller/retiroNominaController", "../../controller/no
 
         this.beneficiarios.recuperarBeneficiarios(this.props.product, function (data) {
           _this3.setState({ list: data.CODE });
-          console.log(data);
+
           var employeesList = data.Message.REGS.REG.filter(function (element) {
             return element.COD_EST == "G" || element.COD_EST == "E";
           });
 
-          _this3.setState({ stateList: employeesList });
+          _this3.setState({
+            stateList: employeesList,
+            stateListLength: employeesList.length
+          });
+
+          _this3._getPage(_this3.state.page, _this3.state.rows, employeesList);
         });
+
+        var productRecordEnv = localStorage.getItem("recordatoriosEnviados");
+
+        if (productRecordEnv !== null) {
+          var recordsEnv = JSON.parse(productRecordEnv);
+          this.setState({ recordatoriosEnviados: recordsEnv });
+
+          recordsEnv.map(function (e, i) {
+            var fechaActual = new Date();
+            var fechaGuardada = new Date(e.fechaHabilitacion);
+            var nroPolizaExiste = recordsEnv.some(function (obj) {
+              return obj.nroPoliza === _this3.props.product.NROPOLIZA;
+            });
+
+            if (nroPolizaExiste) {
+              if (e.nroPoliza === _this3.props.product.NROPOLIZA) {
+                if (fechaActual.getTime() > fechaGuardada.getTime()) {
+                  _this3.setState({ generarBoton: true });
+                } else {
+                  _this3.setState({ generarBoton: false });
+                }
+              }
+            } else {
+              _this3.setState({ generarBoton: true });
+            }
+          });
+        }
       }
     }]);
 

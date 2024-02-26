@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../services/userService", "../common/modalReactBootstrap", "../common/validationResc", "../common/modal", "../lib/utils", "../services/segurosOnlineService", "../redux/store"], function (React, UserService, ModalReactBootstrap, ValidationResc, Modal, Utils, SegurosOnlineService, Store) {
+define(["react", "../services/userService", "../common/modalReactBootstrap", "../common/validationResc", "../common/modal", "../lib/utils", "../services/segurosOnlineService", "../services/retiroNominaService", "../redux/store"], function (React, UserService, ModalReactBootstrap, ValidationResc, Modal, Utils, SegurosOnlineService, RetiroNominaService, Store) {
   var Rescate1 = function (_React$Component) {
     _inherits(Rescate1, _React$Component);
 
@@ -91,8 +91,8 @@ define(["react", "../services/userService", "../common/modalReactBootstrap", "..
           var montoCuentaAct = Number.parseInt(_this.state.montoCuentaActual, 10);
           montoTotalCuenta = montoCuentaAct / 100;
 
-          if (montoTotalCuenta > 1500) {
-            //Monto no permitido mayor a 1500.
+          if (montoTotalCuenta > _this.state.sumMax) {
+            //Monto no permitido mayor a sumMax.
             _this.props.switch('errorMonto');
           } else {
             //pasar a la pantalla siguiente.
@@ -106,8 +106,8 @@ define(["react", "../services/userService", "../common/modalReactBootstrap", "..
         } else {
           var montoTotalRetirar = Number.parseFloat(montoRetirar.value).toFixed(2);
 
-          if (montoTotalRetirar > 1500) {
-            //Monto no permitido mayor a 1500.
+          if (montoTotalRetirar > _this.state.sumMax) {
+            //Monto no permitido mayor a sumMax.
             _this.props.switch('errorMonto');
           } else {
             //pasar a la pantalla siguiente.
@@ -125,11 +125,12 @@ define(["react", "../services/userService", "../common/modalReactBootstrap", "..
         disabledMontoRescatar: false,
         cheked: true,
         disabledCheck: true,
-        showModal: true,
+        showModal: false,
+        sumMax: 0,
         modal: {
           title: "Aviso",
           component: null,
-          contentHTML: 'Consider&aacute; que pod&eacute;s rescatar hasta 1500 USD por este medio. Si deseas rescatar m&aacute;s pod&eacute;s hacerlo llamando al 0800-333-0003',
+          contentHTML: "",
           html: true,
           size: "md",
           responseModal: null,
@@ -275,9 +276,22 @@ define(["react", "../services/userService", "../common/modalReactBootstrap", "..
         var _this2 = this;
 
         var userService = new UserService();
+        retiroNominaService = new RetiroNominaService();
         var currentProduct = Store.getState().seguros.currentProduct;
 
         var segurosOnlineService = new SegurosOnlineService();
+
+        retiroNominaService.getNBWSParamGrl({ COD_PAR: "RESSUMMAX" }).then(function (data) {
+          _this2.setState(function (prevState) {
+            return {
+              sumMax: Number(data.Message.REGS.REG[0].VAL_PAR),
+              showModal: true,
+              modal: Object.assign({}, prevState.modal, {
+                contentHTML: "Consider&aacute; que pod&eacute;s rescatar hasta " + data.Message.REGS.REG[0].VAL_PAR + " USD por este medio. Si deseas rescatar m&aacute;s pod&eacute;s hacerlo llamando al 0800-333-0003"
+              })
+            };
+          });
+        });
 
         var ramo = currentProduct.detalle.RAMOPCOD;
         if (ramo.substring(0, 3) == 'IC0' && ramo != 'IC07') {

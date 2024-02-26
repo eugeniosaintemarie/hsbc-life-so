@@ -256,7 +256,16 @@ define(["react", "./itemNominaAbm", "../../common/modalReactBootstrap", "../nomi
                     null,
                     col
                   );
-                })
+                }),
+                this.props.desigBenefEnabled ? React.createElement(
+                  "th",
+                  null,
+                  "Mail para designar beneficiarios"
+                ) : React.createElement(
+                  "th",
+                  null,
+                  "Resultado"
+                )
               )
             ),
             React.createElement(
@@ -270,6 +279,7 @@ define(["react", "./itemNominaAbm", "../../common/modalReactBootstrap", "../nomi
                   key: i,
                   name: nomina.id,
                   checkhandler: _this2._checkHandler,
+                  desigBenefEnabled: _this2.props.desigBenefEnabled,
                   ischecked: listchecked[nomina.id] ? listchecked[nomina.id].isChecked : false
                 });
               })

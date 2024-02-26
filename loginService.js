@@ -108,6 +108,16 @@ define(['react', 'react-dom', './baseService', "../lib/utils.js"], function (Rea
                 return this.call('POST', 'Login/getCanalesCobro', { COBROCOD: 4 }, 'JSON', null, 'JSON', '');
             }
         }, {
+            key: 'getMails',
+            value: function getMails(params) {
+                return this.call('POST', 'Login/obtenerMails', params, 'JSON', null, 'JSON', '');
+            }
+        }, {
+            key: 'sendCodVal',
+            value: function sendCodVal(params) {
+                return this.call('POST', 'Login/enviarCodVal', params, 'JSON', null, 'JSON', '');
+            }
+        }, {
             key: 'verificarPositiveID',
             value: function verificarPositiveID(params) {
                 return this.call('POST', 'Login/verificarPositiveID', params, 'JSON', null, 'TEXT', '');

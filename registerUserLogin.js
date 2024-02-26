@@ -391,7 +391,7 @@ define(["react", "../common/inputvalidation", "../common/errormessage", "./termi
                                 { className: "custom-control-label", htmlFor: "tycHSBCSeguros" },
                                 React.createElement(
                                     "a",
-                                    { href: "https://www.oficinasvirtuales.hsbc.com.ar/oficina-gateway/getPDF/TyC.pdf", target: "blank" },
+                                    { href: "/seguros-gateway/getPDF/TyC.pdf", target: "blank" },
                                     "Acepto t\xE9rminos y condiciones de HSBC Seguros"
                                 )
                             )
@@ -405,7 +405,7 @@ define(["react", "../common/inputvalidation", "../common/errormessage", "./termi
                         null,
                         React.createElement(
                             "button",
-                            { onClick: this._haldleButtonModify,
+                            { onClick: this.props.close,
                                 type: "button",
                                 className: "btn btn-danger m-2", "data-dismiss": "modal" },
                             "Cancelar"

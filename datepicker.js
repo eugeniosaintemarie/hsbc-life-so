@@ -16,7 +16,9 @@ define(["react", "../../libs/react/js/react-input-mask.min"], function (React, I
       var _this = _possibleConstructorReturn(this, (DatePicker.__proto__ || Object.getPrototypeOf(DatePicker)).call(this, props));
 
       _this._onFocus = function (e) {
-        $("#" + _this.props.id).addClass("input-invalid");
+        _this.setState({
+          isValid: e
+        });
       };
 
       _this._formatFechaString = function (date) {
@@ -104,7 +106,8 @@ define(["react", "../../libs/react/js/react-input-mask.min"], function (React, I
 
       _this.state = {
         value: "",
-        reloadable: false
+        reloadable: false,
+        isValid: false
       };
       return _this;
     }
@@ -150,10 +153,10 @@ define(["react", "../../libs/react/js/react-input-mask.min"], function (React, I
           this._loadDatePicker();
         }
         return React.createElement(InputMask, {
+          className: className + " " + (!this.state.isValid ? "" : "input-invalid"),
           type: "text",
           autocomplete: "off",
           disabled: disabled,
-          className: className,
           id: id,
           name: name,
           maxLength: "10",

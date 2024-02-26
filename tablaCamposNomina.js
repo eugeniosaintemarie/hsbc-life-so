@@ -167,7 +167,7 @@ define(['react', "../redux/store", 'react-dom'], function (React, Store, ReactDO
                 }
 
                 var campos = [];
-                var regexTexto = "^([A-ZÑ]+\\ ?)+$";
+                var regexTexto = "^([A-ZÑÀ-ÿÁ-ü]+\\ ?)+$";
                 var regexMail = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$";
 
                 var opcionesCuil = [{ texto: "XX-XXXXXXXX-X", regex: "^\\d{2}\\-\\d{8}\\-\\d$" }, { texto: "XXXXXXXXXXX", regex: "^\\d{11}$" }];
@@ -294,10 +294,10 @@ define(['react', "../redux/store", 'react-dom'], function (React, Store, ReactDO
                         formato: {
                             texto: "",
                             regex: "",
-                            options: opcionesNumericos2
+                            options: opcionesNumericos
                         },
                         modal: {
-                            texto: "El formato que debes usar para el campo suma asegurada tiene que ser utilizando comas para separar decimales 10000,00"
+                            texto: "El formato que debes usar para el campo suma asegurada tiene que ser utilizando comas para separar decimales 10000,00.  Tené en cuenta que esto puede variar si el archivo que cargás está en una versión distinta a la Latinoamericana"
                         } });
                 }
                 if (sueldo) {
@@ -306,10 +306,10 @@ define(['react', "../redux/store", 'react-dom'], function (React, Store, ReactDO
                         formato: {
                             texto: "",
                             regex: "",
-                            options: opcionesNumericos2
+                            options: opcionesNumericos
                         },
                         modal: {
-                            texto: "El formato que debes usar para el campo sueldo tiene que ser utilizando comas para separar decimales 10000,00"
+                            texto: "El formato que debes usar para el campo sueldo tiene que ser utilizando comas para separar decimales 10000,00.  Tené en cuenta que esto puede variar si el archivo que cargás está en una versión distinta a la Latinoamericana"
 
                         } });
                 }

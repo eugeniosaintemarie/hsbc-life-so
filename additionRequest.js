@@ -43,7 +43,7 @@ define(["react"], function (React) {
                                     React.createElement(
                                         "small",
                                         { className: "text-body pl-4 " },
-                                        "Hac\xE9 click para completar la solicitud."
+                                        "Fuiste invitado por tu empleador a adherirte a esta p\xF3liza. Hac\xE9 click para completar la solicitud."
                                     )
                                 ),
                                 React.createElement(

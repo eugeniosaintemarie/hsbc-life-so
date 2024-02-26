@@ -97,7 +97,7 @@ define(["react", "../../controller/vidaColectivoController", "../../controller/r
           if (data && data instanceof Blob && data.size > 0) {
             var filename = _this.props.product.NROPOLIZA + ".pdf";
             var fileManager = new FileManager();
-            var resultDownload = fileManagerPDF(data, filename);
+            var resultDownload = fileManager.downloadPDF(data, filename);
             if (!resultDownload) {
               var contentInfo = "Ha surgido un error al descargar el PDF";
               _this._handleCopyServiceError(contentInfo);

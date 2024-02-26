@@ -198,7 +198,9 @@ define(["react", "./grupoFamiliar/listNewFamilyGroup", "./grupoFamiliar/newFamil
               onResults: this._handleResultTable,
               getParentName: this._getParentName,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos
             });
           case "EditBeneficiary":
             return React.createElement(NewFamilyGroup, {
@@ -217,7 +219,9 @@ define(["react", "./grupoFamiliar/listNewFamilyGroup", "./grupoFamiliar/newFamil
               onResults: this._handleResultTable,
               getParentName: this._getParentName,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos
             });
           case "identyValidationIndividualBeneficiary":
             return React.createElement(IdentityValidation, {
@@ -246,6 +250,10 @@ define(["react", "./grupoFamiliar/listNewFamilyGroup", "./grupoFamiliar/newFamil
             loaded: true
           });
         });
+
+        if (this.state.listaBeneficiarios.length > 0) {
+          this._setSelectedList(this.state.listaBeneficiarios);
+        }
       }
     }]);
 

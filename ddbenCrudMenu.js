@@ -246,6 +246,14 @@ define(["react", "./ddbenListBeneficiaries", "./newIndividualBeneficiary", "./id
               body: "Te sugerimos que confirmes con el Tomador de la p\xF3liza que ya haya realizado la gesti\xF3n para habilitar esta funcionalidad.",
               button: this._cancelModifications
             });
+          case "weAreSorry":
+            return React.createElement(MessageComponent, {
+              titleClass: "font-weight-bold mt-5 pl-5 text-danger",
+              title: "\xA1Lo sentimos!",
+              bodyClass: "font-weight-bold px-5",
+              body: "No es posible realizar la carga para este producto por este medio. Por favor comunicate con tu ejecutivo de cuentas para poder realizar la carga.",
+              button: this._cancelModifications
+            });
         }
       }
     }, {
@@ -281,19 +289,23 @@ define(["react", "./ddbenListBeneficiaries", "./newIndividualBeneficiary", "./id
           DOCUMDAT: product.NRO_DOC,
           DOCUMTIP: Number(product.TIP_DOC)
         }).then(function (response) {
-          if (!response || !response.Message || !response.Message.Request || response.Message.Request.ESTADO != "OK") {
-            if (response.Message.Request.ERROR == "PO" || response.Message.Request.ERROR == "DO") {
-              _this2.setState({ currentForm: "serviceErrorPo" });
+          if (response.Message.CAMPOS.PERMITE == "S") {
+            if (!response || !response.Message || !response.Message.Request || response.Message.Request.ESTADO != "OK") {
+              if (response.Message.Request.ERROR == "PO" || response.Message.Request.ERROR == "DO") {
+                _this2.setState({ currentForm: "serviceErrorPo" });
+              } else {
+                _this2.setState({ currentForm: "serviceError" });
+              }
             } else {
-              _this2.setState({ currentForm: "serviceError" });
-            }
-          } else {
-            _this2.setState({
-              listaBeneficiarios: _this2._handleServiceResponse(response.Message.CAMPOS.NOMINAS.NOMINA),
-              currentForm: "ListBeneficiaries"
-            });
+              _this2.setState({
+                listaBeneficiarios: _this2._handleServiceResponse(response.Message.CAMPOS.NOMINAS.NOMINA),
+                currentForm: "ListBeneficiaries"
+              });
 
-            _this2._setSelectedList(_this2.state.listaBeneficiarios);
+              _this2._setSelectedList(_this2.state.listaBeneficiarios);
+            }
+          } else if (response.Message.CAMPOS.PERMITE == "N") {
+            _this2.setState({ currentForm: "weAreSorry" });
           }
         });
       }

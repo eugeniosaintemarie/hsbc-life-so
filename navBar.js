@@ -80,7 +80,7 @@ define(["react", "react-redux"], function (React, ReactRedux) {
           React.createElement(
             "a",
             { className: "navbar-brand", href: "#" },
-            React.createElement("img", { src: "../img/logo.png", alt: "logo" })
+            React.createElement("img", { src: "https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_logo.png", alt: "logo" })
           ),
           this.menu()
         );

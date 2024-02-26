@@ -30,6 +30,11 @@ define(["react", "react-bootstrap"], function (React, ReactBootstrap) {
     }
 
     _createClass(ModalReactBootstrap, [{
+      key: "_renderHTML",
+      value: function _renderHTML(html) {
+        return { __html: html };
+      }
+    }, {
       key: "render",
       value: function render() {
         var _props = this.props,
@@ -49,7 +54,8 @@ define(["react", "react-bootstrap"], function (React, ReactBootstrap) {
             accept = _props.accept,
             responseModal = _props.responseModal,
             classAccept = _props.classAccept,
-            classCancel = _props.classCancel;
+            classCancel = _props.classCancel,
+            contentHTML = _props.contentHTML;
 
         var comp = this.props.component;
         if (comp) {
@@ -84,7 +90,7 @@ define(["react", "react-bootstrap"], function (React, ReactBootstrap) {
             !this.props.html && this.props.component !== null && comp,
             this.props.html && this.props.component === null && React.createElement("div", {
               className: "col-md-12 text-center",
-              dangerouslySetInnerHTML: { __html: this.props.contentHTML }
+              dangerouslySetInnerHTML: this._renderHTML(contentHTML)
             }),
             !this.props.html && this.props.component === null && React.createElement("h2", null)
           ),

@@ -62,7 +62,7 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
           if (dat === "") {
             _this.controller.imprimirCertIncorp(pdfReq, function (data) {
               var filename = 'Certificado Incorporacion - ' + _this.props.product.NROPOLIZA + '.pdf';
-              var resultDownload = _this.fileManagerPDF(data, filename);
+              var resultDownload = _this.fileManager.downloadPDF(data, filename);
 
               if (!resultDownload) {
                 _this.setState({
@@ -121,7 +121,7 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
 
         _this.controller.imprimirCertCober(pdfReq, function (data) {
           var filename = 'Certificado Cobertura - ' + _this.props.product.NROPOLIZA + '.pdf';
-          var resultDownload = _this.fileManagerPDF(data, filename);
+          var resultDownload = _this.fileManager.downloadPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({
@@ -159,6 +159,22 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
     _createClass(AppointBeneficiary, [{
       key: "render",
       value: function render() {
+        var product = this.props.product;
+        var contenido = void 0;
+
+        if (product.EST_DBE === "E") {
+          contenido = React.createElement(
+            "button",
+            { className: "btn btn-danger border-dark right", onClick: this.props.handleShowDdbenCrudMenu },
+            "Modificar Beneficiarios"
+          );
+        } else {
+          contenido = React.createElement(
+            "button",
+            { className: "btn btn-danger border-dark right", onClick: this.props.handleShowDdbenCrudMenu },
+            "Designar Beneficiarios"
+          );
+        }
         return React.createElement(
           React.Fragment,
           null,
@@ -170,43 +186,42 @@ define(["react", "../../controller/beneficiariosController", "../../common/modal
               { className: "col-md-12" },
               React.createElement(
                 "div",
-                { className: "alert border bg-light row " },
-                React.createElement("div", { className: "alert-benef" }),
+                null,
                 React.createElement(
                   "div",
-                  { className: "col-md-7 " },
+                  { className: "col-md-8 p-3" },
                   React.createElement(
-                    "small",
-                    { className: "text-body pl-4  " },
-                    "Hac\xE9 click para designar tus beneficiarios."
+                    "span",
+                    { className: "text-body" },
+                    "Hac\xE9 click para designar los beneficiarios de tu poliza."
                   )
                 ),
                 React.createElement(
                   "div",
-                  { className: "col-md-5" },
-                  React.createElement(
-                    "button",
-                    { className: "btn btn-danger border-dark right", onClick: this.props.handleShowDdbenCrudMenu },
-                    "Designar Beneficiarios"
-                  ),
-                  React.createElement(
-                    "button",
-                    { type: "button", className: "close", "data-dismiss": "alert" },
-                    "\xD7"
-                  )
+                  { className: "col-md-5 p-3" },
+                  contenido
                 )
               )
             )
           ),
           React.createElement(
             "div",
-            { className: "container" },
+            { className: "container col-md-17" },
             React.createElement(
               "div",
               null,
               React.createElement(
+                "div",
+                { className: "p-3" },
+                React.createElement(
+                  "span",
+                  { className: "text-body" },
+                  "Hac\xE9 click para imprimir tu certificado de incorporaci\xF3n."
+                )
+              ),
+              React.createElement(
                 "button",
-                { className: "btn btn-danger m-2 btn-sm rounded p-1 pl-2 pr-2 ", onClick: this._handleImpresionCertIncorp },
+                { className: "btn btn-danger m-3 border-dark right", onClick: this._handleImpresionCertIncorp },
                 "Certificado Incorporaci\xF3n"
               )
             )

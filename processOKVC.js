@@ -66,7 +66,7 @@ define(["react", "./additionPdfColectivo"], function (React, AdditionPdfColectiv
                 {
                   className: "btn btn-light  m-2 p-1 pr-2 pl-2",
                   type: "button",
-                  onClick: this.props.itsSave ? this.props.handleShowAdditionRequestColectivo : this._handleShowAdditionPdf
+                  onClick: this.props.isModify !== undefined && this.props.isModify ? this.props.handleShowAdditionRequestColectivo : this.props.itsSave ? this.props.handleShowAdditionRequestColectivo : this._handleShowAdditionPdf
                 },
                 "Aceptar"
               )

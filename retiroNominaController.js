@@ -30,6 +30,7 @@ define(["react", "../lib/utils", "../services/segurosOnlineService", "../service
         var _this2 = this;
 
         var error = [];
+        console.log(product);
         list.map(function (benef) {
           if (benef.VALIDACION != "NOMAIL") {
             _this2.retiroNominaService.grabarNominaEmpleados({
@@ -46,7 +47,8 @@ define(["react", "../lib/utils", "../services/segurosOnlineService", "../service
                 CER_SEC: product.CERTISEC,
                 TOM_TDO: user.TIPODOCU.toString(),
                 TOM_NDO: user.NUMEDOCU.toString(),
-                TOM_APE: user.CLIENAP1
+                TOM_APE: user.CLIENAP1,
+                COD_GRU: product.group
               }
             }).then(function (data) {
               if (data.GRABANOM != "NO_ERROR") callback.apply(undefined, error.concat([data]));else callback(error);
@@ -78,6 +80,10 @@ define(["react", "../lib/utils", "../services/segurosOnlineService", "../service
               TOM_NDO: item.TOM_NDO,
               TOM_APE: item.TOM_APE,
               FEC_NAC: item.FEC_NAC,
+              DES_GRU: item.DES_GRU,
+              FEC_ACT: item.FEC_ACT,
+              TIP_SOL: item.TIP_SOL,
+              TIP_MOD: item.TIP_MOD,
               MAIL: item.DIR_EMA
             };
           });
@@ -623,16 +629,20 @@ define(["react", "../lib/utils", "../services/segurosOnlineService", "../service
           CER_POL: requestData.CER_POL,
           CER_ANN: requestData.CER_ANN,
           CER_SEC: requestData.CER_SEC,
+          COD_GRU: requestData.COD_GRU,
           TOM_TDO: requestData.TOM_TDO,
           TOM_NDO: requestData.TOM_NDO,
           TOM_APE: requestData.TOM_APE,
           TIP_DOC: requestData.TIP_DOC,
+          TIP_SOL: requestData.TIP_SOL,
           NRO_DOC: requestData.NRO_DOC,
           COD_EST: state,
           NRO_SOL: requestNumber
         }).then(function (data) {
           if (!(!data || !data.Code) && data.Code == "NO_ERROR") {
             callBack("NO_ERROR");
+          } else {
+            callBack("ERROR");
           }
         });
       }

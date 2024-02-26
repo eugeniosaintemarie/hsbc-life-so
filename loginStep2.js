@@ -54,119 +54,97 @@ define(["react", "../common/inputMaskValidation", "../common/dropdownContent", "
             null,
             React.createElement(
               "div",
-              { className: "form-container" },
+              { className: "hsbc-title-step offset-1" },
+              " Paso 2"
+            ),
+            React.createElement(
+              "h2",
+              { className: "hsbc-subtitle" },
+              "Inici\xE1 sesi\xF3n ingresando tu documento:"
+            ),
+            React.createElement("div", { className: "hsbc-divider" }),
+            React.createElement(
+              "form",
+              { noValidate: true, onSubmit: this.props.onSubmit },
               React.createElement(
-                "h5",
-                { className: "form-title" },
-                "Ingres\xE1 tu documento"
+                "div",
+                { className: "form-group offset-1" },
+                React.createElement(
+                  "div",
+                  null,
+                  React.createElement(
+                    "label",
+                    {
+                      htmlFor: "tipoEmail",
+                      className: "col-form-label smallFont"
+                    },
+                    "Tipo de documento:"
+                  )
+                ),
+                React.createElement(
+                  "div",
+                  { className: "lessPadding" },
+                  React.createElement(DropDownContent, {
+                    list: this.state.listTipoDoc,
+                    className: "input-background-color lessPadding form-control",
+                    id: "tipoDoc",
+                    name: "tipoDoc",
+                    idObject: "POV_COD_TDO",
+                    nameObject: "POV_DES_TDO",
+                    typeValue: "id",
+                    defaultValue: this.state.identifier.DOCUMTIP,
+                    onResult: this._handleResults,
+                    disabled: true
+                  })
+                )
               ),
               React.createElement(
-                "form",
-                { noValidate: true, onSubmit: this.props.onSubmit },
+                "div",
+                { className: "form-group offset-1" },
                 React.createElement(
                   "div",
-                  { className: "form-group offset-1" },
+                  null,
                   React.createElement(
-                    "div",
-                    { className: "w-100" },
-                    React.createElement(
-                      "label",
-                      {
-                        htmlFor: "tipoEmail",
-                        className: "col-md-7 col-lg-4 col-form-label"
-                      },
-                      "Tipo de Doc:"
-                    )
-                  ),
-                  React.createElement(
-                    "div",
-                    { className: "col-md-11" },
-                    React.createElement(DropDownContent, {
-                      list: this.state.listTipoDoc,
-                      className: "input-background-color form-control",
-                      id: "tipoDoc",
-                      name: "tipoDoc",
-                      idObject: "POV_COD_TDO",
-                      nameObject: "POV_DES_TDO",
-                      typeValue: "id",
-                      defaultValue: this.state.identifier.DOCUMTIP,
-                      onResult: this._handleResults,
-                      disabled: true
-                    })
-                  )
-                ),
-                React.createElement(
-                  "div",
-                  { className: "form-group offset-1" },
-                  React.createElement(
-                    "div",
-                    { className: "w-100" },
-                    React.createElement(
-                      "label",
-                      {
-                        htmlFor: "doc",
-                        className: "col-md-7 col-lg-4 col-form-label"
-                      },
-                      "Nro de Doc:"
-                    )
-                  ),
-                  React.createElement(
-                    "div",
-                    { className: "col-md-11" },
-                    React.createElement(InputMaskValidation, {
-                      id: "nroDoc",
-                      name: "nroDoc",
-                      type: "nroDoc",
-                      autoFocus: true,
-                      requiredStr: "DNI requerido",
-                      charactersStr: "",
-                      invalidStr: "El campo no tiene formato",
-                      className: "input-background-color form-control",
-                      mask: this._handleMaskDni(),
-                      alwaysShowMask: true,
-                      onResult: this._handleResults
-                    })
-                  ),
-                  React.createElement("br", null),
-                  React.createElement(
-                    "div",
-                    { className: "col-md-4 offset-6 offset-sm-8 offset-md-4 offset-lg-7" },
-                    this.props.isSubmitting && React.createElement(Loader, null),
-                    React.createElement(
-                      "button",
-                      _defineProperty({
-                        type: "submit",
-                        id: "btn-submit",
-                        className: "btn btn-primary btn-hsbc",
-                        disabled: submitDisabled
-                      }, "className", "btn btn-primary btn-hsbc " + (submitDisabled ? "disabled" : "")),
-                      this.props.isSubmitting ? "Ingresando" : "Ingresar"
-                    )
-                  )
-                ),
-                React.createElement(
-                  "div",
-                  { className: "small mt-5" },
-                  "\xBFNuevo en HSBC Seguros Online?",
-                  React.createElement(
-                    "a",
+                    "label",
                     {
+                      htmlFor: "doc",
+                      className: "col-form-label smallFont"
+                    },
+                    "Documento:"
+                  )
+                ),
+                React.createElement(
+                  "div",
+                  { className: "lessPadding" },
+                  React.createElement(InputMaskValidation, {
+                    id: "nroDoc",
+                    name: "nroDoc",
+                    type: "nroDoc",
+                    autoFocus: true,
+                    requiredStr: "DNI requerido",
+                    charactersStr: "",
+                    invalidStr: "El campo no tiene formato",
+                    className: "input-background-color lessPadding form-control",
+                    mask: this._handleMaskDni(),
+                    alwaysShowMask: true,
+                    onResult: this._handleResults
+                  })
+                ),
+                React.createElement("br", null),
+                React.createElement("br", null),
+                React.createElement(
+                  "div",
+                  null,
+                  this.props.isSubmitting && React.createElement(Loader, null),
+                  React.createElement(
+                    "button",
+                    _defineProperty({
                       type: "submit",
-                      className: "btn btn-link link p-1",
-                      onClick: this.props.register },
-                    "Registrar"
-                  )
-                ),
-                React.createElement(
-                  "div",
-                  { className: "pt-0" },
-                  React.createElement(
-                    "a",
-                    {
-                      href: "#",
-                      className: "btn btn-link link p-0",
-                      onClick: this.props.knowMore },
-                    "Conoce m\xE1s"
+                      id: "btn-submit",
+                      className: "btn btn-primary btn-hsbc",
+                      disabled: submitDisabled
+                    }, "className", "btn hsbc-btn-red " + (submitDisabled ? "disabled" : "")),
+                    this.props.isSubmitting ? "Iniciando Sesion" : "Iniciar Sesion"
                   )
                 )
               )

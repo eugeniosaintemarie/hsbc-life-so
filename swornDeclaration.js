@@ -285,7 +285,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
                   React.createElement(
                     "a",
                     { className: " btn btn-danger m-1 text-white d-flex justify-content-center align-items-center",
-                      href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/Declaracion Jurada I.pdf",
+                      href: "/seguros-gateway/getPDF/Declaracion Jurada I.pdf",
                       download: true,
                       target: "_blank",
                       type: "button"
@@ -359,7 +359,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
                   React.createElement(
                     "a",
                     { className: " btn btn-danger m-1 text-white d-flex justify-content-center align-items-center",
-                      href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/Declaracion Jurada II.pdf",
+                      href: "/seguros-gateway/getPDF/Declaracion Jurada II.pdf",
                       download: true,
                       target: "_blank",
                       type: "button"

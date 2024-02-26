@@ -26,15 +26,9 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
           previusForm: previusForm,
           product: form
         }, viewsToFalse), function () {});
-        if (form.appointBeneficiary) {
-          _this.setState({ showAppointBeneficiary: true });
-        }
 
         if (form.additionRequest) {
           _this.setState({ showAdditionRequest: true });
-        }
-        if (form.additionRequestColectivo) {
-          _this.setState({ showAdditionRequestColectivo: true });
         }
       };
 
@@ -62,6 +56,15 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
         var viewsToFalse = _this.setToFalse();
         _this.setState(Object.assign({}, currentState, viewsToFalse, {
           showAdditionRequestColectivo: !current
+        }));
+      };
+
+      _this._handleShowAdditionFormModify = function () {
+        var current = _this.state.showAdditionFormModify;
+        var currentState = _this.state;
+        var viewsToFalse = _this.setToFalse();
+        _this.setState(Object.assign({}, currentState, viewsToFalse, {
+          showAdditionFormModify: !current
         }));
       };
 
@@ -234,6 +237,15 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
         }));
       };
 
+      _this._handleShowConstAltasTempranas = function () {
+        var current = _this.state.showConstAltasTempranas;
+        var currentState = _this.state;
+        var viewsToFalse = _this.setToFalse();
+        _this.setState(Object.assign({}, currentState, viewsToFalse, {
+          showConstAltasTempranas: !current
+        }));
+      };
+
       _this._handleShowPrintedByMail = function () {
         var current = _this.state.showPrintedByMail;
         var currentState = _this.state;
@@ -370,6 +382,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
           showAltasTempranas: false,
           showAccountState: false,
           showDropRequest: false,
+          showConstAltasTempranas: false,
           showCopyPolicy: false,
           showNomina: false,
           showMoreInformation: false,
@@ -388,6 +401,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
           showDdbenCrudMenu: false,
           showAdditionRequest: false,
           showAdditionRequestColectivo: false,
+          showAdditionFormModify: false,
           showListaEmpleadosRetiro: false,
           showConsultaNomina: false,
           showConsultaBeneficiary: false,
@@ -416,103 +430,95 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
           _this.userService.getCustomerProducts().then(function (data) {
             _this.userService.buscarClientes().then(function (productsCollective) {
               _this.segurosOnlineService.getBuscarPrecarga().then(function (productsNotIssued) {
-                _this.segurosOnlineService.recuperarBeneficiarios({}).then(function (beneficiarios) {
-                  _this.retiroNominaService.recuperarNominaEmpleados({}).then(function (aggregates) {
-                    _this.segurosOnlineService.getPolXEmailMasivo({}).then(function (response) {
-                      _this.segurosOnlineService.getPEPLowRisk({}).then(function (pep) {
-                        if (beneficiarios.Code === "NO_ERROR" || aggregates.Code === "NO_ERROR") {
-                          var beneficiaryForm = beneficiarios.Message.REGS.REG;
-                          var aggregatesForm = aggregates.Message.REGS.REG;
-                          beneficiaryForm.map(function (beneficiaryData) {
-                            myForms.push(beneficiaryData);
-                          });
-                          aggregatesForm.map(function (aggregatesData) {
-                            myForms.push(aggregatesData);
-                          });
-                        }
-                        _this.setState({
-                          misformularios: myForms,
-                          productNotIssued: productsNotIssued
+                _this.segurosOnlineService.getProdColAseg({}).then(function (productsUnificados) {
+                  _this.segurosOnlineService.getPolXEmailMasivo({}).then(function (response) {
+                    _this.segurosOnlineService.getPEPLowRisk({}).then(function (pep) {
+                      if (productsUnificados.Code === "NO_ERROR") {
+                        var productsForm = productsUnificados.Message.REGS.REG;
+
+                        productsForm.map(function (productData) {
+                          myForms.push(productData);
                         });
-                        var products = data;
-                        var product = {};
-                        if (products && products.productosIndividuales && products.productosIndividuales.length > 0) {
-                          product = products.productosIndividuales[0];
-                        } else if (productsCollective && productsCollective.length > 0) {
-                          product = productsCollective[0];
-                        } else if (productsNotIssued && productsNotIssued.length > 0) {
-                          product = productsNotIssued[0];
-                        } else if (beneficiarios.Message.REGS.REG && beneficiarios.Message.REGS.REG.length > 0) {
-                          var productData = beneficiarios.Message.REGS.REG[0];
-                          var detalle = productData.COD_PRO + "-" + productData.POL_ANN.toString().padStart(2, "0") + "-" + productData.POL_SEC.toString().padStart(6, "0") + " -" + productData.CER_POL.toString().padStart(4, "0") + "-" + productData.CER_ANN.toString().padStart(4, "0") + "-" + productData.CER_SEC.toString().padStart(6, "0");
-                          var productdetails = Object.assign({}, productData, { NROPOLIZA: detalle });
-                          product = { detalle: productdetails, appointBeneficiary: true };
-                          _this.setState({ showAppointBeneficiary: true });
-                        } else if (myForms && myForms.length > 0) {
-                          var nroPol = myForms[0].COD_PRO + "-" + myForms[0].POL_ANN.toString().padStart(2, "0") + "-" + myForms[0].POL_SEC.toString().padStart(6, "0") + " -" + myForms[0].CER_POL.toString().padStart(4, "0") + "-" + myForms[0].CER_ANN.toString().padStart(4, "0") + "-" + myForms[0].CER_SEC.toString().padStart(6, "0");
-                          _this.setState({ showAdditionRequest: true });
-                          product = {
-                            additionRequest: true,
-                            detalle: Object.assign({
-                              NROPOLIZA: nroPol
-                            }, myForms[0])
+                      }
+
+                      _this.setState({
+                        misformularios: myForms,
+                        productNotIssued: productsNotIssued
+                      });
+
+                      var products = data;
+                      var product = {};
+
+                      if (products && products.productosIndividuales && products.productosIndividuales.length > 0) {
+                        product = products.productosIndividuales[0];
+                      } else if (productsCollective && productsCollective.length > 0) {
+                        product = productsCollective[0];
+                      } else if (productsNotIssued && productsNotIssued.length > 0) {
+                        product = productsNotIssued[0];
+                      } else if (myForms && myForms.length > 0) {
+                        var nroPol = myForms[0].COD_PRO + "-" + myForms[0].POL_ANN.toString().padStart(2, "0") + "-" + myForms[0].POL_SEC.toString().padStart(6, "0") + " -" + myForms[0].CER_POL.toString().padStart(4, "0") + "-" + myForms[0].CER_ANN.toString().padStart(4, "0") + "-" + myForms[0].CER_SEC.toString().padStart(6, "0");
+
+                        product = {
+                          additionRequest: true,
+                          detalle: Object.assign({
+                            NROPOLIZA: nroPol
+                          }, myForms[0])
+                        };
+                      }
+
+                      if (response.Code === "NO_ERROR" && pep.Message.REGS.REG[0].PLR_PED === 'N') {
+                        if (products && products.productosIndividuales && products.productosIndividuales.length > 0 && products.productosIndividuales.length <= 10) {
+                          if (response.Code === "NO_ERROR" && response.Message.REGS.REG[0].PXM_PED === 'S') {
+                            //Verifica que todas las polizas tengas un mail asociado
+                            var list = products.productosIndividuales;
+                            _this._verificarMailPolizas(list, function (tienenEmail) {
+                              if (tienenEmail) {
+                                _this.segurosOnlineService.setPolXEmailMasivo({ COD_EST: 'H' });
+                              } else {
+                                _this.setState({
+                                  showModal: true,
+                                  modal: {
+                                    title: "",
+                                    component: React.createElement(MailOnboarding, { email: user.MAIL, listPol: list, handleClose: _this._handleModalIsOpen }),
+                                    contentHTML: '',
+                                    html: false,
+                                    size: "xl",
+                                    responseModal: null,
+                                    hiddenButtonClose: true
+                                  }
+                                });
+                              }
+                            });
                           };
-                        }
-
-                        if (response.Code === "NO_ERROR" && pep.Message.REGS.REG[0].PLR_PED === 'N') {
-                          if (products && products.productosIndividuales && products.productosIndividuales.length > 0 && products.productosIndividuales.length <= 10) {
-                            if (response.Code === "NO_ERROR" && response.Message.REGS.REG[0].PXM_PED === 'S') {
-                              //Verifica que todas las polizas tengas un mail asociado
-                              var list = products.productosIndividuales;
-                              _this._verificarMailPolizas(list, function (tienenEmail) {
-                                if (tienenEmail) {
-                                  _this.segurosOnlineService.setPolXEmailMasivo({ COD_EST: 'H' });
-                                } else {
-                                  _this.setState({
-                                    showModal: true,
-                                    modal: {
-                                      title: "",
-                                      component: React.createElement(MailOnboarding, { email: user.MAIL, listPol: list, handleClose: _this._handleModalIsOpen }),
-                                      contentHTML: '',
-                                      html: false,
-                                      size: "xl",
-                                      responseModal: null,
-                                      hiddenButtonClose: true
-                                    }
-                                  });
-                                }
-                              });
-                            };
-                          } else {
-                            _this.segurosOnlineService.setPolXEmailMasivo({ COD_EST: 'A' });
-                          }
                         } else {
-                          _this.setState({
-                            showModal: true,
-                            modal: {
-                              title: "",
-                              component: React.createElement(ModalPepLowRisk, { doc: {
-                                  tipoDoc: user.TIPODOCU, nroDoc: user.NUMEDOCU
-                                },
-                                email: user.MAIL,
-                                listPol: products.productosIndividuales,
-                                handleClose: _this._handleModalIsOpen }),
-                              contentHTML: '',
-                              html: false,
-                              size: "xl",
-                              responseModal: null,
-                              hiddenButtonClose: true
-                            }
-                          });
+                          _this.segurosOnlineService.setPolXEmailMasivo({ COD_EST: 'A' });
                         }
-
-                        _this.isLoaded = true;
-                        _this.props.setCurrentProduct(product);
+                      } else {
                         _this.setState({
-                          user: user,
-                          products: products,
-                          product: product
+                          showModal: true,
+                          modal: {
+                            title: "",
+                            component: React.createElement(ModalPepLowRisk, { doc: {
+                                tipoDoc: user.TIPODOCU, nroDoc: user.NUMEDOCU
+                              },
+                              email: user.MAIL,
+                              listPol: products.productosIndividuales,
+                              handleClose: _this._handleModalIsOpen }),
+                            contentHTML: '',
+                            html: false,
+                            size: "xl",
+                            responseModal: null,
+                            hiddenButtonClose: true
+                          }
                         });
+                      }
+
+                      _this.isLoaded = true;
+                      _this.props.setCurrentProduct(product);
+                      _this.setState({
+                        user: user,
+                        products: products,
+                        product: product
                       });
                     });
                   });
@@ -531,6 +537,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
         user: null,
         showAccountState: false,
         showDropRequest: false,
+        showConstAltasTempranas: false,
         showCopyPolicy: false,
         showNomina: false,
         showMoreInformation: false,
@@ -553,6 +560,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
         showDdbenCrudMenu: false,
         showAdditionRequest: false,
         showAdditionRequestColectivo: false,
+        showAdditionFormModify: false,
         misformularios: null,
         showAdditionManager: false,
         showAdditionManagerColectivo: false,
@@ -685,6 +693,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
                       handleShowPrintAccountStatus: this._handleShowPrintAccountStatus,
                       handleShowAccountState: this._handleShowAccountState,
                       handleShowDropRequest: this._handleShowDropRequest,
+                      handleShowConstAltasTempranas: this._handleShowConstAltasTempranas,
                       handleShowCopyPolicy: this._handleShowCopyPolicy,
                       handleShowPayments: this._handleShowPayments,
                       handleShowSiniestros: this._handleShowSiniestros,
@@ -701,6 +710,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
                       showMore: this.state.showMoreInformation,
                       showAccountState: this.state.showAccountState,
                       showDropRequest: this.state.showDropRequest,
+                      showConstAltasTempranas: this.state.showConstAltasTempranas,
                       showCopyPolicy: this.state.showCopyPolicy,
                       showPrintAccountStatus: this.state.showPrintAccountStatus,
                       showPayments: this.state.showPayments,
@@ -730,6 +740,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
                       showAdditionRequest: this.state.showAdditionRequest,
                       handleShowAdditionRequest: this._handleShowAdditionRequest,
                       showAdditionRequestColectivo: this.state.showAdditionRequestColectivo,
+                      showAdditionFormModify: this.state.showAdditionFormModify,
                       handleShowAdditionRequestColectivo: this._handleShowAdditionRequestColectivo,
                       handleShowListaEmpleadosRetiro: this._handleShowListaEmpleadosRetiro,
                       showListaEmpleadosRetiro: this.state.showListaEmpleadosRetiro,
@@ -741,6 +752,7 @@ define(["react", "react-redux", "../segurosOnline/login", "../common/navBar", ".
                       handleShowAdditionManager: this._handleShowAdditionManager,
                       showAdditionManagerColectivo: this.state.showAdditionManagerColectivo,
                       handleShowAdditionManagerColectivo: this._handleShowAdditionManagerColectivo,
+                      handleShowAdditionFormModify: this._handleShowAdditionFormModify,
                       user: this.state.user,
                       recoverPayrollEmployees: this.state.currentForm.detalle
                     })

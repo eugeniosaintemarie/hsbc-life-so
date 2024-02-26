@@ -201,7 +201,13 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           }
         };
         //Domicilio solicitante
-        regArray.push(this.setPerAddressRegData("S", "1", "1", "S", !formData.applicantProvince.id ? "0" : formData.applicantProvince.id, formData.applicantLocality.value, formData.applicantStreet.value, formData.applicantNumber.value, formData.applicantFloor.value, formData.applicantDepartment.value, !formData.applicantCP.value ? "0" : formData.applicantCP.value, "", "", formData.applicantAreaTel.value, formData.applicantTelephone.value));
+
+        if (formData.isModify !== undefined && formData.isModify) {
+          regArray.push(this.setPerAddressRegData("S", "1", "1", "S", "", "", "", "", "", "", "", "", "", "", ""));
+        } else {
+          regArray.push(this.setPerAddressRegData("S", "1", "1", "S", !formData.applicantProvince.id ? "0" : formData.applicantProvince.id, formData.applicantLocality.value, formData.applicantStreet.value, formData.applicantNumber.value, formData.applicantFloor.value, formData.applicantDepartment.value, !formData.applicantCP.value ? "0" : formData.applicantCP.value, "", "", formData.applicantAreaTel.value, formData.applicantTelephone.value));
+        }
+
         //Domicilio tomador
         regArray.push(this.setPerAddressRegData("T", "1", "1", "S", "0", "", "", "", "", "", "0", "", "", "", ""));
         return Utils.json2xml(xmlFormat);
@@ -223,7 +229,13 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           }
         };
         //Datos solicitante
-        regArray.push(this.setPerGeneralRegData("S", "1", !formData.applicantTypeCCC.id ? "0" : formData.applicantTypeCCC.id, formData.applicantCuilNumber.value, formData.applicantSurname.value, formData.applicantName.value, Utils.formatFechaNumber(formData.applicantDateBirth.value), formData.applicantNationality ? formData.applicantNationality.id : "", "", formData.applicantGender ? formData.applicantGender.id : "", formData.applicantCivilStatus ? formData.applicantCivilStatus.id : "", formData.applicantEmail.value, "", !formData.applicantTypeCCC.id ? "0" : formData.applicantTypeCCC.id, formData.applicantCuilNumber.value, "", "", formData.applicantCityBorn ? formData.applicantCityBorn.value : "", formData.applicantIVA ? formData.applicantIVA.value : "", ""));
+
+        if (formData.isModify !== undefined && formData.isModify) {
+          regArray.push(this.setPerGeneralRegData("S", "1", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
+        } else {
+          regArray.push(this.setPerGeneralRegData("S", "1", !formData.applicantTypeCCC.id ? "0" : formData.applicantTypeCCC.id, formData.applicantCuilNumber.value, formData.applicantSurname.value, formData.applicantName.value, Utils.formatFechaNumber(formData.applicantDateBirth.value), formData.applicantNationality ? formData.applicantNationality.id : "", "", formData.applicantGender ? formData.applicantGender.id : "", formData.applicantCivilStatus ? formData.applicantCivilStatus.id : "", formData.applicantEmail.value, "", !formData.applicantTypeCCC.id ? "0" : formData.applicantTypeCCC.id, formData.applicantCuilNumber.value, "", "", formData.applicantCityBorn ? formData.applicantCityBorn.value : "", formData.applicantIVA ? formData.applicantIVA.value : "", ""));
+        }
+
         //Datos tomador
         regArray.push(this.setPerGeneralRegData("T", "1", "0", "", "", "", 0, "", "", "", "", "", "", "0", "", "", "", "", "", ""));
         //Datos conyuge
@@ -231,19 +243,23 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           regArray.push(this.setPerGeneralRegData("C", "1", "5", formData.applicantCUILConyuge.value, formData.applicantSurnameConyuge.value, formData.applicantNameConyuge.value, Utils.formatFechaNumber(formData.applicantDateBirthConyuge.value), formData.applicantNationalityConyuge ? formData.applicantNationalityConyuge.id : "", "", formData.applicantGenderConyuge ? formData.applicantGenderConyuge.id : "", "", formData.applicantEmailConyuge.value, "", "5", formData.applicantCUILConyuge.value, "", "", "", "", ""));
         }
         //Datos beneficiarios
-        if (formData.listBenef.list.length > 0) {
-          if (formData.listBenef.list[0].NOMINAS.BENEFORD) {
-            formData.listBenef.list.forEach(function (beneficiary, i) {
-              regArray.push(_this2.setPerGeneralRegData("B", i + 1, beneficiary.NOMINAS.TIPDOCBENE, beneficiary.NOMINAS.NUMDOCBENE, beneficiary.NOMINAS.APEBENE, beneficiary.NOMINAS.BENNOMBRE, beneficiary.NOMINAS.FNACIMIE, "", "0", "", "", beneficiary.NOMINAS.BENEMAIL, beneficiary.NOMINAS.RELBECOD, "", "", "", //Politicamente expuesta
-              "", beneficiary.NOMINAS.BENNUMTELEF, beneficiary.NOMINAS.BENEPORC, beneficiary.NOMINAS.BENEFORD));
-            });
-          } else {
-            formData.listBenef.list.forEach(function (beneficiary, i) {
-              regArray.push(_this2.setPerGeneralRegData("F", i + 1, beneficiary.NOMINAS.TIPDOCBENE, beneficiary.NOMINAS.NUMDOCBENE, beneficiary.NOMINAS.APEBENE, beneficiary.NOMINAS.BENNOMBRE, beneficiary.NOMINAS.FNACIMIE, "", "0", "", "", beneficiary.NOMINAS.BENEMAIL ? beneficiary.NOMINAS.BENEMAIL : "", "", "", "", "", //Politicamente expuesta
-              "", beneficiary.NOMINAS.RELBECOD, "", ""));
-            });
+
+        if (formData.isModify === undefined) {
+          if (formData.listBenef.list.length > 0) {
+            if (formData.listBenef.list[0].NOMINAS.BENEFORD) {
+              formData.listBenef.list.forEach(function (beneficiary, i) {
+                regArray.push(_this2.setPerGeneralRegData("B", i + 1, beneficiary.NOMINAS.TIPDOCBENE, beneficiary.NOMINAS.NUMDOCBENE, beneficiary.NOMINAS.APEBENE, beneficiary.NOMINAS.BENNOMBRE, beneficiary.NOMINAS.FNACIMIE, "", "0", "", "", beneficiary.NOMINAS.BENEMAIL, beneficiary.NOMINAS.RELBECOD, "", "", "", //Politicamente expuesta
+                "", beneficiary.NOMINAS.BENNUMTELEF, beneficiary.NOMINAS.BENEPORC, beneficiary.NOMINAS.BENEFORD));
+              });
+            } else {
+              formData.listBenef.list.forEach(function (beneficiary, i) {
+                regArray.push(_this2.setPerGeneralRegData("F", i + 1, beneficiary.NOMINAS.TIPDOCBENE, beneficiary.NOMINAS.NUMDOCBENE, beneficiary.NOMINAS.APEBENE, beneficiary.NOMINAS.BENNOMBRE, beneficiary.NOMINAS.FNACIMIE, "", "0", "", "", beneficiary.NOMINAS.BENEMAIL ? beneficiary.NOMINAS.BENEMAIL : "", "", "", "", "", //Politicamente expuesta
+                "", beneficiary.NOMINAS.RELBECOD, "", ""));
+              });
+            }
           }
         }
+
         return Utils.json2xml(xmlFormat);
       }
     }, {
@@ -269,7 +285,7 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           DA1_DOM: formData.formConyuge ? formData.formConyuge.id : "", //booleano conyuge vida colectivo
           DA1_FDE: 0,
           DA1_LOC: /* formData.applicantCBU ? formData.applicantCBU.id : ya no hay numero de cbu*/"",
-          DA1_PAI: "00",
+          DA1_PAI: formData.conyugeModify && formData.sumAsegModify ? formData.conyugeModify + formData.sumAsegModify : "00",
           DA2_FDE: 0,
           DA2_LOC: formData.applicantTitular ? this.setGroupsBurial(formData) : "",
           DA2_PAI: "00",
@@ -287,7 +303,7 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           EMP_ACT: formData.applicantOccupation ? formData.applicantOccupation.id : "", //codigo de ocupacion
           EMP_IME: formData.applicantSalary ? formData.applicantSalary.value : 0,
           EMP_NEG: "",
-          EMP_NOM: formData.applicantPlus ? formData.applicantPlus.value : product.CAPITMAX,
+          EMP_NOM: formData.applicantPlus ? formData.applicantPlus.value : formData.isModify !== undefined && formData.isModify ? "0" : product.GCAPIMAX,
           EMP_ROL: formData.salary ? formData.salary.id : 0,
           EMP_STA: "",
           FAT_CRE: "",
@@ -324,9 +340,10 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
           TCE_PRE: "",
           TIP_COB: "",
           TIP_COT: 0,
-          TIP_IVA: formData.listBenef.list.length ? 2 : 1, //tipo de beneficiario
+          TIP_IVA: formData.listBenef === undefined ? 0 : formData.listBenef.list.length ? 2 : 1, //tipo de beneficiario
           TIP_PER: "00",
           TIP_REN: "P",
+          TIP_SOL: product.TIP_SOL,
           TIP_TAS: formData.applicantRequisito ? formData.applicantRequisito : "",
           TIT_COD: "",
           TIT_DOT: "",
@@ -359,6 +376,21 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
       key: "getDatosPoliza",
       value: function getDatosPoliza(POL_SEC, POL_ANN, COD_PRO, callBack) {
         this.retiroNominaService.getDatosPoliza({
+          COD_PRO: COD_PRO,
+          POL_ANN: POL_ANN,
+          POL_SEC: POL_SEC
+        }).then(function (data) {
+          if (!(!data || !data.Message)) {
+            callBack(data);
+          } else {
+            callBack("ERROR");
+          }
+        });
+      }
+    }, {
+      key: "getPolizaAseg",
+      value: function getPolizaAseg(POL_SEC, POL_ANN, COD_PRO, callBack) {
+        this.retiroNominaService.getPolizaAseg({
           COD_PRO: COD_PRO,
           POL_ANN: POL_ANN,
           POL_SEC: POL_SEC
@@ -455,6 +487,7 @@ define(["react", "../lib/utils", "../services/retiroNominaService", "../services
       key: "getMotivosBaja",
       value: function getMotivosBaja(callBack) {
         var currentProduct = this.segurosData.currentProduct;
+
         this.segurosOnlineService.getMotivosBaja({
           TIP_PRO: currentProduct.detalle.TIPOPRODU || currentProduct.TIPOPRODU
         }).then(function (data) {

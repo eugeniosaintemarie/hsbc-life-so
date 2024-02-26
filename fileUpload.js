@@ -1,12 +1,14 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "loadsh", "../../common/messageComponent", "../../common/modalReactBootstrap", "../../common/inputFile2", "../../controller/nominaController", "../../controller/retiroNominaController", "../../controller/vidaColectivoController", "../../common/errorExcel", "../../common/buttonLoading", "../../redux/store"], function (React, Loadsh, MessageComponent, ModalReactBootstrap, InputFile2, NominaController, RetiroNominaController, VidaColectivoController, ErrorExcel, ButtonLoading, Store) {
+define(["react", "loadsh", "../../common/messageComponent", "../../common/modalReactBootstrap", "../../common/inputFile2", "../../common/dropdownContent.js", "../../controller/nominaController", "../../controller/retiroNominaController", "../../controller/vidaColectivoController", "../../common/errorExcel", "../../common/buttonLoading", "../../redux/store"], function (React, Loadsh, MessageComponent, ModalReactBootstrap, InputFile2, DropDownContent, NominaController, RetiroNominaController, VidaColectivoController, ErrorExcel, ButtonLoading, Store) {
   var FileUpload = function (_React$Component) {
     _inherits(FileUpload, _React$Component);
 
@@ -17,13 +19,25 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
 
       _this._handleModalIsOpen = function (e) {
         var current = _this.state.showModal;
+
         _this.setState({
           showModal: !current
         });
       };
 
+      _this._handleResults = function (id, result) {
+        var _this$setState;
+
+        var groupSelected = _this.state.gruposPrimarios.find(function (grupo) {
+          return Number(grupo.GRUPOCOD) === Number(result.id);
+        });
+
+        _this.setState((_this$setState = {}, _defineProperty(_this$setState, id, result), _defineProperty(_this$setState, "showGroup", true), _defineProperty(_this$setState, "groupSelectedName", result.value), _defineProperty(_this$setState, "groupSelected", groupSelected), _this$setState));
+      };
+
       _this._handleButtonCancel = function () {
         _this.setState({ listExcel: [], filename: "" });
+
         _this.fileExcel = null;
         _this.props.handleShowMain();
       };
@@ -32,19 +46,24 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
         var target = oInput.target;
         var _validFileExtensions = [".xls", ".xlsx"];
         var listFiles = oInput.target.files;
+
         if (listFiles.length == 1) {
           var file = listFiles[0];
           var fileName = file.name;
           _this.setState({ filename: fileName });
+
           if (fileName.length > 0) {
             var blnValid = false;
+
             for (var j = 0; j < _validFileExtensions.length; j++) {
               var sCurExtension = _validFileExtensions[j];
+
               if (fileName.substr(fileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
                 blnValid = true;
                 break;
               }
             }
+
             if (blnValid) {
               _this.fileExcel = file;
               target.value = "";
@@ -59,7 +78,9 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
                   size: "md"
                 }
               });
+
               target.value = "";
+
               return false;
             }
           }
@@ -68,13 +89,26 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
 
       _this._handleButtonProcess = function () {
         var numberOfFields = _this.state.salaryField ? 6 : 5;
+
         if (_this.fileExcel == null) {
           _this.setState({
             showModal: true,
             modal: {
-              contentHTML: "",
-              html: false,
-              title: "Debe seleccionar algun archivo para continuar",
+              component: null,
+              contentHTML: "Debe seleccionar algún archivo para continuar",
+              html: true,
+              title: "Validacion",
+              size: "md"
+            }
+          });
+        } else if (_this.state.group == null || _this.state.group == undefined) {
+          _this.setState({
+            showModal: true,
+            modal: {
+              component: null,
+              contentHTML: "Debe seleccionar algún grupo para continuar",
+              html: true,
+              title: "Validacion",
               size: "md"
             }
           });
@@ -91,13 +125,15 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
                   size: "md"
                 }
               });
+
               _this.setState({
                 listExcel: []
               });
             }
+
             _this.vidaColectivoController.getDatosPoliza(_this.props.product.POLIZSEC, _this.props.product.POLIZANN, _this.props.product.RAMOPCOD, function (callBack) {
-              var edadMin = callBack.Message.DATOS.EDADMING;
-              var edadMax = callBack.Message.DATOS.EDADMAXG;
+              var edadMin = _this.state.groupSelected.GEDADMIN;
+              var edadMax = _this.state.groupSelected.GEDADMAX;
               _this.nominaController.validateField(list, numberOfFields, _this.state.salaryField, edadMin, edadMax, function (listError) {
                 _this.setState({
                   fileError: listError.length,
@@ -116,7 +152,8 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
               }, function (listOK) {
                 _this.setState({
                   listExcel: listOK,
-                  validation: false
+                  validation: false,
+                  showButton: true
                 });
               });
             });
@@ -166,6 +203,11 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
                   null,
                   "Fecha de Nacimiento"
                 ),
+                _this.state.showGroup && React.createElement(
+                  "th",
+                  null,
+                  "Grupo"
+                ),
                 _this.state.salaryField && React.createElement(
                   "th",
                   null,
@@ -205,12 +247,17 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
                     null,
                     e.FECHA_DE_NACIMIENTO
                   ),
+                  _this.state.showGroup && React.createElement(
+                    "td",
+                    null,
+                    _this.state.groupSelectedName
+                  ),
                   _this.state.salaryField && React.createElement(
                     "td",
                     null,
                     e.SUELDO
                   ),
-                  _this.state.validation && (e.VALIDACION ? _this._caseValidationResult(e) : React.createElement(
+                  _this.state.validation && (e.VALIDACION ? (console.log(e.VALIDACION), _this._caseValidationResult(e)) : React.createElement(
                     "td",
                     null,
                     React.createElement("div", {
@@ -298,7 +345,9 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
         _this.setState({
           validation: true
         });
+
         var listExcelClon = Loadsh.cloneDeep(_this.state.listExcel);
+
         _this.nominaController.validateNominaAdhesion(listExcelClon, function (fielProcess) {
           _this.setState({
             listExcel: listExcelClon
@@ -308,10 +357,15 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
 
       _this._handleSendMailButton = function () {
         var listToSend = [];
+
         _this.state.listExcel.map(function (item) {
           if (item.VALIDACION != "MAILOK" && item.VALIDACION != "YAEXIST" && item.VALIDACION != "NOEXIST" && item.VALIDACION != "NODESIGNA") listToSend.push(item);
         });
+
         if (listToSend.length > 0) _this.setState({ enviarLoading: true });
+
+        _this.props.product.group = _this.state.groupSelected.GRUPOCOD;
+
         _this.retiroNominaController.sendNomina(listToSend, _this.props.product, function (errors) {
           if (errors.length == 0 && listToSend.length != 0) _this.setState({ showSuccessMsg: true, enviarLoading: false });else if (errors.length != 0 && listToSend.length != 0) _this.setState({ showErrorsMsg: true, enviarLoading: false });
         }, _this.props.user, "VIDCOL");
@@ -319,14 +373,20 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
 
       _this._handleRestartButton = function () {
         _this.setState({ showSuccessMsg: false, listExcel: [], filename: "" });
+
         _this.fileExcel = null;
         _this.props.handleShowMain();
       };
 
       _this.state = {
         listExcel: [],
+        gruposPrimarios: [],
+        showGroup: false,
+        groupSelectedName: "",
+        groupSelected: "",
         filename: "",
         validation: false,
+        showButton: false,
         salaryField: false,
         validProduct: false,
         showSuccessMsg: false,
@@ -341,6 +401,7 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
           size: "md"
         }
       };
+
       _this.fileExcel = null;
       _this.nominaController = new NominaController();
       _this.retiroNominaController = new RetiroNominaController();
@@ -374,31 +435,62 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
             React.Fragment,
             null,
             React.createElement(
-              "em",
-              null,
-              "Seleccion\xE1 el archivo de la nomina de asegurados que deseas ingresar"
-            ),
-            React.createElement(
               "div",
-              { className: "container" },
+              { className: "d-lg-flex align-items-center" },
               React.createElement(
                 "div",
-                { className: "col-md-12" },
+                { className: "col-md-9 pl-0" },
+                React.createElement(
+                  "em",
+                  null,
+                  "1. Seleccion\xE1 el archivo de la nomina de asegurados que deseas ingresar"
+                ),
                 React.createElement(
                   "div",
-                  { className: "custom-file col-md-5" },
-                  React.createElement(InputFile2 //carga de archivo
-                  , { onChange: this.fileChangedHandler,
-                    filename: this.state.filename
-                  })
+                  { className: "container" },
+                  React.createElement(
+                    "div",
+                    { className: "col-md-12 pl-0" },
+                    React.createElement(
+                      "div",
+                      { className: "custom-file col-md-7" },
+                      React.createElement(InputFile2 //carga de archivo
+                      , { onChange: this.fileChangedHandler,
+                        filename: this.state.filename
+                      })
+                    )
+                  )
                 ),
+                React.createElement(
+                  "em",
+                  null,
+                  "2. indic\xE1 a que grupo de facturaci\xF3n corresponde a la nomina que estas cargando"
+                ),
+                React.createElement(
+                  "div",
+                  { className: "container" },
+                  React.createElement(DropDownContent, {
+                    list: this.state.gruposPrimarios,
+                    className: "form-control col-md-7",
+                    id: "group",
+                    name: "group",
+                    idObject: "GRUPOCOD",
+                    nameObject: "GRUPODES",
+                    showPlaceHolder: true,
+                    placeHolder: "Seleccione...",
+                    onResult: this._handleResults })
+                )
+              ),
+              React.createElement(
+                "div",
+                { className: "col-md-6 mt-md-0 mt-3 pl-0" },
                 React.createElement(
                   "button",
                   {
-                    className: "ml-3 btn btn-hsbc mt-2",
+                    className: "btn btn-hsbc mt-2",
                     onClick: this._handleButtonProcess
                   },
-                  "Procesar"
+                  "Procesar nomina"
                 )
               )
             ),
@@ -452,7 +544,7 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
             React.createElement(
               "div",
               { className: "row justify-content-md-center mt-2" },
-              this.state.listExcel.length > 0 && (!this.state.validation ? React.createElement(
+              this.state.listExcel.length > 0 && this.state.showGroup && this.state.showButton && (!this.state.validation ? React.createElement(
                 "button",
                 {
                   className: "btn btn btn-danger border-dark right mt-2 mr-3",
@@ -491,14 +583,37 @@ define(["react", "loadsh", "../../common/messageComponent", "../../common/modalR
         );
       }
     }, {
+      key: "componentDidUpdate",
+      value: function componentDidUpdate(prevProps, prevState) {
+        if (this.state.group && this.state.group !== prevState.group || this.state.filename !== prevState.filename) {
+          this.setState({
+            showButton: false,
+            validation: false
+          });
+        }
+      }
+    }, {
       key: "componentDidMount",
       value: function componentDidMount() {
+        var _this2 = this;
+
         if (this.props.product.RAMOPTVC == "MS" || this.props.product.RAMOPTVC == "EC" || this.props.product.RAMOPTVC == "CU" || this.props.product.RAMOPTVC == "SE" || this.props.product.RAMOPTVC == "AP") {
           this.setState({ validProduct: true });
         }
+
         if (this.props.product.RAMOPTVC == "MS") {
           this.setState({ salaryField: true });
         }
+
+        this.vidaColectivoController.getDatosPoliza(this.props.product.POLIZSEC, this.props.product.POLIZANN, this.props.product.RAMOPCOD, function (data) {
+          var filterGrupos = data.Message.DATOS.GRUPOS.GRUPO.filter(function (e) {
+            return e.GRUPOTIP === "P";
+          });
+
+          _this2.setState({
+            gruposPrimarios: filterGrupos
+          });
+        });
       }
     }]);
 

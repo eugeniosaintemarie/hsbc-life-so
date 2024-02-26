@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../services/userService", "../lib/utils", "../common/datepicker", "../services/segurosOnlineService", "../common/modalReactBootstrap", "../redux/store", "../common/fileManager", "./nominas/tablaNomina", "../common/loader", "../common/buttonLoading", "../controller/nominaController", "./altasTempranas.js"], function (React, UserService, Utils, DatePicker, SegurosOnlineService, ModalReactBootstrap, Store, FileManager, TablaNomina, Loader, ButtonLoading, NominaController, AltasTempranas) {
+define(["react", "../services/userService", "../lib/utils", "../common/datepicker", "../services/segurosOnlineService", "../common/modalReactBootstrap", "../redux/store", "../common/fileManager", "./nominas/tablaNomina", "../common/loader", "../common/buttonLoading", "../controller/nominaController", "./altasTempranas.js", "./consultaNovedades.js"], function (React, UserService, Utils, DatePicker, SegurosOnlineService, ModalReactBootstrap, Store, FileManager, TablaNomina, Loader, ButtonLoading, NominaController, AltasTempranas, ConsultaNovedades) {
   var Nomina = function (_React$Component) {
     _inherits(Nomina, _React$Component);
 
@@ -24,9 +24,11 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
 
       _this._handlerLoadListChecked = function () {
         var lista = [];
+
         for (var index = 0; index < _this.state.nominas.ASEGURADOS.length; index++) {
           lista.push({ isChecked: false });
-        }
+        };
+
         _this.setState({ listChecked: lista });
       };
 
@@ -34,8 +36,19 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
         var current = _this.state.showAltasTempranas;
         var currentState = _this.state;
         var viewsToFalse = _this.props.setToFalse;
+
         _this.setState(Object.assign({}, currentState, viewsToFalse, {
           showAltasTempranas: !current
+        }));
+      };
+
+      _this._handleShowNovedades = function () {
+        var current = _this.state.showNovedades;
+        var currentState = _this.state;
+        var viewsToFalse = _this.props.setToFalse;
+
+        _this.setState(Object.assign({}, currentState, viewsToFalse, {
+          showNovedades: !current
         }));
       };
 
@@ -108,7 +121,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
           var filename = 'nomina de asegurados.pdf';
           var fileManager = new FileManager();
 
-          var resultDownload = fileManagerPDF(data, filename);
+          var resultDownload = fileManager.downloadPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({
@@ -202,7 +215,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
                 }).then(function (data) {
                   var filename = 'Certificado Incorporacion - ' + detalle.NROPOLIZA + '.pdf';
                   var fileManager = new FileManager();
-                  if (fileManagerPDF(data, filename)) {
+                  if (fileManager.downloadPDF(data, filename)) {
                     resolve();
                   } else _this._downloadFailed();
                 });
@@ -244,7 +257,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
           var filename = detalle.NROPOLIZA + '.pdf';
           var fileManager = new FileManager();
 
-          var resultDownload = fileManagerPDF(data, filename);
+          var resultDownload = fileManager.downloadPDF(data, filename);
 
           if (!resultDownload) {
             _this.setState({
@@ -323,8 +336,10 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
         showAsegurados: false,
         showAltaTemprana: false,
         showAltasTempranas: false,
+        showNovedades: false,
         detalleEndosos: {},
         listChecked: [],
+        listNovedades: [],
         modal: {
           title: "",
           component: null,
@@ -374,8 +389,9 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
         return React.createElement(
           React.Fragment,
           null,
-          this.state.showAltasTempranas && React.createElement(AltasTempranas, { goToNomina: this._handleShowAltasTempranas, nroPoliza: this.props.nroPoliza, nroDocu: this.state.nroDocumento, tipoDocumento: this.state.tipoDocumento, nroEndoso: this.props.nroEndoso, asegurados: this.state.nominas.ASEGURADOS }),
-          !this.state.showAltasTempranas && React.createElement(
+          this.state.showAltasTempranas && React.createElement(AltasTempranas, { isTomador: false, goToNomina: this._handleShowAltasTempranas, nroPoliza: this.props.nroPoliza, nroDocu: this.state.nroDocumento, tipoDocumento: this.state.tipoDocumento, nroEndoso: this.props.nroEndoso, asegurados: this.state.nominas.ASEGURADOS }),
+          this.state.showNovedades && React.createElement(ConsultaNovedades, { goToNomina: this._handleShowNovedades, listNovedades: this.state.listNovedades, nroPoliza: this.props.nroPoliza }),
+          !this.state.showAltasTempranas && !this.state.showNovedades && React.createElement(
             React.Fragment,
             null,
             React.createElement(
@@ -452,7 +468,7 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
                   )
                 )
               ),
-              !this.props.reqSeguimiento && !this.state.showAltasTempranas && React.createElement(
+              !this.props.reqSeguimiento && !this.state.showAltasTempranas && !this.state.showNovedades && React.createElement(
                 React.Fragment,
                 null,
                 React.createElement(
@@ -534,13 +550,37 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
                         loading: this.state.nominaLoading },
                       "Certificado de N\xF3mina Completa"
                     )
+                  ),
+                  React.createElement("div", { className: "pb-4 row col-md-11" }),
+                  React.createElement(
+                    "h6",
+                    null,
+                    "Consulta de novedades de n\xF3mina"
+                  ),
+                  React.createElement(
+                    "p",
+                    null,
+                    "Ingres\xE1 para ver las novedades de tu n\xF3mina"
+                  ),
+                  React.createElement(
+                    "div",
+                    { className: "pb-1" },
+                    React.createElement(
+                      ButtonLoading,
+                      {
+                        disabled: submitDisabled || this.state.showNovedades,
+                        className: "ml-1 btn btn-hsbc right " + (submitDisabled ? "disabled" : ""),
+                        onClick: this._handleShowNovedades,
+                        loading: this.state.showNovedades },
+                      "Novedades de N\xF3mina"
+                    )
                   )
                 )
               ),
               this.state.nominas !== null ? React.createElement(
                 "div",
                 { className: "col-md-12 remove-left-padding" },
-                this.state.nominas && !this.state.showAltaTemprana && !this.state.showAltasTempranas ? React.createElement(
+                this.state.nominas && !this.state.showAltaTemprana && !this.state.showAltasTempranas && !this.state.showNovedades ? React.createElement(
                   "div",
                   null,
                   React.createElement(TablaNomina, {
@@ -611,6 +651,17 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
           'CERTIANN': detalle.CERTIANN,
           'CERTISEC': detalle.CERTISEC
         };
+
+        paramsGetNovedades = {
+          SUPLENUM: this.props.nroEndoso,
+          RAMOPCOD: detalle.RAMOPCOD,
+          POLIZANN: detalle.POLIZANN,
+          POLIZSEC: detalle.POLIZSEC,
+          CERTIPOL: detalle.CERTIPOL,
+          CERTIANN: detalle.CERTIANN,
+          CERTISEC: detalle.CERTISEC
+        };
+
         if (this.props.reqSeguimiento) {
           this.nominaController.detalleEnviadas(this.props.reqSeguimiento, function (data) {
             if (data != "ERROR") _this3.setState({
@@ -631,6 +682,12 @@ define(["react", "../services/userService", "../lib/utils", "../common/datepicke
             _this3._handlerLoadListChecked();
           });
         }
+
+        segurosOnlineService.getNovedadesPol(paramsGetNovedades).then(function (novedadesData) {
+          _this3.setState({
+            listNovedades: novedadesData.Message.DATOS.CAMPOS.CAMPO
+          });
+        });
       }
     }]);
 

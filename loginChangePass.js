@@ -67,17 +67,22 @@ define(["react", "../common/inputvalidation", "../common/loader", "../common/err
                     null,
                     React.createElement(
                         "div",
-                        { className: "form-container" },
+                        null,
                         React.createElement(
-                            "h5",
-                            { className: "form-title" },
+                            "h4",
+                            { className: "hsbc-title-red" },
                             title
                         ),
-                        this.props.detail != '' ? React.createElement(
+                        React.createElement("p", null),
+                        React.createElement(
                             "p",
-                            null,
-                            detail
-                        ) : '',
+                            { className: "loginSecretQuestionMargin" },
+                            this.props.detail != '' ? React.createElement(
+                                "p",
+                                null,
+                                detail
+                            ) : ''
+                        ),
                         React.createElement(
                             "form",
                             { noValidate: true, onSubmit: this.props.onSubmit },
@@ -88,7 +93,7 @@ define(["react", "../common/inputvalidation", "../common/loader", "../common/err
                                     "label",
                                     {
                                         htmlFor: "passwordChange",
-                                        className: "col-md-3 col-form-label text-md-left" },
+                                        className: "loginSecretQuestionInputs col-md-3 col-form-label text-md-left" },
                                     "Contrase\xF1a Nueva"
                                 ),
                                 React.createElement(
@@ -112,7 +117,7 @@ define(["react", "../common/inputvalidation", "../common/loader", "../common/err
                                     "label",
                                     {
                                         htmlFor: "passwordChangeRepeat",
-                                        className: "col-md-3 col-form-label text-md-left" },
+                                        className: "loginSecretQuestionInputs col-md-3 col-form-label text-md-left" },
                                     "Repita contrase\xF1a"
                                 ),
                                 React.createElement(
@@ -132,7 +137,7 @@ define(["react", "../common/inputvalidation", "../common/loader", "../common/err
                             React.createElement(Errormessage, { className: "text-danger text-center", show: this.state.txtError == '' ? false : true, text: this.state.txtError }),
                             React.createElement(
                                 "div",
-                                { className: "col-md-4 offset-md-8 " },
+                                { className: "loginSecretQuestionMargin" },
                                 this.props.isSubmitting && React.createElement(Loader, null),
                                 React.createElement(
                                     "button",
@@ -140,36 +145,10 @@ define(["react", "../common/inputvalidation", "../common/loader", "../common/err
                                         type: "submit",
                                         id: "btn-submit",
                                         disabled: submitDisabled,
-                                        className: "btn btn-primary btn-hsbc " + (submitDisabled ? "disabled" : "") },
+                                        className: "btn hsbc-btn-red " + (submitDisabled ? "disabled" : "") },
                                     this.props.isSubmitting ? "Ingresando" : "Ingresar"
                                 )
                             )
-                        )
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "form-container" },
-                        React.createElement(
-                            "h5",
-                            { className: "form-title" },
-                            "\xBFNuevo en HSBC Seguros On line?"
-                        ),
-                        React.createElement(
-                            "div",
-                            { className: "col-md-4 offset-md-4" },
-                            React.createElement(
-                                "button",
-                                { type: "submit", className: "btn btn-primary btn-hsbc", onClick: this.props.register },
-                                "Registrar"
-                            )
-                        ),
-                        React.createElement(
-                            "a",
-                            {
-                                href: "#",
-                                className: "btn btn-link link",
-                                onClick: this.props.knowMore },
-                            "Conoce m\xE1s"
                         )
                     )
                 );

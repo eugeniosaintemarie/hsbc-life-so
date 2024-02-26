@@ -249,7 +249,7 @@ define(["react", "../../../lib/utils", "../../../common/inputvalidation", "../..
                       formatValue: true,
                       formatType: "YYYY/MM/DD",
                       maxDate: today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
-                      minDate: minimo = new Date(1990, 1, 1),
+                      minDate: minimo = new Date(1920, 0, 1),
                       onResult: this._handleBirthDayResults,
                       valueIsObject: true
                     })
@@ -879,7 +879,7 @@ define(["react", "../../../lib/utils", "../../../common/inputvalidation", "../..
             React.createElement(
               "p",
               { className: "m-3 font-italic" },
-              "Si queres designar como beneficiario a un familiar no directo, amigo, o alguien cuyo vinculo no este dentro del campo \"Relacion/Parentezco\" por favor comunicate con el centro de atencion al cliente 0800-333-0003 para hacer dicha accion"
+              "Si queres designar como beneficiario a un familiar no directo, amigo, o alguien cuyo vinculo no este dentro del campo \"Relacion/Parentesco\" por favor comunicate con el centro de atencion al cliente 0800-333-0003 para hacer dicha accion"
             )
           );
         } else {

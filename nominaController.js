@@ -65,6 +65,109 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         reader.readAsBinaryString(file);
       }
     }, {
+      key: "handleXLSValidated",
+      value: function handleXLSValidated(file, callBack, validation) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          var workbook = XLSX.read(data, {
+            type: "binary"
+          });
+
+          workbook.SheetNames.forEach(function (sheetName) {
+            listxls = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+            if (listxls.length <= 2000) {
+              var trimedList = [];
+              listxls.forEach(function (row) {
+                var newObj = [];
+                Object.keys(row).map(function (field) {
+                  newObj[field.trim()] = row[field];
+                });
+
+                trimedList.push(newObj);
+              });
+              callBack(trimedList);
+            } else {
+              validation();
+            }
+          });
+        };
+        reader.onerror = function (ex) {};
+        reader.readAsBinaryString(file);
+      }
+    }, {
+      key: "handleXLSValidatedCopyExcel",
+      value: function handleXLSValidatedCopyExcel(file, callBack, validation) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var data = e.target.result;
+          var workbook = XLSX.read(data, {
+            type: "binary"
+          });
+
+          workbook.SheetNames.forEach(function (sheetName) {
+            listxls = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+            if (listxls.length <= 2000) {
+              var trimedList = [];
+              listxls.forEach(function (row) {
+                var newObj = [];
+                Object.keys(row).map(function (field) {
+                  newObj[field.trim()] = row[field];
+                });
+
+                trimedList.push(newObj);
+              });
+              callBack(trimedList);
+            } else {
+              validation();
+            }
+          });
+        };
+        reader.onerror = function (ex) {};
+        // reader.readAsBinaryString(file);
+      }
+    }, {
+      key: "handlePromiseXLSX",
+      value: function handlePromiseXLSX(file) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+            var data = e.target.result;
+            var workbook = XLSX.read(data, {
+              type: "binary"
+            });
+
+            var hojas = workbook.SheetNames;
+            var listExcel = [];
+
+            hojas.forEach(function (hoja) {
+              listxls = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[hoja]);
+
+              listxls.forEach(function (row) {
+                var newObj = {};
+
+                for (var key in row) {
+                  if (row.hasOwnProperty(key)) {
+                    var newKey = key.trim().replace(/\s/g, "");
+                    var value = row[key];
+
+                    newObj[newKey] = value;
+                  }
+                }
+
+                listExcel.push(newObj);
+              });
+            });
+
+            resolve(listExcel);
+          };
+
+          reader.onerror = function (ex) {};
+          reader.readAsBinaryString(file);
+        });
+      }
+    }, {
       key: "validateField",
       value: function validateField(listFiels, numberOfFields, salaryState, edadMin, edadMax, callBackError, callBackSuccess) {
         var _this2 = this;
@@ -102,7 +205,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               cont++;
               field[e] = field[e].toString().trim();
               obj[e.toUpperCase()] = field[e].toString();
-              var patron = /^[A-ZÑ ]+$/i;
+              var patron = /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s']+$/;
               if (!patron.test(field[e])) {
                 listStringError.push("El " + e + " no debe contener caracteres especiales");
                 isValid = false;
@@ -118,7 +221,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               }
             } else if (e.toUpperCase() === "FECHA DE NACIMIENTO") {
               cont++;
-              var formattedDate = _this2.fechaDeExcel(field[e], "DD/MM/AAAA");
+              var formattedDate = _this2.fechaDeExcel(field[e], "DD/MM/AAAA") || _this2.fechaDeExcel(field[e], "D/M/AAAA");
               var age = Utils.fAgeCalc2(formattedDate);
               obj[e.toUpperCase().trim().replace(/\s/g, "_")] = formattedDate;
               var datePattern = /^\d{2}\/\d{2}\/\d{4}$/g;
@@ -196,7 +299,12 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
     }, {
       key: "fechaDeExcel",
       value: function fechaDeExcel(days, fecha) {
+        if (isNaN(days) || fecha === "AAAAMMDD") {
+          return days;
+        }
+
         var date = new Date(1900, 0, 1);
+
         date.setDate(date.getDate() + days - 2);
 
         // Consigo los valores del valor ingresado para ver si es una fecha válida
@@ -206,11 +314,13 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
 
         fecha = fecha.replace(/DD/g, dia);
         fecha = fecha.replace(/MM/g, mes);
+
         if (fecha.indexOf("AAAA") >= 0) {
           fecha = fecha.replace(/AAAA/g, anio);
         } else if (fecha.indexOf("AA") >= 0) {
           fecha = fecha.replace(/AA/g, anio.substr(2, 2));
         }
+
         return fecha;
       }
     }, {
@@ -221,8 +331,34 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         var listError = [];
         var listCabeceraError = [];
         var listCuils = [];
+
         listFields.map(function (field, rowNum) {
+          var numberProperty = camposNomina.filter(function (campo) {
+            return campo.nombre === "Suma asegurada" || campo.nombre === "Sueldo";
+          });
+          var properties = Object.keys(field);
+          var keyFecha = properties.find(function (key) {
+            return key.toUpperCase().trim().includes("FECHA");
+          });
+
+          if (keyFecha.toUpperCase().includes("FECHA") && !keyFecha.toUpperCase().includes("DE")) {
+            field[keyFecha.replace(" ", " DE ")] = field[keyFecha];
+
+            delete field[keyFecha];
+          }
+
           listStringError = [];
+
+          if (numberProperty.length > 0 && numberProperty[0].formato.texto === "10000,00") {
+            var property = properties.find(function (property) {
+              return property.toLowerCase() === numberProperty[0].nombre.toLowerCase();
+            });
+
+            if (property && typeof field[property] !== "string") {
+              field[property] = field[property].toString().replace(".", ",");
+            }
+          }
+
           camposNomina.map(function (campo) {
             // tengo que recorrer por los campos de la nomina, porque sino no puede verificar si falta alguno
             // Object.keys(field).map((key, row) => {
@@ -239,19 +375,25 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               if (key.toUpperCase().trim() === "CUIL") {
                 if (listCuils.includes(valorKey.trim())) {
                   listStringError.push("El CUIL " + valorKey + " se encuentra duplicado");
-                } else {
+                } else if (formato.test(valorKey)) {
                   listCuils.push(valorKey.trim());
+                } else {
+                  listStringError.push("El formato del campo " + key + " no es correcto");
                 }
-              } else if ((valorKey === undefined || valorKey === "") && key.toUpperCase().trim() !== "MAIL") {
+              } else if ((valorKey === undefined || valorKey === "") && key.toUpperCase().trim() !== "MAIL" && key.toUpperCase().trim() !== "SEXO" && key.toUpperCase().trim() !== "ACTIVIDAD") {
                 listStringError.push("El campo " + key + " es obligatorio");
               } else if (key.toUpperCase().substr(0, 5) !== "FECHA" && !formato.test(valorKey)) {
                 listStringError.push("El formato del campo " + key + " no es correcto");
               } else if (key.toUpperCase().substr(0, 5) === "FECHA" && !formato.test(_this3.fechaDeExcel(valorKey, campo.formato.texto))) {
                 listStringError.push("El formato del campo " + key + " no es correcto");
+              } else if (key.toUpperCase().trim() === "NOMBRE" && valorKey.length >= 30) {
+                listStringError.push("El formato del campo " + key + " debe ser menor a 30 caracteres");
               }
             } else {
               // Si la cabecera no es correcta la guarda en la lista
-              if (campo.nombre.toUpperCase().trim() !== "MAIL") listStringError.push("El campo " + campo.nombre + " es obligatorio");
+              if (campo.nombre.toUpperCase().trim() !== "MAIL" && campo.nombre.toUpperCase().trim() !== "SEXO" && campo.nombre.toUpperCase().trim() !== "ACTIVIDAD") {
+                listStringError.push("El campo " + campo.nombre + " es obligatorio");
+              }
             }
           });
 
@@ -288,6 +430,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
       value: function sendNomina(list, product, callback, user, form) {
         var _this4 = this;
 
+        var producto = product.cup ? product.cup : product;
         var error = [];
         list.map(function (benef) {
           if (benef.VALIDACION != "NOMAIL") {
@@ -297,12 +440,12 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               VALIDACION: benef.VALIDACION,
               FORM: form,
               POLIZA: {
-                COD_PRO: product.RAMOPCOD,
-                POL_ANN: product.POLIZANN,
-                POL_SEC: product.POLIZSEC,
-                CER_POL: product.CERTIPOL,
-                CER_ANN: product.CERTIANN,
-                CER_SEC: product.CERTISEC,
+                COD_PRO: producto.RAMOPCOD,
+                POL_ANN: producto.POLIZANN,
+                POL_SEC: producto.POLIZSEC,
+                CER_POL: producto.CERTIPOL,
+                CER_ANN: producto.CERTIANN,
+                CER_SEC: producto.CERTISEC,
                 TOM_TDO: user.TIPODOCU.toString(),
                 TOM_NDO: user.NUMEDOCU.toString(),
                 TOM_APE: user.CLIENAP1
@@ -322,7 +465,8 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         list.map(function (benef) {
           _this5.segurosOnlineService.designarBeneficiario({
             MAIL: benef.DIR_EMA,
-            DATOSREGISTRO: { ASE_APE: benef.ASE_APE,
+            DATOSREGISTRO: {
+              ASE_APE: benef.ASE_APE,
               ASE_NOM: benef.ASE_NOM,
               MAIL: benef.DIR_EMA,
               NRO_DOC: benef.NRO_DOC,
@@ -399,7 +543,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         var nomina = list.map(function (item) {
           var newItem = {
             EDAD: 0,
-            MAIL: item.MAIL ? item.MAIL : "",
+            MAIL: item.MAIL ? item.MAIL : item.EMAIL ? item.EMAIL : "",
             PROFECOD: item.PROFECOD,
             SEXO: context == "ABM" ? item.SEXO : "",
             DOCUMTIP: context == "ABM" ? item.DOCUMTIP : 5, //CUIL
@@ -407,7 +551,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
             CLIENAP1: context == "ABM" ? item.CLIENAP1 : item.APELLIDO.toUpperCase(),
             CLIENAP2: "",
             CLIENNOM: context == "ABM" ? item.CLIENOM : item.NOMBRE.toUpperCase(),
-            FECNAC: context == "ABM" ? item.FECNAC : Number(_this6.fechaDeExcel(item["FECHA DE NACIMIENTO"], "AAAAMMDD")),
+            FECNAC: context == "ABM" ? item.FECNAC : item.FECHA_DE_NACIMIENTO,
             FECING: context == "ABM" ? item.FECING : item["FECHA DE INGRESO"] ? Number(_this6.fechaDeExcel(item["FECHA DE INGRESO"], "AAAAMMDD")) : 0,
             SUELDO: item.SUELDO,
             SWSELEC: context == "ABM" ? item.SWSELECT : "T",
@@ -434,7 +578,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               {
                 newItem.COBERTURA = [{
                   COBERCOD: 100,
-                  SUMAASEG: context == "ABM" ? item.COBERTURAS.COBERTURA[0].SUMAASEG : item["SUMA ASEGURADA"] ? item["SUMA ASEGURADA"] : 0
+                  SUMAASEG: context == "ABM" ? parseInt(item.COBERTURAS.COBERTURA[0].SUMAASEG) : item["SUMA ASEGURADA"] ? parseInt(item["SUMA ASEGURADA"]) : 0
                 }];
               }
               break;
@@ -442,7 +586,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               {
                 newItem.COBERTURA = [{
                   COBERCOD: 300,
-                  SUMAASEG: context == "ABM" ? item.COBERTURAS.COBERTURA[0].SUMAASEG : item["SUMA ASEGURADA"] ? item["SUMA ASEGURADA"] : 0
+                  SUMAASEG: context == "ABM" ? parseInt(item.COBERTURAS.COBERTURA[0].SUMAASEG) : item["SUMA ASEGURADA"] ? parseInt(item["SUMA ASEGURADA"]) : 0
                 }];
               }
               break;
@@ -483,6 +627,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         var currentProduct = this.segurosData.currentProduct;
 
         var reqList = this.reqEnvioListaNomina(listNomina, currentProduct, context);
+
         this.abmNominaService.traerNumeroCotizacionColectivo({
           PRODUCTO: currentProduct.ramopcod,
           SUBPRODUCTO: currentProduct.ramopcod == "CE01" ? "CEX1" : currentProduct.ramopcod
@@ -495,7 +640,16 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
               return new Promise(function (resolve) {
                 var isLast = i === segmentedList.length - 1 ? true : false;
                 var reqHeader = _this7.reqEnvioNomina(currentProduct, nroCotizCol.CODIGO, nroCotizCol.NUMERO, segmentedList[i].length, grupo, isLast);
-                _this7.abmNominaService.enviarNomina(Object.assign({ NOMINA: segmentedList[i] }, reqHeader)).then(function (errorSend) {
+                var listaSinGuiones = segmentedList[i].map(function (el) {
+                  var DOCUMDAT = void 0;
+                  if (typeof el.DOCUMDAT === "number") {
+                    DOCUMDAT = el.DOCUMDAT.toString();
+                  } else if (typeof el.DOCUMDAT === "string") {
+                    DOCUMDAT = el.DOCUMDAT.replaceAll("-", "");
+                  }
+                  return Object.assign({}, el, { DOCUMDAT: DOCUMDAT });
+                });
+                _this7.abmNominaService.enviarNomina(Object.assign({ NOMINA: listaSinGuiones }, reqHeader)).then(function (errorSend) {
                   resolve();
                   if (isLast) {
                     if (errorSend.Code != "NO_ERROR") {
@@ -514,8 +668,14 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
                           NUMERO: nroCotizCol.NUMERO
                         }],
                         FECVIG: grupo.fecvig
+
                       }).then(function (errorVal) {
-                        if (errorVal.Code == "NO_ERROR" && errorVal.Message.DATOS.CANTERR != 0) {
+                        if (errorVal.Code == "BUSINESS_VALIDATION_ERROR") {
+                          callback(errorVal.Code, {
+                            CANTERROR: 1,
+                            LISTAERRORES: { LISTAERROR: [] }
+                          });
+                        } else if (errorVal.Code == "NO_ERROR" && errorVal.Message.DATOS.CANTERR != 0) {
                           callback(null, errorVal.Message.DATOS);
                         } else {
                           _this7.userService.getLoggedUser().then(function (userdata) {
@@ -650,8 +810,12 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         lista.forEach(function (item) {
           added.push({
             CUIL: item.DOCUMDAT,
-            MAIL: item.EMAIL,
-            DOCUMTIP: item.DOCUMTIP
+            MAIL: item.MAIL || item.EMAIL,
+            DOCUMTIP: item.DOCUMTIP,
+            APELLIDO: item.CLIENAP1,
+            NOMBRE: item.CLIENOM,
+            FECHA_DE_NACIMIENTO: item.FECNAC,
+            SUELDO: item.SUELDO
           });
         });
         this.validateNominaAsegurados(added, function (response) {
@@ -663,17 +827,53 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
         });
       }
     }, {
-      key: "validateNominaAsegurados",
-      value: function validateNominaAsegurados(listExcel, response) {
+      key: "validateNominaAbm",
+      value: function validateNominaAbm(nomina) {
         var _this9 = this;
 
+        return new Promise(function (resolve, reject) {
+          var added = [];
+          var list = [];
+
+          nomina.forEach(function (item) {
+            added.push({
+              CUIL: item.DOCUMDAT,
+              MAIL: item.MAIL !== undefined ? item.MAIL : item.EMAIL,
+              DOCUMTIP: item.DOCUMTIP,
+              APELLIDO: item.CLIENAP1,
+              NOMBRE: item.CLIENOM,
+              FECHA_DE_NACIMIENTO: item.FECNAC,
+              SUELDO: item.SUELDO
+            });
+          });
+
+          _this9.validateNominaAsegurados(added, function (response) {
+            list.push(response);
+            if (list.length === added.length) {
+              for (var i = 0; i < nomina.length; i++) {
+                nomina[i].VALIDACION = list[i].VALIDACION;
+
+                if (list[i].VALIDACION === "DOCOK") {
+                  nomina[i].DATOSREGISTRO = list[i].DATOSREGISTRO;
+                }
+              }
+
+              resolve();
+            }
+          });
+        });
+      }
+    }, {
+      key: "validateNominaAsegurados",
+      value: function validateNominaAsegurados(listExcel, response) {
+        var _this10 = this;
+
         listExcel.map(function (e) {
-          // HF 20221005 ABMSO INI
-          // if (e.MAIL != undefined) {
-          if (false) {
-          // HF 20221005 ABMSO FIN
+          if (e.MAIL != undefined && e.MAIL != "") {
             e.CUIL = e.CUIL.toString().replace(/-/gi, ""); //Si el cuil tiene guiones se los saca
-            _this9.segurosOnlineService.P_NBWS_ClienteSuscripto({
+            e.NOMBRE = e.NOMBRE.toString().replace(/´/gi, "");
+            e.APELLIDO = e.APELLIDO.toString().replace(/´/gi, "");
+            _this10.segurosOnlineService.P_NBWS_ClienteSuscripto({
               MAIL: e.MAIL,
               DOCUMTIP: 1, // Codigo DNI
               DOCUMDAT: e.CUIL.substring(2, 10)
@@ -703,7 +903,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
                   response(e);
                 } else {
                   //llamo al servicio por cuil
-                  _this9.segurosOnlineService.P_NBWS_ClienteSuscripto({
+                  _this10.segurosOnlineService.P_NBWS_ClienteSuscripto({
                     MAIL: e.MAIL,
                     DOCUMTIP: 5, // Codigo CUIL
                     DOCUMDAT: e.CUIL
@@ -761,12 +961,12 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
     }, {
       key: "validateNominaAdhesion",
       value: function validateNominaAdhesion(listExcel, response, product) {
-        var _this10 = this;
+        var _this11 = this;
 
         listExcel.map(function (e) {
           if (e.MAIL != undefined) {
             e.CUIL = e.CUIL.toString().replace(/-/gi, ""); //Si el cuil tiene guiones se los saca
-            _this10.segurosOnlineService.getListaDesignacionDeBenef({
+            _this11.segurosOnlineService.getListaDesignacionDeBenef({
               RAMOPCOD: product.RAMOPCOD,
               POLIZANN: product.POLIZANN,
               POLIZSEC: product.POLIZSEC,
@@ -790,7 +990,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
                 e.DATOSREGISTRO = registryDataExi;
                 response(e);
               } else {
-                _this10.segurosOnlineService.P_NBWS_ClienteSuscripto({
+                _this11.segurosOnlineService.P_NBWS_ClienteSuscripto({
                   MAIL: e.MAIL,
                   DOCUMTIP: 1, // Codigo DNI
                   DOCUMDAT: e.CUIL.substring(2, 10)
@@ -820,7 +1020,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
                       response(e);
                     } else {
                       //llamo al servicio por cuil
-                      _this10.segurosOnlineService.P_NBWS_ClienteSuscripto({
+                      _this11.segurosOnlineService.P_NBWS_ClienteSuscripto({
                         MAIL: e.MAIL,
                         DOCUMTIP: 5, // Codigo CUIL
                         DOCUMDAT: e.CUIL
@@ -881,132 +1081,164 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
       key: "getActivitiesFromExcel",
       value: function getActivitiesFromExcel(list) {
         var resp = list.map(function (item) {
+          for (var key in item) {
+            if (key !== key.toUpperCase()) {
+              item[key.toUpperCase()] = item[key];
+
+              delete item[key];
+            }
+          }
+
           return item.ACTIVIDAD;
         });
+
+        resp = resp.filter(function (e) {
+          return e !== undefined;
+        });
+
         return [].concat(_toConsumableArray(new Set(resp)));
       }
     }, {
-      key: "validateNomina",
-      value: function validateNomina(listExcel, response, product) {
-        var _this11 = this;
+      key: "validateDesigBenef",
+      value: function validateDesigBenef(documdat, response, product) {
+        var _this12 = this;
 
-        listProcess = listExcel.map(function (e) {
-          _this11.segurosOnlineService.getListaDesigBenefNoVal({
-            RAMOPCOD: product.RAMOPCOD,
-            POLIZANN: product.POLIZANN,
-            POLIZSEC: product.POLIZSEC,
-            CERTIPOL: product.CERTIPOL,
-            CERTIANN: product.CERTIANN,
-            CERTISEC: product.CERTISEC,
-            DOCUMDAT: e.CUIL,
-            DOCUMTIP: 5 //cuil
-          }).then(function (data) {
-            if (
-            //si no encuentra por cuil
-            data.Message.Request.ERROR != "" || data.Message.Request.ESTADO != "OK") {
-              //buscar por dni
-              _this11.segurosOnlineService.getListaDesigBenefNoVal({
-                RAMOPCOD: product.RAMOPCOD,
-                POLIZANN: product.POLIZANN,
-                POLIZSEC: product.POLIZSEC,
-                CERTIPOL: product.CERTIPOL,
-                CERTIANN: product.CERTIANN,
-                CERTISEC: product.CERTISEC,
-                DOCUMDAT: e.CUIL.substring(2, 10),
-                DOCUMTIP: 1 //dni
-              }).then(function (data) {
-                if (data.Message.Request.ERROR != "" || data.Message.Request.ESTADO != "OK") {
-                  e.VALIDACION = "NOEXIST";
-                  response(e);
-                } else if (data.Message.CAMPOS.PERMITE != "S") {
-                  e.VALIDACION = "NODESIGNA";
-                  e.MOTIVO = data.Message.CAMPOS.MOTIVO;
-                  response(e);
-                } else {
-                  //Busca por DNI
-                  _this11.segurosOnlineService.P_NBWS_ClienteSuscripto({
-                    MAIL: e.MAIL,
-                    DOCUMTIP: 1, // Codigo DNI
-                    DOCUMDAT: e.CUIL.substring(2, 10)
-                  }).then(function (clienteSuscripto) {
-                    if (clienteSuscripto.Code == "NO_ERROR") {
-                      var _clienteSuscripto$Mes = clienteSuscripto.Message.CAMPOS.CAMPO[0],
-                          MAIL = _clienteSuscripto$Mes.MAIL,
-                          DOCUMDAT = _clienteSuscripto$Mes.DOCUMDAT,
-                          CORRECTO = _clienteSuscripto$Mes.CORRECTO;
-                      //Si encuentra por DNI pero correo no coincide
+        var e = {};
 
-                      if (MAIL != "" && DOCUMDAT == 0 && CORRECTO == "N") {
-                        e.VALIDACION = "DOCOK";
-                        e.POLIZA = product;
-                        //Guarda Benef
-                        e.DATOSREGISTRO = {
-                          MAIL: MAIL,
-                          NRO_DOC: e.CUIL.substring(2, 10),
-                          TIP_DOC: "1",
-                          ASE_APE: e.APELLIDO,
-                          ASE_NOM: e.NOMBRE
-                        };
-                        response(e);
-                        //coincide DNI y correo
-                      } else if (MAIL != "" && DOCUMDAT != 0 && CORRECTO == "S") {
-                        e.VALIDACION = "OK";
-                        e.POLIZA = product;
-                        e.DATOSREGISTRO = {
-                          MAIL: MAIL,
-                          NRO_DOC: e.CUIL.substring(2, 10),
-                          TIP_DOC: "1",
-                          ASE_APE: e.APELLIDO,
-                          ASE_NOM: e.NOMBRE
-                        };
-                        response(e);
-                      } else if (MAIL == "" && DOCUMDAT == 0 && CORRECTO == "N") {
-                        //No lo encuentra, es nuevo y se da de alta
-                        e.VALIDACION = "ADD";
-                        e.POLIZA = product;
-                        e.DATOSREGISTRO = {
-                          MAIL: e.MAIL,
-                          NRO_DOC: e.CUIL,
-                          TIP_DOC: "5",
-                          ASE_APE: e.APELLIDO,
-                          ASE_NOM: e.NOMBRE
-                        };
-                        response(e);
-                      }
-                      //SI ENCUENTRA MAIL, PERO NO COINCIDE DNI
-                      else if (MAIL == "" && DOCUMDAT != 0 && CORRECTO == "N") {
-                          e.VALIDACION = "MAILOK";
-                          response(e);
-                        } else {
-                          e.VALIDACION = "MAILOK";
-                          response(e);
-                        }
-                    }
-                  });
-                }
-              });
-              //si lo encuentra por cuil
-            } else if (data.Message.Request.ERROR == "" && data.Message.Request.ESTADO == "OK") {
-              if (data.Message.CAMPOS.PERMITE != "S") {
+        this.segurosOnlineService.getListaDesigBenefNoVal({
+          RAMOPCOD: product.RAMOPCOD,
+          POLIZANN: product.POLIZANN,
+          POLIZSEC: product.POLIZSEC,
+          CERTIPOL: product.CERTIPOL,
+          CERTIANN: product.CERTIANN,
+          CERTISEC: product.CERTISEC,
+          DOCUMDAT: documdat,
+          DOCUMTIP: 5 //cuil
+        }).then(function (data) {
+          if (
+          //si no encuentra por cuil
+          data.Message.Request.ERROR != "" || data.Message.Request.ESTADO != "OK") {
+            //buscar por dni
+            _this12.segurosOnlineService.getListaDesigBenefNoVal({
+              RAMOPCOD: product.RAMOPCOD,
+              POLIZANN: product.POLIZANN,
+              POLIZSEC: product.POLIZSEC,
+              CERTIPOL: product.CERTIPOL,
+              CERTIANN: product.CERTIANN,
+              CERTISEC: product.CERTISEC,
+              DOCUMDAT: documdat.substring(2, 10),
+              DOCUMTIP: 1 //dni
+            }).then(function (data) {
+              if (data.Message.Request.ERROR != "" || data.Message.Request.ESTADO != "OK") {
+                e.VALIDACION = "NOEXIST";
+                response(e);
+              } else if (data.Message.CAMPOS.PERMITE != "S") {
                 e.VALIDACION = "NODESIGNA";
                 e.MOTIVO = data.Message.CAMPOS.MOTIVO;
                 response(e);
               } else {
-                _this11.segurosOnlineService.P_NBWS_ClienteSuscripto({
+                e.VALIDACION = "OK";
+                response(e);
+              }
+            });
+          } else if (data.Message.Request.ERROR == "" && data.Message.Request.ESTADO == "OK") {
+            if (data.Message.CAMPOS.PERMITE != "S") {
+              e.VALIDACION = "NODESIGNA";
+              e.MOTIVO = data.Message.CAMPOS.MOTIVO;
+              response(e);
+            } else {
+              e.VALIDACION = "OK";
+              response(e);
+            }
+          }
+        });
+      }
+    }, {
+      key: "validateNomina",
+      value: function validateNomina(listExcel, response, product) {
+        var _this13 = this;
+
+        listProcess = listExcel.map(function (e) {
+          _this13.segurosOnlineService.P_NBWS_ClienteSuscripto({
+            MAIL: e.MAIL,
+            DOCUMTIP: 5, // Codigo CUIL
+            DOCUMDAT: e.CUIL
+          }).then(function (clienteSuscripto) {
+            if (clienteSuscripto.Code == "NO_ERROR") {
+              var _clienteSuscripto$Mes = clienteSuscripto.Message.CAMPOS.CAMPO[0],
+                  MAIL = _clienteSuscripto$Mes.MAIL,
+                  DOCUMDAT = _clienteSuscripto$Mes.DOCUMDAT,
+                  CORRECTO = _clienteSuscripto$Mes.CORRECTO;
+
+              if (MAIL != "" && DOCUMDAT != 0 && CORRECTO == "S") {
+                //Si coinciden CUIL y MAIL
+                //DEBE ENVIAR MAIL Y GRABAR
+                e.VALIDACION = "OK";
+                e.DATOSREGISTRO = {
                   MAIL: e.MAIL,
-                  DOCUMTIP: 5, // Codigo CUIL
-                  DOCUMDAT: e.CUIL
+                  NRO_DOC: e.CUIL,
+                  TIP_DOC: "5",
+                  ASE_APE: e.APELLIDO,
+                  ASE_NOM: e.NOMBRE
+                };
+                e.POLIZA = product;
+                response(e);
+              } else if (MAIL != "" && DOCUMDAT == 0 && CORRECTO == "N") {
+                //Si encuentra CUIL pero no mail
+                e.VALIDACION = "DOCOK"; //
+                e.POLIZA = product;
+                //registro benef
+                e.DATOSREGISTRO = {
+                  MAIL: MAIL,
+                  NRO_DOC: e.CUIL,
+                  TIP_DOC: "5",
+                  ASE_APE: e.APELLIDO,
+                  ASE_NOM: e.NOMBRE
+                };
+                response(e);
+              } else {
+                //Se deberia poder sacar esta condicion porque ya lo verifica si esta registrado
+                //Busca por DNI
+                _this13.segurosOnlineService.P_NBWS_ClienteSuscripto({
+                  MAIL: e.MAIL,
+                  DOCUMTIP: 1, // Codigo DNI
+                  DOCUMDAT: e.CUIL.substring(2, 10)
                 }).then(function (clienteSuscripto) {
                   if (clienteSuscripto.Code == "NO_ERROR") {
                     var _clienteSuscripto$Mes2 = clienteSuscripto.Message.CAMPOS.CAMPO[0],
-                        MAIL = _clienteSuscripto$Mes2.MAIL,
-                        DOCUMDAT = _clienteSuscripto$Mes2.DOCUMDAT,
-                        CORRECTO = _clienteSuscripto$Mes2.CORRECTO;
+                        _MAIL = _clienteSuscripto$Mes2.MAIL,
+                        _DOCUMDAT = _clienteSuscripto$Mes2.DOCUMDAT,
+                        _CORRECTO = _clienteSuscripto$Mes2.CORRECTO;
+                    //Si encuentra por DNI pero correo no coincide
 
-                    if (MAIL != "" && DOCUMDAT != 0 && CORRECTO == "S") {
-                      //Si coinciden CUIL y MAIL
-                      //DEBE ENVIAR MAIL Y GRABAR
+                    if (_MAIL != "" && _DOCUMDAT == 0 && _CORRECTO == "N") {
+                      e.VALIDACION = "DOCOK";
+                      e.POLIZA = product;
+                      //Guarda Benef
+                      e.DATOSREGISTRO = {
+                        MAIL: _MAIL,
+                        NRO_DOC: e.CUIL.substring(2, 10),
+                        TIP_DOC: "1",
+                        ASE_APE: e.APELLIDO,
+                        ASE_NOM: e.NOMBRE
+                      };
+                      response(e);
+                      //coincide DNI y correo
+                    } else if (_MAIL != "" && _DOCUMDAT != 0 && _CORRECTO == "S") {
                       e.VALIDACION = "OK";
+                      e.POLIZA = product;
+                      e.DATOSREGISTRO = {
+                        MAIL: _MAIL,
+                        NRO_DOC: e.CUIL.substring(2, 10),
+                        TIP_DOC: "1",
+                        ASE_APE: e.APELLIDO,
+                        ASE_NOM: e.NOMBRE
+                      };
+                      response(e);
+                    } else if (_MAIL == "" && _DOCUMDAT == 0 && _CORRECTO == "N") {
+                      //No lo encuentra, es nuevo y se da de alta
+                      e.VALIDACION = "ADD";
+                      e.POLIZA = product;
                       e.DATOSREGISTRO = {
                         MAIL: e.MAIL,
                         NRO_DOC: e.CUIL,
@@ -1014,83 +1246,14 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
                         ASE_APE: e.APELLIDO,
                         ASE_NOM: e.NOMBRE
                       };
-                      e.POLIZA = product;
                       response(e);
-                    } else if (MAIL != "" && DOCUMDAT == 0 && CORRECTO == "N") {
-                      //Si encuentra CUIL pero no mail
-                      e.VALIDACION = "DOCOK"; //
-                      e.POLIZA = product;
-                      //registro benef
-                      e.DATOSREGISTRO = {
-                        MAIL: MAIL,
-                        NRO_DOC: e.CUIL,
-                        TIP_DOC: "5",
-                        ASE_APE: e.APELLIDO,
-                        ASE_NOM: e.NOMBRE
-                      };
+                    } else if (_MAIL == "" && _DOCUMDAT != 0 && _CORRECTO == "N") {
+                      //SI ENCUENTRA MAIL, PERO NO COINCIDE DNI
+                      e.VALIDACION = "MAILOK";
                       response(e);
                     } else {
-                      //Se deberia poder sacar esta condicion porque ya lo verifica si esta registrado
-                      //Busca por DNI
-                      _this11.segurosOnlineService.P_NBWS_ClienteSuscripto({
-                        MAIL: e.MAIL,
-                        DOCUMTIP: 1, // Codigo DNI
-                        DOCUMDAT: e.CUIL.substring(2, 10)
-                      }).then(function (clienteSuscripto) {
-                        if (clienteSuscripto.Code == "NO_ERROR") {
-                          var _clienteSuscripto$Mes3 = clienteSuscripto.Message.CAMPOS.CAMPO[0],
-                              _MAIL = _clienteSuscripto$Mes3.MAIL,
-                              _DOCUMDAT = _clienteSuscripto$Mes3.DOCUMDAT,
-                              _CORRECTO = _clienteSuscripto$Mes3.CORRECTO;
-                          //Si encuentra por DNI pero correo no coincide
-
-                          if (_MAIL != "" && _DOCUMDAT == 0 && _CORRECTO == "N") {
-                            e.VALIDACION = "DOCOK";
-                            e.POLIZA = product;
-                            //Guarda Benef
-                            e.DATOSREGISTRO = {
-                              MAIL: _MAIL,
-                              NRO_DOC: e.CUIL.substring(2, 10),
-                              TIP_DOC: "1",
-                              ASE_APE: e.APELLIDO,
-                              ASE_NOM: e.NOMBRE
-                            };
-                            response(e);
-                            //coincide DNI y correo
-                          } else if (_MAIL != "" && _DOCUMDAT != 0 && _CORRECTO == "S") {
-                            e.VALIDACION = "OK";
-                            e.POLIZA = product;
-                            e.DATOSREGISTRO = {
-                              MAIL: _MAIL,
-                              NRO_DOC: e.CUIL.substring(2, 10),
-                              TIP_DOC: "1",
-                              ASE_APE: e.APELLIDO,
-                              ASE_NOM: e.NOMBRE
-                            };
-                            response(e);
-                          } else if (_MAIL == "" && _DOCUMDAT == 0 && _CORRECTO == "N") {
-                            //No lo encuentra, es nuevo y se da de alta
-                            e.VALIDACION = "ADD";
-                            e.POLIZA = product;
-                            e.DATOSREGISTRO = {
-                              MAIL: e.MAIL,
-                              NRO_DOC: e.CUIL,
-                              TIP_DOC: "5",
-                              ASE_APE: e.APELLIDO,
-                              ASE_NOM: e.NOMBRE
-                            };
-                            response(e);
-                          }
-                          //SI ENCUENTRA MAIL, PERO NO COINCIDE DNI
-                          else if (_MAIL == "" && _DOCUMDAT != 0 && _CORRECTO == "N") {
-                              e.VALIDACION = "MAILOK";
-                              response(e);
-                            } else {
-                              e.VALIDACION = "MAILOK";
-                              response(e);
-                            }
-                        }
-                      });
+                      e.VALIDACION = "MAILOK";
+                      response(e);
                     }
                   }
                 });
@@ -1102,7 +1265,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
     }, {
       key: "getNomina",
       value: function getNomina(group, callback) {
-        var _this12 = this;
+        var _this14 = this;
 
         var currentProduct = this.segurosData.currentProduct;
 
@@ -1120,7 +1283,7 @@ define(["react", "../services/segurosOnlineService", "../services/abmNominaServi
           } else if (respControl.Message.DATOS.EXISTE == "V") {
             callback("laterValidity");
           } else if (respControl.Message.Request.ESTADOMSG == "OK") {
-            _this12.abmNominaService.recuperoNomina({
+            _this14.abmNominaService.recuperoNomina({
               //CIAASCOD:,
               //USUARCOD:,
               //CLIENAS:,

@@ -29,6 +29,10 @@ define(["react", "react-redux", "../../../lib/utils", "../../../common/inputvali
         _this.controller.verificarCodigoEmail(_this.state.code.value, function (data) {
           if (data == "pass") {
             //Registrar datos en el AIS
+            _this.setState({
+              isConfirmed: true,
+              countClicks: _this.state.countClicks + 1
+            });
             _this.props.accept();
           } else if (data == "OK") {
             _this.setState({
@@ -38,7 +42,9 @@ define(["react", "react-redux", "../../../lib/utils", "../../../common/inputvali
               //Inteto fallido
             });
           } else if (data == "logOut" || data == "BL") {
-            _this.props.logout();
+            if (_this.state.countClicks !== 2) {
+              _this.props.logout();
+            }
           }
         });
       };
@@ -47,6 +53,8 @@ define(["react", "react-redux", "../../../lib/utils", "../../../common/inputvali
         loaded: false,
         code: "",
         count: 1,
+        countClicks: 1,
+        isConfirmed: false,
 
         showError: false,
         textError: ""
@@ -130,7 +138,8 @@ define(["react", "react-redux", "../../../lib/utils", "../../../common/inputvali
               {
                 className: "btn btn-dark  m-2 p-1 pr-2 pl-2",
                 type: "button",
-                onClick: this._handleConfirmOnClick
+                onClick: this._handleConfirmOnClick,
+                disabled: this.state.isConfirmed
               },
               "Confirmar"
             ),

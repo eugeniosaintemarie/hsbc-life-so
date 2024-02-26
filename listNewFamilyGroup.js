@@ -253,6 +253,13 @@ define(["react", "./table", "../../../../common/modalReactBootstrap", "../../../
       value: function componentDidMount() {
         this._checkUpdate();
       }
+    }, {
+      key: "componentDidUpdate",
+      value: function componentDidUpdate(prevProps) {
+        if (this.props.listaBeneficiarios !== prevProps.listaBeneficiarios) {
+          this._checkUpdate();
+        }
+      }
     }]);
 
     return ListNewFamilyGroup;

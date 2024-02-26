@@ -129,6 +129,11 @@ define(['react', 'react-dom', './baseService'], function (React, ReactDOM, BaseS
                 return this.call('POST', 'VidCol/getDatosPoliza', param, 'JSON', true);
             }
         }, {
+            key: 'getPolizaAseg',
+            value: function getPolizaAseg(param) {
+                return this.call('POST', 'VidCol/getPolizaAseg', param, 'JSON', true);
+            }
+        }, {
             key: 'sendApplication',
             value: function sendApplication(param) {
                 return this.call('POST', 'vidaColectivo/enviarSolicitud', param, 'JSON', true);

@@ -44,9 +44,48 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
             };
 
             _this._handleDateResults = function (id, result) {
-                if (Utils.formatFixedString(result) !== _this.state.datePedido && Utils.formatFechaNumber(Utils.formatFixedString(result)) != 0) {
-                    _this.setState(_defineProperty({}, id, Utils.formatFixedString(result)));
-                    _this.getGroups();
+                _this.props.startLoading();
+
+                var abmNominaService = new AbmNominaService();
+
+                var currentProduct = Store.getState().seguros.currentProduct;
+
+                var numberDate = Number(result.id);
+                var detalle = currentProduct.detalle ? currentProduct.detalle : currentProduct.cup;
+                var indexOptionDate = _this.props.optionsDate.findIndex(function (date) {
+                    return date.FECEFESU === numberDate;
+                });
+
+                if (indexOptionDate === 1) {
+                    abmNominaService.getPolDispABM({
+                        RAMOPCOD: detalle.RAMOPCOD,
+                        POLIZANN: detalle.POLIZANN,
+                        POLIZSEC: detalle.POLIZSEC,
+                        CERTIPOL: detalle.CERTIPOL,
+                        CERTIANN: detalle.CERTIANN,
+                        CERTISEC: detalle.CERTISEC,
+                        FECEFECT: numberDate
+                    }).then(function (response) {
+                        if (response.Message.DATOS.MARCA === "OK") {
+                            var _this$setState;
+
+                            _this.setState((_this$setState = {}, _defineProperty(_this$setState, id, Utils.formatFechaString(result.id)), _defineProperty(_this$setState, "disableOptions", false), _this$setState));
+                        } else {
+                            var _this$setState2;
+
+                            _this.setState((_this$setState2 = {}, _defineProperty(_this$setState2, id, Utils.formatFechaString(result.id)), _defineProperty(_this$setState2, "showModal", true), _defineProperty(_this$setState2, "modal", {
+                                component: null,
+                                contentHTML: "No es posible cargar esta nomina ya que la vigencia para la misma aun no se encuentra habilitada.",
+                                html: true,
+                                title: "Nomina de asegurados",
+                                size: "md"
+                            }), _defineProperty(_this$setState2, "sigProceso", ""), _defineProperty(_this$setState2, "disableOptions", true), _defineProperty(_this$setState2, "showErrorNotCompleted", false), _this$setState2));
+                        }
+                    });
+                } else {
+                    var _this$setState3;
+
+                    _this.setState((_this$setState3 = {}, _defineProperty(_this$setState3, id, Utils.formatFechaString(result.id)), _defineProperty(_this$setState3, "disableOptions", false), _this$setState3));
                 }
             };
 
@@ -74,14 +113,14 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
 
             _this.getGroups = function () {
                 var abmNominaService = new AbmNominaService();
+
                 var currentProduct = Store.getState().seguros.currentProduct;
 
                 var detalle = currentProduct.detalle ? currentProduct.detalle : currentProduct.cup;
 
                 var fechvigen = _this.state.datePedido ? _this.formatDate(_this.state.datePedido) : _this.formatDate(_this.state.today);
-                if (fechvigen) {
-                    _this.props.startLoading();
 
+                if (fechvigen && !_this.state.disableOptions) {
                     abmNominaService.traerCondicionesPoliza({
                         CIAASCOD: detalle.CIAASCOD,
                         RAMOPCOD: detalle.RAMOPCOD,
@@ -94,16 +133,20 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                     }).then(function (data) {
                         if (data && data.GRUPOS.GRUPO && data.GRUPOS.GRUPO.length > 0) {
                             var apiGroups = [];
+
                             data.GRUPOS.GRUPO.forEach(function (group) {
                                 apiGroups.push({ id: group.GRUPOCOD, name: group.GRUPODES });
                             });
+
                             _this.setState({
                                 groups: apiGroups
                             });
+
                             _this.props.stopLoading();
                         } else {
                             _this.setState({ groups: [] });
                             _this._showModal();
+
                             _this.props.stopLoading();
                         }
                     });
@@ -127,6 +170,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                 groups: [],
                 sigProceso: 'nominaCompleta',
                 showErrorNotCompleted: false,
+                disableOptions: false,
                 modal: {
                     title: "",
                     component: null,
@@ -154,6 +198,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                 var ramo = currentProduct.ramopcod;
                 var ramosPermitidos = ["CAP1", "CAP2", "CAP3", "CAP5", "CA01", "CA11", "CA12", "CA13", "CA21", "CE11", "CT01", "CT11", "CO11"];
                 var enUnMes = new Date(new Date().setMonth(new Date().getMonth() + 1));
+
                 if (!ramosPermitidos.some(function (e) {
                     return e == ramo;
                 })) {
@@ -185,6 +230,11 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                                 "label",
                                                 null,
                                                 "No es posible realizar la carga para este producto por este medio"
+                                            ),
+                                            React.createElement(
+                                                "label",
+                                                null,
+                                                "Por favor comun\xEDcate con tu ejecutivo de cuentas para poder realizar la carga."
                                             )
                                         )
                                     )
@@ -235,13 +285,18 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                     React.createElement(
                                         "div",
                                         { className: "col-md-6" },
-                                        React.createElement(DatePicker, {
+                                        React.createElement(DropDownContent, {
+                                            list: this.props.optionsDate,
+                                            className: "form-control",
                                             id: "datePedido",
-                                            className: "input-background-color form-control",
                                             name: "datePedido",
-                                            onResult: this._handleDateResults,
-                                            value: this.state.datePedido,
-                                            maxDate: enUnMes
+                                            idObject: "FECEFESU",
+                                            nameObject: "FECHA",
+                                            defaultValue: '',
+                                            defaultName: true,
+                                            showPlaceHolder: true,
+                                            placeHolder: "Seleccione...",
+                                            onResult: this._handleDateResults
                                         }),
                                         React.createElement(
                                             "p",
@@ -272,6 +327,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                             name: "group",
                                             defaultValue: '',
                                             defaultName: true,
+                                            disabled: this.state.disableOptions,
                                             showPlaceHolder: true,
                                             placeHolder: "Seleccione...",
                                             onResult: this._handleResults })
@@ -286,7 +342,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                         React.createElement(
                                             "div",
                                             { className: "custom-control custom-radio custom-control-inline" },
-                                            React.createElement("input", { onChange: this._handleOnChangeRadio, type: "radio", id: "nominaCompleta", name: "sigProceso", checked: this.state.sigProceso == "nominaCompleta", className: "float-right custom-control-input" }),
+                                            React.createElement("input", { onChange: this._handleOnChangeRadio, type: "radio", id: "nominaCompleta", name: "sigProceso", checked: this.state.sigProceso == "nominaCompleta", className: "float-right custom-control-input", disabled: this.state.disableOptions }),
                                             React.createElement(
                                                 "label",
                                                 { className: "custom-control-label", name: "sigProceso", htmlFor: "nominaCompleta" },
@@ -304,7 +360,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                         React.createElement(
                                             "div",
                                             { className: "custom-control custom-radio custom-control-inline" },
-                                            React.createElement("input", { onChange: this._handleOnChangeRadio, type: "radio", id: "nominaAbm", name: "sigProceso", className: "float-right custom-control-input" }),
+                                            React.createElement("input", { onChange: this._handleOnChangeRadio, type: "radio", id: "nominaAbm", name: "sigProceso", className: "float-right custom-control-input", disabled: this.state.disableOptions }),
                                             React.createElement(
                                                 "label",
                                                 { className: "custom-control-label", name: "sigProceso", htmlFor: "nominaAbm" },
@@ -339,7 +395,7 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                                         { className: "col-md-6" },
                                         React.createElement(
                                             "button",
-                                            { onClick: this._handleSubmit, className: "btn btn-hsbc" },
+                                            { onClick: this._handleSubmit, className: "btn btn-hsbc", disabled: this.state.disableOptions },
                                             "Continuar"
                                         )
                                     )
@@ -356,6 +412,13 @@ define(["react", "../../common/datepicker", "../../common/dropdownContent", "../
                             contentHTML: this.state.modal.contentHTML
                         })
                     );
+                }
+            }
+        }, {
+            key: "componentDidUpdate",
+            value: function componentDidUpdate(prevProps, prevState) {
+                if (prevState.datePedido !== this.state.datePedido) {
+                    this.getGroups();
                 }
             }
         }]);

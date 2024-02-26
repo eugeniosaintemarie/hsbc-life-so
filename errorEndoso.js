@@ -34,7 +34,7 @@ define(["react"], function (React) {
                     React.createElement(
                         'p',
                         null,
-                        'La p\xF3liza no esta encuentra disponible para realizar endosos. Por favor comunicarse con el centro de atenci\xF3n al cliente 0800-333-0003 para realizar el mismo.'
+                        'La p\xF3liza no se encuentra disponible para realizar endosos. Por favor comunicarse con el centro de atenci\xF3n al cliente 0800-333-0003 para realizar el mismo.'
                     )
                 );
             };

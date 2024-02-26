@@ -138,7 +138,7 @@ define(['react', 'react-dom', '../lib/utils', "../services/segurosOnlineService"
 
                                     if (vExisteCUI) {
                                         _this.setState({
-                                            cuentaTitular: Object.values(json.responseParam.BusDataSeg.Ownership.OwnName)
+                                            cuentaTitular: Object.values(json.responseParam.BusDataSeg.Ownership.OwnName)[0]
                                         });
 
                                         _this.props.addTipoCuenta(Object.values(json.responseParam.BusDataSeg.Ownership.Acct.Type.ShortDesc)[0]);
@@ -146,7 +146,7 @@ define(['react', 'react-dom', '../lib/utils', "../services/segurosOnlineService"
                                         _this.props.addNumeroCBU(_this.state.form.numeroCBU);
                                         _this.props.addCUIT(titularCUIT);
                                         _this.props.addTitular({
-                                            value: Object.values(json.responseParam.BusDataSeg.Ownership.OwnName)
+                                            value: Object.values(json.responseParam.BusDataSeg.Ownership.OwnName)[0]
                                         });
                                         setTimeout(function () {
                                             //Start the timer

@@ -1,0 +1,222 @@
+.light{font-family: "HSBC Univers Next Light", Helvetica, Arial, sans-serif; font-style: normal; font-weight: 300;}
+.bold{font-family: "HSBC Univers Next Bold"; font-style:normal; font-weight:700;}
+
+/*.A-BTNSO-RW-ALL.no-link{border: 1px solid #333;}*/
+
+.socialMediaFooter{display:none;}
+
+.video-responsive.marginT0{margin-top:0px;}
+
+.hidden{display:none;}
+
+img[alt~="Online"]{
+  margin-top: 26px !important;
+}
+
+img[alt~="Telefónica"]{
+  margin-top: 26px !important;
+}
+
+/* CONTENEDOR */
+#contenedor{background: #EEEEEE; border-radius: 12px; padding:30px 120px;}
+ @media(max-width:479px){
+   /* ES CELULAR */
+   #contenedor{padding:30px 20px;}
+}
+ @media(min-width:480px) and (max-width:959px){
+   /* ES TABLET */
+   #contenedor{padding:30px 20px;}
+}
+
+/* SOLAPA PARA SELECCIONAR OPCIONES DESPLEGABLES */
+#client-selector{border-bottom:1px solid #707070;}
+#client-selector .flex-container {display:flex; flex-wrap:nowrap;}
+#client-selector .flex-container .option{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:center; padding:10px 16px 6px 16px; border-bottom:4px solid #EEEEEE; cursor:pointer; font-size:16px; text-align:center;}
+#client-selector .flex-container .option:hover{background:#FFFFFF; border-bottom:4px solid #707070; color:#DB0011;}
+#client-selector .flex-container .selected{border-bottom:4px solid #DB0011; color:#DB0011; font-family: "HSBC Univers Next Bold"; font-style: normal; font-weight: 700;}
+#client-selector .flex-container .selected:hover{background:#FFFFFF; border-bottom:4px solid #DB0011; color:#DB0011;}
+ @media(max-width:479px){
+   /* ES CELULAR */
+   #client-selector .flex-container{display:inline;}
+   #client-selector .flex-container .option{display:block;}
+}
+
+/* CONTENIDO AL SELECCIONAR OPCIONES DESPLEGABLES 
+.etiquetas .flex-container {display:flex; flex-wrap:nowrap;}
+.etiquetas .flex-container .etiqueta{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:wrap; align-items:center; padding:10px 16px 6px 16px; cursor:pointer; font-size:18px; min-width:50%;}
+
+.etiqueta{background:#FFFFFF; padding:30px; cursor:pointer; font-size:18px; box-shadow:0px 3px 6px #bfb6b6; border-radius:4px;}
+.etiqueta .icono{}*/
+
+.etiqueta{display:flex; flex-wrap:nowrap; flex-direction:row; align-items:center; background:#FFFFFF; padding:15px 30px; cursor:pointer; font-size:18px; box-shadow:0px 3px 6px #bfb6b6; border-radius:4px; margin-bottom:10px; text-decoration:none;}
+.etiqueta:hover{background:#F3F3F3;}
+.etiqueta .icono{max-width:40px; margin-right:30px;}
+.etiqueta .icono img{width:100%; max-width:40px;}
+.etiqueta:hover .icono img{transform:scale(1.2)}
+
+.etiqueta-destacado{display:flex; flex-wrap:nowrap; flex-direction:row; align-items:center; background:#FFFFFF; padding:15px 30px 15px 20px; cursor:pointer; font-size:18px; box-shadow:0px 3px 6px #bfb6b6; border-radius:4px; margin-bottom:10px; text-decoration:none; border:2px solid #DB0011; border-left:10px solid #DB0011;}
+.etiqueta-destacado:hover{background:#F3F3F3;}
+.etiqueta-destacado .icono{max-width:40px; margin-right:25px;}
+.etiqueta-destacado .icono img{width:100%; max-width:40px;}
+.etiqueta-destacado:hover .icono img{transform:scale(1.2)}
+
+ @media(min-width:479px){
+   /* NO ES CELULAR */
+   .mvp .etiqueta{display:block; height:75%;}
+   .mvp .etiqueta .icono{margin-bottom:10px;}
+}
+
+/* LANDINGS */
+.back-btn{float:left; padding:10px 16px 16px 16px; background:#FFFFFF;}
+#contenedor .back-btn{background:#EEEEEE;}
+.back-btn button{background:#FFFFFF; border:none; cursor:pointer;}
+#contenedor .back-btn button{background:#EEEEEE;}
+.back-btn button img{max-height:16px; margin-right:5px;}
+ @media(max-width:479px){
+   /* ES CELULAR */
+   .back-btn{float:none;}
+}
+.comparador .cc-column{cursor:pointer;}
+.comparador .cc-column:hover{background:#EEEEEE;}
+.conocela{margin:10px 0;}
+ @media(min-width:479px){
+   /* NO ES CELULAR */
+   .comparador .A-TYP16L-RW-ALL{min-height:60px;}
+}
+
+.notification-banner .A-TYP16R-RW-ALL strong{font-family:"HSBC Univers Next Bold"; font-style:normal; font-weight:700;}
+
+/* CONTENIDO RELACIONADO */
+.relacionados{background: #EEEEEE 0% 0% no-repeat; box-shadow:0px 3px 6px #bfb6b6; border-radius: 4px; padding:10px; margin-bottom:40px;}
+.relacionados h3{border-left: 3px solid #E4001B; padding-left:10px;}
+.relacionados p.A-TYP16L-RW-ALL{font-size:14px; padding-left:10px; margin:3px 0;}
+.relacionados ul{list-style:none; margin-top:10px; font-size:14px;}
+.relacionados ul li {margin-bottom:10px; padding-left:10px;}
+.relacionados ul li:last-child {margin-bottom:10px;}
+.relacionados ul li h4{font-size:14px;}
+
+/* CONTENIDO */
+.contenido {height:fit-content;}
+.contenido img.responsive-image{width:100%;}
+.contenido img.responsive-icon{width:20%; max-width:80px; min-width:40px; margin-top:20px; margin-bottom:5px;}
+.contenido .heading img.responsive-icon{margin-top:0px;}
+.contenido img.responsive-icon-1L{width:20%; max-width:80px; min-width:40px; float:left; margin:0px 20px 5px 0;}
+.contenido img.responsive-icon-1Ls{width:20%; max-width:40px; min-width:20px; float:left; margin:0px 20px 25px 0;}
+.contenido .heading:last-child{margin-top:0px;}
+.contenido .A-PNLINLNEMSGE-RW-ALL{border-radius:4px;}
+.contenido h4.A-TYP16B-RW-ALL{line-height: 1.5;}
+.contenido a.width100{width:100%;}
+ @media(min-width:959px){
+   /* ES DESKTOP */
+   .contenido .poliza-seguros p.A-PAR16R-RW-ALL{min-height:72px;}
+   .contenido .poliza-seguros .responsive-icon{height: 59px !important;}
+}
+
+.contenido table.comparador-seguros{width:100%; font-family: "HSBC Univers Next","Arial","PingFang SC","Microsoft YaHei","Lantinghei SC","Heiti SC","simhei","sans-serif";}
+.contenido table.comparador-seguros thead tr{background:#DB0011; color:#FFFFFF; font-weight:700;}
+.contenido table.comparador-seguros thead tr th{padding:5px 10px;}
+.contenido table.comparador-seguros tbody th{text-align:left; padding:5px 10px; width:30%; font-weight:700;}
+.contenido table.comparador-seguros tbody tr.comparador-hr th{padding:5px 0px;}
+.contenido table.comparador-seguros tbody td{text-align:center; padding:5px 10px;}
+.contenido table.comparador-seguros tbody tr:nth-child(even){background:#EEEEEE;}
+.contenido table.comparador-seguros .A-BTNP-RW-ALL, .contenido table.comparador-seguros .A-BTNSO-RW-ALL, .contenido table.comparador-seguros .A-BTNSJ-RW-ALL, .contenido table.comparador-seguros .A-BTNSODB-RW-ALL, .contenido table.comparador-seguros .A-BTNSS-RW-ALL, .contenido table.comparador-seguros .A-BTNSGDB-RW-ALL {    padding:15px 10px; font-size:14px; min-width:110px;}
+
+.contenido table.comparador-productos{width:100%}
+.contenido table.comparador-productos thead tr{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:start; width:100%; min-height:80px;}
+.contenido table.comparador-productos thead tr td:first-child{width:50%;}
+.contenido table.comparador-productos tbody tr{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:start; width:100%; min-height:80px;}
+.contenido table.comparador-productos tbody tr th{width:50%;}
+.contenido table.comparador-productos th{padding:0 10px;}
+.contenido table.comparador-productos td{padding:0 10px;}
+.contenido table.comparador-productos tbody tr:nth-child(odd){background:#EEEEEE;}
+
+/* CAJA ROJA PUNTOS */
+.contenido .red-box {background:#DB0011; margin:10px auto; padding:25px 20px 30px 30px;}
+.contenido .red-box p{color:#FFFFFF;}
+.contenido .red-box p strong{font-family: "HSBC Univers Next","Arial","PingFang SC","Microsoft YaHei","Lantinghei SC","Heiti SC","simhei","sans-serif"; font-weight: 700;}
+.contenido .red-box hr{max-width:200px; border-top:1px solid #FFFFFF; border-bottom:0px; margin:20px 0 10px 0;}
+
+/* CAJA CON CALL TO ACTION */
+.cta-box{/*background:#EDEDED; box-shadow:0px 3px 6px #bfb6b6; border-radius:16px; padding:15px 30px;*/ display:none;}
+
+/* CAJA TE FUE UTIL LA INFORMACION? */
+
+.useful-info-box{/*background: url(/ayuda/images/nps-box/pregunta.svg) no-repeat 10px 10px #FFFFFF;*/background-image: url( '/ayuda/images/nps-box/pregunta.svg'); background-repeat:no-repeat; background-size: 40px; background-position:30px 13px; border-radius:16px; border:1px solid #333333; padding:15px 30px 15px 90px; display:flex; flex-wrap:nowrap;}
+.useful-info-box div{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:start;}
+.useful-info-box div.titulo{width:50%;}
+.useful-info-box div.calificacion{width:50%;}
+.useful-info-box table{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:start; width:75%; min-height:80px;}
+.useful-info-box table tr:first-child{min-height:50px;}
+.useful-info-box table td{padding:0 10px; width:40px;}
+.useful-info-box table td img{width:80%;}
+.useful-info-box table td:hover img{transform:scale(1.2)}
+.useful-info-box table .respuesta{display:none;}
+.useful-info-box table tr.respuesta td{padding:0px; width:auto; text-align:center;}
+
+.useful-info-nps{background-image: url( '/ayuda/images/nps-box/pregunta.svg'); background-repeat:no-repeat; background-size: 40px; background-position:30px 13px; border-radius:16px; border:1px solid #333333; padding:15px 30px 15px 90px;}
+
+.nps-box{background:#FFFFFF; border-radius:16px; border:1px solid #333333; padding:15px 30px; display:flex; flex-wrap:nowrap;}
+.nps-box div{display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:center; padding:0 0 0 10px;}
+.nps-box div:nth-child(2) {min-width:50%;}
+ @media(max-width:479px){
+   /* ES CELULAR */
+   .nps-box{display:block;}
+   .nps-box div img {max-width:50px; margin-bottom:15px;}
+   .nps-box div:nth-child(1) {width:30%;}
+   .nps-box div:nth-child(2) {width:70%; margin-bottom:15px;}
+   .nps-box div:nth-child(3) {width:20%; float:left;}
+   .nps-box div:nth-child(4) {width:20%; float:left;}
+   .nps-box div:nth-child(5) {width:20%; float:left;}
+   
+}
+ @media(min-width:480px) and (max-width:959px){
+   /* ES TABLET */
+}
+
+table.registracion-canales-desktop{}
+table.registracion-canales-desktop td:first-child{width:15%; padding-right:20px;}
+table.registracion-canales-desktop td:last-child{width:20%; padding-left:20px;}
+
+.cc-destacado-gris{background:#EDEDED; padding-top:20px;}
+.cc-destacado-gris .A-TYP22L-RW-ALL{color:#DB0011;}
+
+
+/* ZOCALO SEGUROS */
+
+#zocalo{border-top:1px solid #4A4A49; margin-top:50px;}
+#zocalo .rotulo{min-height:95px; display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:center;}
+#zocalo .rotulo div{padding:5px 10px; text-align:center; width:22%; font-size:13px;}
+#zocalo .rotulo div:last-child{text-align:right; padding-right:0px; width:32%;}
+#zocalo .rotulo div.nro-ssn span{font-weight:700;}
+#zocalo .rotulo div.telefono{font-weight:700; color:#29ABE2; font-size:14px;}
+#zocalo .rotulo div.web{font-weight:700; color:#29ABE2; font-size:14px;}
+#zocalo .rotulo div.web a{text-decoration:none; color:#29ABE2;}
+#zocalo .rotulo div.nro-ssn{border-right: 1px solid #4A4A49;}
+#zocalo .rotulo div.telefono{border-right: 1px solid #4A4A49;}
+
+ @media(max-width:959px){
+   #zocalo .rotulo{display:block;}
+   #zocalo .rotulo div{width:100%;}
+   #zocalo .rotulo div:last-child{text-align:center;}
+}
+#zocalo .detalle p{margin-bottom:10px;}
+#zocalo .detalle .entidades{background-color:#EDF0EF; padding:20px;}
+#zocalo .detalle .entidades a{font-weight:700; text-decoration:none;}
+#zocalo .detalle .atencion{padding:20px;}
+#zocalo .detalle .atencion p:first-child{font-weight:700;}
+#zocalo .emisora{padding:20px 10px;}
+#zocalo .emisora p{margin-bottom:10px;}
+
+/* ESPECIAL FERIADO */
+#feriado {background:#F3F3F3;}
+#feriado #fecha-proximo{font-family:"HSBC Univers Next Bold"; font-style:normal; font-weight:700; color:#DB0011;}
+#feriado .heading strong{font-family:"HSBC Univers Next Bold"; font-style:normal; font-weight:700;}
+#feriado .cc{align-items:center;}
+#feriado .cc-column:last-child{padding-right:0px;}
+ @media(min-width:959px){
+   /* ES DESKTOP */
+   #operar-feriado p.A-PAR16R-RW-ALL{min-height:72px;}
+}
+.alerta {background:#FFF3FA; box-shadow:0px 3px 6px #bfb6b6; border-left:8px solid #DB0011; padding:10px; border-radius:4px;}
+.alerta h4{background: url(/ayuda/images/icons/alert-feriados.svg) no-repeat top left; padding:3px 0 0 45px; min-height:30px; margin:10px 0;}
+.alerta p{margin:0 0 10px 0;}

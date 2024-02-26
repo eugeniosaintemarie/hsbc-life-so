@@ -43,7 +43,9 @@ define(["react", "../../controller/nominaController", "../../common/dropdownCont
 
       _this.state = {
         RESPUESTAS: _this.props.activities.map(function () {
-          return { list: [] };
+          {
+            return { list: [] };
+          }
         })
       };
 
@@ -100,49 +102,51 @@ define(["react", "../../controller/nominaController", "../../common/dropdownCont
               "div",
               { className: "col-md-12" },
               this.activities.map(function (act, i) {
-                return React.createElement(
-                  "div",
-                  { className: "text-center mt-3 mb-3" },
-                  React.createElement(
+                if (act !== undefined) {
+                  return React.createElement(
                     "div",
-                    { className: "form-inline justify-content-center  mt-2 mb-2" },
-                    React.createElement("input", {
-                      className: "form-control input-size text-center",
-                      type: "text",
-                      id: "idInput_" + i,
-                      name: act,
-                      value: _this3.state[act],
-                      onChange: _this3._handleOnResultInputs
-                    }),
+                    { className: "text-center mt-3 mb-3" },
                     React.createElement(
-                      "button",
-                      {
-                        className: "btn btn-link btn-hsbc btn-detail-prima input-size",
-                        onClick: function onClick() {
-                          return _this3._handleOnClickSearchActivities(_this3.state[act], i);
-                        }
+                      "div",
+                      { className: "form-inline justify-content-center  mt-2 mb-2" },
+                      React.createElement("input", {
+                        className: "form-control input-size text-center",
+                        type: "text",
+                        id: "idInput_" + i,
+                        name: act,
+                        value: _this3.state[act],
+                        onChange: _this3._handleOnResultInputs
+                      }),
+                      React.createElement(
+                        "button",
+                        {
+                          className: "btn btn-link btn-hsbc btn-detail-prima input-size",
+                          onClick: function onClick() {
+                            return _this3._handleOnClickSearchActivities(_this3.state[act], i);
+                          }
 
-                      },
-                      React.createElement("img", { width: "16px", src: "../img/home/tick.svg" })
+                        },
+                        React.createElement("img", { width: "16px", src: "../img/home/tick.svg" })
+                      )
+                    ),
+                    React.createElement(
+                      "div",
+                      null,
+                      React.createElement(DropDownContent, {
+                        supClassName: "form-inline justify-content-center  mt-2 mb-2",
+                        list: _this3.state.RESPUESTAS[i].list,
+                        className: "col-md-8  input-background-color form-control input-size text-center ",
+                        id: "idCbo_" + i,
+                        name: i,
+                        typeValue: "id",
+                        idObject: "CODIGO",
+                        nameObject: "DESCRIPCIONA",
+
+                        onResult: _this3._handleOnResultDrop
+                      })
                     )
-                  ),
-                  React.createElement(
-                    "div",
-                    null,
-                    React.createElement(DropDownContent, {
-                      supClassName: "form-inline justify-content-center  mt-2 mb-2",
-                      list: _this3.state.RESPUESTAS[i].list,
-                      className: "col-md-8  input-background-color form-control input-size text-center ",
-                      id: "idCbo_" + i,
-                      name: i,
-                      typeValue: "id",
-                      idObject: "CODIGO",
-                      nameObject: "DESCRIPCIONA",
-
-                      onResult: _this3._handleOnResultDrop
-                    })
-                  )
-                );
+                  );
+                }
               })
             )
           )

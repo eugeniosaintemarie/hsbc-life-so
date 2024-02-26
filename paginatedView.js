@@ -28,7 +28,7 @@ define(["react"], function (React) {
       };
 
       _this._setLimits = function () {
-        var limits = [100, 300, 600, 900, 1200];
+        var limits = [100, 300, 600, 900, 1200, 2000];
 
         var list = limits.filter(function (item) {
           if (item < _this.props.total) return item;
@@ -39,7 +39,7 @@ define(["react"], function (React) {
       _this._setLimits = function () {
         var total = _this.props.total;
         var flag = 0;
-        var limits = [100, 300, 600, 900, 1200];
+        var limits = [100, 300, 600, 900, 1200, 2000];
         var list = limits.filter(function (limit) {
           if (limit < total) return limit;else if (limit >= total && flag == 0) {
             flag = 1;
@@ -108,12 +108,19 @@ define(["react"], function (React) {
               React.createElement(
                 "div",
                 { className: "paginador" },
-                React.createElement(
+                this.props.selected !== undefined ? React.createElement(
                   "div",
                   null,
                   this.props.activepage,
                   " - ",
                   this.props.selected,
+                  " de ",
+                  this.props.total,
+                  " elementos"
+                ) : React.createElement(
+                  "div",
+                  null,
+                  this.props.activepage,
                   " de ",
                   this.props.total,
                   " elementos"

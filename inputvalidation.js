@@ -166,6 +166,7 @@ define(["react", "../../libs/react/js/react-input-mask.min"], function (React, I
             onKeyPress = _props.onKeyPress,
             onKeyDown = _props.onKeyDown,
             inputMode = _props.inputMode,
+            placeholder = _props.placeholder,
             mask = _props.mask,
             upperCase = _props.upperCase,
             _props$disabled = _props.disabled,
@@ -201,6 +202,7 @@ define(["react", "../../libs/react/js/react-input-mask.min"], function (React, I
             onKeyPress: onKeyPress,
             onKeyDown: onKeyDown,
             inputMode: inputMode,
+            placeholder: placeholder,
             mask: mask,
             disabled: disabled
           }),

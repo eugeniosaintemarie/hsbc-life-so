@@ -6,7 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib/utils"], function (React, ErrorList, FormIndividualNominee, Utils) {
+define(["react", "../../common/errorList", "../../controller/nominaController", "./formIndividualNominee", "../../lib/utils"], function (React, ErrorList, NominaController, FormIndividualNominee, Utils) {
   var NewIndividualNominee = function (_React$Component) {
     _inherits(NewIndividualNominee, _React$Component);
 
@@ -132,8 +132,10 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
         var today = 0;
         var listError = [];
         var validationOk = true;
-        var badCuil = _this.props.cuilChecker(_this.listValuesNominee[1].cuil.value);
+        var badCuil = _this.props.duplicateChecker("DOCUMDAT", _this.listValuesNominee[1].cuil.value);
+        var badMail = _this.props.duplicateChecker("EMAIL", _this.listValuesNominee[1].email.value);
         var emailData = _this.listValuesNominee[1].email.value;
+
         var listSend = Object.keys(_this.listValuesNominee).map(function (currency) {
           var nominee = _this.listValuesNominee[currency];
           Object.keys(nominee).map(function (e) {
@@ -151,6 +153,7 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
                 }
               }
             };
+
             //inicio de verificacion que van en todos los ramos
             if (e == "emailVer") {
               if (emailData != nominee[e].value) {
@@ -159,6 +162,7 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
                 listError.push("El correo electrónico no coincide");
               }
             }
+
             if (e == "cuil") {
               // aca se fija si hay 11 numeros
               if (!Utils.fValCUIT(nominee[e].value)) {
@@ -175,12 +179,23 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
                 listError.push("El Cuil se encuentra duplicado");
               }
             }
+
             if (e == "email") {
               if (nominee[e].isValidate == false && nominee[e].value != "") {
                 nominee[e].refe.current._onFocus(true);
                 validationOk = false;
+              } else if (badMail) {
+                // aca se fija que no haya repetidos
+                nominee[e].refe.current._onFocus(true);
+                validationOk = false;
+                listError.push("El Mail se encuentra duplicado");
+              } else {
+                //aca permite que se pueda modificar sin que tomer el MAIL repetido
+                nominee[e].refe.current._onFocus(true);
+                validationOk = true;
               }
             }
+
             if (e == "fecNac") {
               if (!_this.validateFecha(_this.listValuesNominee[currency].fecNac.value)) {
                 nominee[e].refe.current._onFocus(true);
@@ -192,6 +207,7 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
                 var maximo = new Date();
                 var nacimientoFormateado = _this._handleDateFormat(_this.listValuesNominee[currency].fecNac.value);
                 var fechaIngresada = new Date(parseInt(String(nacimientoFormateado).substring(0, 4)), parseInt(String(nacimientoFormateado).substring(4, 6)), parseInt(String(nacimientoFormateado).substring(6, 8)));
+
                 if (fechaIngresada < minimo || fechaIngresada > maximo) {
                   nominee[e].refe.current._onFocus(true);
                   validationOk = false;
@@ -199,6 +215,7 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
                 }
               }
             }
+
             _handleFieldValidation(nominee, e, "name", "El formato del nombre no es el correcto, la longitud tiene que ser mayor a 2, no debe tener caracteres especiales, no debe tener espacios dobles, no puede tener 3 o más letras consecutivas iguales, no puede ser Otros, Desconocido, No posee, No aplica o Sin nombre");
             _handleFieldValidation(nominee, e, "surname", "El formato del apellido no es el correcto, la longitud tiene que ser mayor a 2, no debe tener caracteres especiales, no debe tener espacios dobles, no puede tener 3 o más letras consecutivas iguales, no puede ser Otros, Desconocido, No posee, No aplica o Sin nombre");
             _handleFieldValidation(nominee, e, "cuil", "El CUIL debe tener 11 dígitos");
@@ -218,21 +235,27 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
               }
               _handleFieldValidation(nominee, e, "profeCod", "");
             }
+
             if (_this.plans.vidaColecOp.some(function (el) {
               return el == _this.ramoCod;
             })) {
               _handleFieldValidation(nominee, e, "fecIng", "Formato de fecha invalido");
             }
           });
+
           _this.setState({ showError: !validationOk, listErrorText: listError });
 
           //variable creada para enviar el valor de suma asegurada destro del array de coberturas
           var coverage = [];
+
           for (var i = 0; i < 20; i++) {
             coverage[i] = { COBERCOD: 0, SUMAASEG: 0 };
           }
-          coverage[0] = { COBERCOD: !_this.props.selectedNominee ? 0 : _this.props.selectedNominee.COBERTURAS.COBERTURA[0].COBERCOD,
-            SUMAASEG: _this._handleMoneyFormat(_this.listValuesNominee[currency].sumAseg.value) };
+
+          coverage[0] = {
+            COBERCOD: !_this.props.selectedNominee ? 0 : _this.props.selectedNominee.COBERTURAS.COBERTURA[0].COBERCOD,
+            SUMAASEG: _this._handleMoneyFormat(_this.listValuesNominee[currency].sumAseg.value)
+          };
 
           return {
             FECING: _this._handleDateFormat(_this.listValuesNominee[currency].fecIng.value),
@@ -257,9 +280,17 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
             SALDODEUDA: _this._handleMoneyFormat(_this.listValuesNominee[currency].saldoDeuda.value)
           };
         });
+
         if (validationOk) {
-          _this.props.addNominee(listSend[0]);
-          _this.props.switch('table');
+          if (_this.props.desigBenefEnabled) {
+            _this.nominaController.validateNominaAbm(listSend).then(function () {
+              _this.props.addNominee(listSend[0]);
+              _this.props.switch('table');
+            });
+          } else {
+            _this.props.addNominee(listSend[0]);
+            _this.props.switch('table');
+          }
         }
       };
 
@@ -288,6 +319,7 @@ define(["react", "../../common/errorList", "./formIndividualNominee", "../../lib
       };
 
       _this.listValuesNominee = {};
+      _this.nominaController = new NominaController();
       return _this;
     }
 

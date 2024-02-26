@@ -53,7 +53,14 @@ define(["react", "loadsh", "./bonus/bonusUniformCapital", "./bonus/bonusCapital"
               applicantData: this.formData,
               onResults: this._handleResults,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos,
+              isModify: this.props.isModify !== undefined ? this.props.isModify : false,
+              multiplo: this.props.multiplo,
+              sueldo: this.props.sueldo,
+              disableElements: this.props.disableElements,
+              recSolData: this.props.recSolData
             });
           case "bonusUniformCapital":
             return React.createElement(BonusUniformCapital, {
@@ -65,7 +72,10 @@ define(["react", "loadsh", "./bonus/bonusUniformCapital", "./bonus/bonusCapital"
               notConyuge: this.props.notConyuge,
               onResults: this._handleResults,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos,
+              isModify: this.props.isModify !== undefined ? this.props.isModify : false
             });
           case "bonusCapital":
             return React.createElement(BonusCapital, {
@@ -77,12 +87,21 @@ define(["react", "loadsh", "./bonus/bonusUniformCapital", "./bonus/bonusCapital"
               applicantData: this.formData,
               onResults: this._handleResults,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos,
+              isModify: this.props.isModify !== undefined ? this.props.isModify : false,
+              sumAseg: this.props.sumAseg,
+              disableElements: this.props.disableElements,
+              recSolData: this.props.recSolData
             });
           case "loader":
             return React.createElement(
               "div",
-              { className: "col-md-11 d-flex justify-content-center" },
+              {
+                className: "col-md-11 d-flex justify-content-center",
+                style: this.props.isModify !== undefined && this.props.isModify ? { "margin-bottom": "4rem" } : {}
+              },
               React.createElement(Loader, { width: "4rem", height: "4rem" })
             );
 

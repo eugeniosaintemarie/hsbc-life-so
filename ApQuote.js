@@ -49,13 +49,14 @@ define(["react"], function (React) {
     _createClass(ApQuote, [{
       key: "render",
       value: function render() {
-        var listPoliza = this.props.listPoliza;
+        var _props = this.props,
+            listPoliza = _props.listPoliza,
+            grupoPoliza = _props.grupoPoliza,
+            listSubGrupos = _props.listSubGrupos;
 
 
         if (this.props.isConyuge && this.props.notConyuge) {
-          var capitalMaximoConyu = listPoliza.GRUPOS.GRUPO.find(function (e) {
-            return parseInt(e.GRUPOCOD) == 50;
-          }).GCAPIMAX;
+          var capitalMaximoConyu = listSubGrupos[0].GCAPIMAX;
         }
 
         return React.createElement(
@@ -90,7 +91,7 @@ define(["react"], function (React) {
                     React.createElement(
                       "p",
                       { className: "col-5 col-md-2 p-0 text-right" },
-                      listPoliza.MONENCOD === 1 ? "$ " + listPoliza.CAPITMAX.toLocaleString("es-AR") : listPoliza.MONENCOD === 2 ? "U$S " + listPoliza.CAPITMAX.toLocaleString("es-AR") : ""
+                      listPoliza.MONENCOD === 1 ? "$ " + grupoPoliza.GCAPIMAX.toLocaleString("es-AR") : listPoliza.MONENCOD === 2 ? "U$S " + grupoPoliza.GCAPIMAX.toLocaleString("es-AR") : ""
                     )
                   ),
                   React.createElement(
@@ -118,7 +119,7 @@ define(["react"], function (React) {
                     React.createElement(
                       "p",
                       { className: "col-5 col-md-2 p-0 text-right" },
-                      listPoliza.MONENCOD === 1 ? "$ " + (listPoliza.CAPITMAX * (listPoliza.TASA / 1000)).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : listPoliza.MONENCOD === 2 ? "U$S " + (listPoliza.CAPITMAX * (listPoliza.TASA / 1000)).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : ""
+                      listPoliza.MONENCOD === 1 ? "$ " + (grupoPoliza.GCAPIMAX * (listPoliza.TASA / 1000)).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : listPoliza.MONENCOD === 2 ? "U$S " + (grupoPoliza.GCAPIMAX * (listPoliza.TASA / 1000)).toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : ""
                     )
                   )
                 )

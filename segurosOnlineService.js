@@ -29,11 +29,6 @@ define(['react', 'react-dom', './baseService'], function (React, ReactDOM, BaseS
                 return this.call('POST', 'Inicio/buscarClientes', param, 'JSON', true);
             }
         }, {
-            key: 'getRecuperarNominaEmpleados',
-            value: function getRecuperarNominaEmpleados(param) {
-                return this.call('POST', 'Inicio/recuperarNominaEmpleados', param, 'JSON', true);
-            }
-        }, {
             key: 'getDetalleRiesgo',
             value: function getDetalleRiesgo(param) {
                 return this.call('POST', 'Inicio/detalleRiesgo', param, 'JSON', true);
@@ -411,6 +406,21 @@ define(['react', 'react-dom', './baseService'], function (React, ReactDOM, BaseS
             key: 'setSolicitudBaja',
             value: function setSolicitudBaja(param) {
                 return this.call('POST', 'SolBaj/setSolicitudBaja', param, 'JSON', true);
+            }
+        }, {
+            key: 'getProdColAseg',
+            value: function getProdColAseg() {
+                return this.call('POST', 'VidCol/getProdColAseg', {}, 'JSON', true);
+            }
+        }, {
+            key: 'getNovedadesPol',
+            value: function getNovedadesPol(param) {
+                return this.call('POST', 'NominaDeAsegurados/getNovedadesPol', param, 'JSON', true);
+            }
+        }, {
+            key: 'getImprimirClausulado',
+            value: function getImprimirClausulado(param) {
+                return this.call('POST', 'Impresos/imprimirClausulado', param, 'JSON', true, 'BLOB');
             }
         }]);
 

@@ -43,8 +43,13 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
 
       _this2._handleResults = function (id, result) {
         _this2.formData[id] = result;
+
         if (result.value !== "") {
           _this2.handleVerificationBrand(id, result);
+        }
+
+        if (id === "applicantCuilNumber" && !result.isValidate && _this2.formData[id].referencies.current !== null) {
+          _this2.formData[id].referencies.current._onFocus(true);
         }
       };
 
@@ -54,6 +59,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
 
       _this2._handleFormValidation = function (saveForm) {
         var field = _this2.formData;
+        var formPropData = _this2.props.formInfo ? _this2.props.formInfo : _this2.props.data;
         var validated = true;
         var errorsList = [];
         var emptyFields = true;
@@ -72,10 +78,25 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
                   validated = false;
                   emptyFields = false;
                 }
+
+                if (element == "applicantCuilNumber" && field[element].value.length !== 11 && formPropData.applicantTypeCCC == "1" && field[element].formatText == undefined) {
+                  errorsList.push("La longitud del CUIL debe ser de 11 digitos");
+                  field[element].referencies.current._onFocus(true);
+                  validated = false;
+                  emptyFields = false;
+                }
               }
               if (field[element].value == "" && saveForm != "saveForm") {
                 field[element].referencies.current._onFocus(true);
-                errorsList[0] = "Complete los campos indicados";
+
+                if (errorsList.length !== 0) {
+                  if (!errorsList.includes("Complete los campos indicados")) {
+                    errorsList.push("Complete los campos indicados");
+                  }
+                } else {
+                  errorsList[0] = "Complete los campos indicados";
+                }
+
                 emptyFields = true;
                 validated = false;
               } else {
@@ -149,9 +170,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
             var fechaNacimientoConyu = field["applicantDateBirthConyuge"].value;
             var dateNacimientoConyu = Utils.formatPolizaDate(Utils.formatFechaNumber(fechaNacimientoConyu));
             var aniosAhoraConyu = Utils.fAgeCalc(dateNacimientoConyu);
-            var grupo = _this.props.listPoliza.GRUPOS.GRUPO.find(function (e) {
-              return parseInt(e.GRUPOCOD) == 50;
-            });
+            var grupo = _this.props.listSubGrupos[0];
 
             var fecha = fechaNacimientoConyu.split("/");
             var dia = parseInt(fecha[0], 10);
@@ -184,13 +203,11 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
             }
           }
 
-          if (saveForm === "saveForm") {
+          if (saveForm === "saveForm" && _this.props.isConyuge && _this.state.notConyuge) {
             var fechaNacimientoConyu = field["applicantDateBirthConyuge"].value;
             var dateNacimientoConyu = Utils.formatPolizaDate(Utils.formatFechaNumber(fechaNacimientoConyu));
             var aniosAhoraConyu = Utils.fAgeCalc(dateNacimientoConyu);
-            var grupo = _this.props.listPoliza.GRUPOS.GRUPO.find(function (e) {
-              return parseInt(e.GRUPOCOD) == 50;
-            });
+            var grupo = _this.props.listSubGrupos[0];
 
             var fecha = fechaNacimientoConyu.split("/");
             var dia = parseInt(fecha[0], 10);
@@ -235,7 +252,8 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
                 size: "md",
                 title: "Validación de campos",
                 component: _this._handleErrorsList(errorsList, emptyFields)
-              } });
+              }
+            });
 
             return false;
           } else {
@@ -362,9 +380,9 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
       _this2.handlePlus = function (product) {
         if (product == "AP" || product == "EC" || product == "CU") {
           if (_this2.props.listPoliza.MONENCOD === 1) {
-            return "$ " + _this2.props.listPoliza.CAPITMAX;
+            return "$ " + _this2.props.grupoPoliza.GCAPIMAX;
           } else if (_this2.props.listPoliza.MONENCOD === 2) {
-            return "U$S " + _this2.props.listPoliza.CAPITMAX;
+            return "U$S " + _this2.props.grupoPoliza.GCAPIMAX;
           }
         } else if (product == "MS") {
           return _this2.state.policy;
@@ -372,7 +390,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
       };
 
       _this2._handleSendForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         if (_this2.formData.formConyuge && _this2.formData.formConyuge.id == 2) {
           _this2.handleEraseData();
         }
@@ -492,7 +510,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
                         "PROVICOD": Number(_this2.formData.applicantProvince.id),
                         "IMPSUELD": 0,
                         "MULTIPLO": 0,
-                        "CAPITASG": _this2.props.listPoliza.CAPITMAX,
+                        "CAPITASG": _this2.props.grupoPoliza.GCAPIMAX,
                         "CONYUGE": _this2.formData.formConyuge ? _this2.formData.formConyuge.id == 1 ? "S" : "N" : "N",
                         "EXPEDNUMC": "0000000050",
                         "DOCUMTIPC": _this2.formData.formConyuge ? 5 : 0,
@@ -523,7 +541,8 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
                         "TOM_NDO": _this2.props.product.TOM_NDO,
                         "DES_PRO": _this2.props.product.DES_PRO,
                         "TOM_APE": _this2.props.listPoliza.NOMBYAPE,
-                        "TOM_NOM": ""
+                        "TOM_NOM": "",
+                        "COD_PRO": _this2.props.product.COD_PRO
                       }
                     }, function (callBack) {
                       if (callBack.RESTS == "OK") {
@@ -569,7 +588,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
       };
 
       _this2._handleSaveForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         if (_this2.formData.formConyuge && _this2.formData.formConyuge.id == 2) {
           _this2.handleEraseData();
         }
@@ -597,7 +616,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
       };
 
       _this2._handleErrorsList = function (errorsList, emptyFields) {
-        if (emptyFields) {
+        if (emptyFields && errorsList.length === 1) {
           return React.createElement(
             "ul",
             null,
@@ -810,7 +829,9 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
                 depoActivitiesList: this.props.depoActivitiesList,
                 onResults: this._handleResults,
                 readOnly: this.props.readOnly,
-                fechaAct: this.props.user.FECHA
+                fechaAct: this.props.user.FECHA,
+                grupoPoliza: this.props.grupoPoliza,
+                listSubGrupos: this.props.listSubGrupos
               })
             ) : "",
             React.createElement(
@@ -824,6 +845,8 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/formaPago"
               conyuge: this.state.conyuge,
               isConyuge: this.props.isConyuge,
               listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos,
               notConyuge: this.state.notConyuge,
               applicantData: this.formData,
               onResults: this._handleResults,

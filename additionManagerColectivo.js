@@ -163,6 +163,8 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
         depoActivitiesList: [],
         countriesList: [],
         listPoliza: null,
+        grupoPoliza: null,
+        listSubGrupos: null,
         fileDDJJ2: { name: "" },
         fileDDJJ1: { name: "" },
         isConyuge: true, //esta es la variable que va a guardar el valor del back de bonus
@@ -207,7 +209,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               readOnly: this.state.readOnly,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -234,7 +238,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
               readOnly: this.state.readOnly,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -261,7 +267,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
               readOnly: this.state.readOnly,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -287,7 +295,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               readOnly: this.state.readOnly,
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -315,7 +325,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               readOnly: this.state.readOnly,
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -342,7 +354,9 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
               handleSetRequestNumber: this.props.handleSetRequestNumber,
               recoverPayrollEmployees: this.props.recoverPayrollEmployees,
               readOnly: this.state.readOnly,
-              listPoliza: this.state.listPoliza
+              listPoliza: this.state.listPoliza,
+              grupoPoliza: this.state.grupoPoliza,
+              listSubGrupos: this.state.listSubGrupos
             }) : React.createElement(
               "div",
               { className: "col-md-11 d-flex justify-content-center" },
@@ -398,17 +412,25 @@ define(["react", "../../redux/store", "./processOKVC", "../../lib/utils", "../..
 
         vidaController.getDatosPoliza(this.props.recoverPayrollEmployees.POL_SEC, this.props.recoverPayrollEmployees.POL_ANN, this.props.recoverPayrollEmployees.COD_PRO, function (callBack) {
           if (callBack !== "ERROR") {
+            var codGrupo = _this2.props.product.COD_GRU;
+            var dataPoliza = callBack.Message.DATOS;
+            var gruposPoliza = dataPoliza.GRUPOS.GRUPO;
+
+            var grupo = gruposPoliza.length > 0 ? gruposPoliza.filter(function (grupo) {
+              return grupo.GRUPOCOD === codGrupo;
+            }) : [];
+            var subGrupos = gruposPoliza.length > 0 ? gruposPoliza.filter(function (grupo) {
+              return grupo.GRUPOPRI === codGrupo;
+            }) : [];
+
             _this2.setState({
-              listPoliza: callBack.Message.DATOS
+              listPoliza: dataPoliza,
+              grupoPoliza: grupo[0],
+              listSubGrupos: subGrupos
             });
-            var grupoCod = callBack.Message.DATOS.GRUPOS.GRUPO.find(function (e) {
-              var num = parseInt(e.GRUPOCOD, 10);
-              return num === 50;
-            });
-            if (typeof grupoCod !== 'undefined') {
-              if (parseInt(grupoCod.GRUPOCOD, 10) === 50) {
-                _this2.setState({ isConyuge: true });
-              }
+
+            if (subGrupos.length === 1) {
+              _this2.setState({ isConyuge: true });
             } else {
               _this2.setState({ isConyuge: false });
             }

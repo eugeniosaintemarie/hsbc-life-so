@@ -80,18 +80,20 @@ define(["react", "./formNewFamilyGroup", "../../../../common/errormessage", "../
         var textError = "";
         var validationOK = true;
         var listSend = [];
-        if (!_this.props.selectedItem && _this.listValuesBeneficiary[1].relationShip.id == "50" && _this.props.listaBeneficiarios.find(function (element) {
-          return element.NOMINAS.RELBECOD == "50";
+        var relationshipId = parseInt(_this.listValuesBeneficiary[1].relationShip.id);
+
+        if (!_this.props.selectedItem && relationshipId >= 50 && relationshipId <= 59 && _this.props.listaBeneficiarios.find(function (element) {
+          return parseInt(element.NOMINAS.RELBECOD) >= 50 && parseInt(element.NOMINAS.RELBECOD) <= 59;
         })) {
           validationOK = false;
           textError = "No puede asegurar mas de 1 conyuge";
-        } else if (!_this.props.selectedItem && _this.listValuesBeneficiary[1].relationShip.id == "2" && _this.props.listaBeneficiarios.filter(function (element) {
-          return element.NOMINAS.RELBECOD == "2";
+        } else if (!_this.props.selectedItem && relationshipId >= 2 && relationshipId <= 9 && _this.props.listaBeneficiarios.filter(function (element) {
+          return parseInt(element.NOMINAS.RELBECOD) >= 2 && parseInt(element.NOMINAS.RELBECOD) <= 9;
         }).length == 6) {
           validationOK = false;
           textError = "No puede asegurar mas de 6 hijos";
-        } else if (!_this.props.selectedItem && (_this.listValuesBeneficiary[1].relationShip.id == "101" || _this.listValuesBeneficiary[1].relationShip.id == "100") && _this.props.listaBeneficiarios.filter(function (element) {
-          return element.NOMINAS.RELBECOD == "101" || element.NOMINAS.RELBECOD == "100";
+        } else if (!_this.props.selectedItem && relationshipId >= 100 && relationshipId <= 109 && _this.props.listaBeneficiarios.filter(function (element) {
+          return parseInt(element.NOMINAS.RELBECOD) >= 100 && parseInt(element.NOMINAS.RELBECOD) <= 109;
         }).length == 4) {
           validationOK = false;
           textError = "No puede asegurar mas de 4 padres/suegros";
@@ -116,17 +118,18 @@ define(["react", "./formNewFamilyGroup", "../../../../common/errormessage", "../
                   textError = "Ingrese una fecha válida";
                 }
               } else if (e == "birthday1") {
-                var relationshipId = _this.listValuesBeneficiary[currency].relationShip.id;
-                var grupo = _this.props.listPoliza.GRUPOS.GRUPO.find(function (e) {
-                  return parseInt(e.GRUPOCOD) == relationshipId;
+                var _relationshipId = _this.listValuesBeneficiary[currency].relationShip.id;
+                var grupo = _this.props.listSubGrupos.find(function (e) {
+                  return parseInt(e.GRUPOCOD) == _relationshipId;
                 });
+
                 //el id 2 hace referencia a "hijos menores de 25 años"
-                if (relationshipId == 2) {
+                if (_relationshipId == 2) {
                   if (!_this._checkNacimientoHijoMayor25(birthday)) {
                     validationOK = false;
                     textError = "La edad debe ser menor a 25 años.";
                   }
-                } else if (!_this._checkEdadFamiliares(birthday, grupo.GEDADMIN, grupo.GEDADMAX)) {
+                } else if (grupo && !_this._checkEdadFamiliares(birthday, grupo.GEDADMIN, grupo.GEDADMAX)) {
                   {
                     validationOK = false;
                     textError = "La edad debe ser entre " + grupo.GEDADMIN + " y " + grupo.GEDADMAX + " años.";
@@ -182,8 +185,9 @@ define(["react", "./formNewFamilyGroup", "../../../../common/errormessage", "../
             listTipoDoc: _this.props.listTipoDoc,
             listParentesco: _this.props.listParentesco,
             readOnly: _this.props.readOnly,
-            listPoliza: _this.props.listPoliza
-
+            listPoliza: _this.props.listPoliza,
+            grupoPoliza: _this.props.grupoPoliza,
+            listSubGrupos: _this.props.listSubGrupos
           })
         );
       };

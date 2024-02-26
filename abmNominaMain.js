@@ -6,7 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaStep2", "./nominaIndividualStep1", "./payrollLoadFail", "../../common/loader"], function (React, IngresarNomina, NominaCompletaStep1, NominaCompletaStep2, NominaIndividualStep1, PayrollLoadFail, Loader) {
+define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaStep2", "./nominaIndividualStep1", "./payrollLoadFail", "./validityErrorScreen", "../../common/loader", "../../controller/vidaColectivoController", "../../controller/nominaController", "../../lib/utils"], function (React, IngresarNomina, NominaCompletaStep1, NominaCompletaStep2, NominaIndividualStep1, PayrollLoadFail, ValidityErrorScreen, Loader, VidaColectivoController, NominaController, Utils) {
   var AbmNominaMain = function (_React$Component) {
     _inherits(AbmNominaMain, _React$Component);
 
@@ -38,11 +38,9 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
 
       _this._stopLoading = function () {
         _this.setState({
-          loaderCount: _this.state.loaderCount - 1
+          loaderCount: _this.state.loaderCount - 1,
+          loaderActive: false
         });
-        if (_this.state.loaderCount == 0) {
-          _this.setState({ loaderActive: false });
-        }
       };
 
       _this._handleCamposNomina = function (campos) {
@@ -68,7 +66,8 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
               "switch": _this._handleSwitch,
               startLoading: _this._startLoading,
               stopLoading: _this._stopLoading,
-              saveGroupData: _this._saveGroup
+              saveGroupData: _this._saveGroup,
+              optionsDate: _this.state.optionsDate
             });
           case "nominaCompleta":
             return React.createElement(NominaCompletaStep1, {
@@ -87,7 +86,8 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
               stopLoading: _this._stopLoading,
               grupo: _this.state.group,
               product: _this.props.product,
-              user: _this.props.user
+              user: _this.props.user,
+              desigBenefEnabled: _this.state.desigBenefEnabled
             });
           case "nominaAbm":
             return React.createElement(NominaIndividualStep1, {
@@ -98,12 +98,18 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
               stopLoading: _this._stopLoading,
               grupo: _this.state.group,
               product: _this.props.product,
-              user: _this.props.user
+              user: _this.props.user,
+              desigBenefEnabled: _this.state.desigBenefEnabled
             });
           case "payrollLoadFail":
             return React.createElement(PayrollLoadFail, {
               "switch": _this._handleSwitch,
               typeError: _this.state.payrollErrorValidation
+            });
+          case "validityErrorScreen":
+            return React.createElement(ValidityErrorScreen, {
+              "switch": _this._handleSwitch,
+              cobroforError: _this.state.cobroforError
             });
         }
       };
@@ -112,10 +118,16 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
         currentView: "main",
         payrollErrorValidation: "",
         loaderActive: false,
+        cobroforError: false,
+        desigBenefEnabled: null,
         loaderCount: 0,
         camposNomina: [],
+        optionsDate: [],
         group: {}
       };
+
+      _this.vidaController = new VidaColectivoController();
+      _this.nominaController = new NominaController();
       return _this;
     }
 
@@ -128,6 +140,110 @@ define(["react", "./ingresarNomina", "./nominaCompletaStep1", "./nominaCompletaS
           this.state.loaderActive && React.createElement(Loader, { width: "2rem", height: "2rem", fullscreen: true, text: "Cargando" }),
           this._caseForm()
         );
+      }
+    }, {
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        var _this2 = this;
+
+        var currentProduct = this.props.product;
+        var detalle = currentProduct.detalle ? currentProduct.detalle : currentProduct.cup;
+
+        this.vidaController.getDatosPoliza(detalle.POLIZSEC, detalle.POLIZANN, detalle.RAMOPCOD, function (response) {
+          if (response !== "ERROR") {
+            var dataPoliza = response.Message.DATOS;
+            var FECEFESU = dataPoliza.FECEFESU;
+            var COBROFOR = dataPoliza.COBROFOR;
+            var FEC_HOY = dataPoliza.FEC_HOY;
+
+            var listOptions = [];
+            var dateEndoso = 0;
+            var dateVigencia = 0;
+
+            if (FECEFESU !== 0 && typeof FECEFESU === "number") {
+              var date = Utils.formatPolizaDate(FECEFESU);
+
+              if (COBROFOR === 1) {
+                date.setMonth(date.getMonth() + COBROFOR);
+                dateEndoso = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: FECEFESU, FECHA: Utils.formatFechaString(FECEFESU) + " - " + Utils.formatFechaString(dateEndoso) });
+
+                date.setMonth(date.getMonth() + COBROFOR);
+                dateVigencia = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: dateEndoso, FECHA: Utils.formatFechaString(dateEndoso) + " - " + Utils.formatFechaString(dateVigencia) });
+              } else if (COBROFOR === 2 || COBROFOR === 3) {
+                var numberDate = Number(FEC_HOY);
+
+                date.setMonth(date.getMonth() + COBROFOR);
+                dateEndoso = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: numberDate, FECHA: Utils.formatFechaString(numberDate) + " - " + Utils.formatFechaString(dateEndoso) });
+
+                date.setMonth(date.getMonth() + COBROFOR);
+                dateVigencia = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: dateEndoso, FECHA: Utils.formatFechaString(dateEndoso) + " - " + Utils.formatFechaString(dateVigencia) });
+              } else if (COBROFOR === 4) {
+                var _numberDate = Number(FEC_HOY);
+
+                date.setMonth(date.getMonth() + 6);
+                dateEndoso = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: _numberDate, FECHA: Utils.formatFechaString(_numberDate) + " - " + Utils.formatFechaString(dateEndoso) });
+
+                date.setMonth(date.getMonth() + 6);
+                dateVigencia = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: dateEndoso, FECHA: Utils.formatFechaString(dateEndoso) + " - " + Utils.formatFechaString(dateVigencia) });
+              } else if (COBROFOR === 5) {
+                var _numberDate2 = Number(FEC_HOY);
+
+                date.setMonth(date.getMonth() + 12);
+                dateEndoso = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: _numberDate2, FECHA: Utils.formatFechaString(_numberDate2) + " - " + Utils.formatFechaString(dateEndoso) });
+
+                date.setMonth(date.getMonth() + 12);
+                dateVigencia = Utils.formatDateToNumber(date);
+
+                listOptions.push({ FECEFESU: dateEndoso, FECHA: Utils.formatFechaString(dateEndoso) + " - " + Utils.formatFechaString(dateVigencia) });
+              } else if (COBROFOR === 6) {
+                _this2.setState({
+                  cobroforError: true,
+                  currentView: "validityErrorScreen"
+                });
+              } else {
+                _this2.setState({
+                  cobroforError: true,
+                  currentView: "validityErrorScreen"
+                });
+              }
+            } else {
+              _this2.setState({
+                cobroforError: false,
+                currentView: "validityErrorScreen"
+              });
+            }
+
+            _this2.setState({
+              optionsDate: listOptions
+            });
+
+            _this2.nominaController.validateDesigBenef("222222222", function (res) {
+              if (res.VALIDACION === "NODESIGNA") {
+                _this2.setState({
+                  desigBenefEnabled: false
+                });
+              } else {
+                _this2.setState({
+                  desigBenefEnabled: true
+                });
+              }
+            }, detalle);
+          }
+        });
       }
     }]);
 

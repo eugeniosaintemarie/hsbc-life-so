@@ -69,15 +69,29 @@ define([], function () {
       }
       return dateFormatted;
     },
-    formatFechaString: function formatFechaString(date) {
+    formatFechaString: function formatFechaString(date, format) {
       //NumbertoString
       var resp = "";
+
       if (date) {
         var day = date.toString().substring(6);
         var month = date.toString().substring(4, 6);
         var year = date.toString().substring(0, 4);
-        resp = day + "/" + month + "/" + year;
+
+        if (format) {
+          var simbolDate = format.includes("/") ? "/" : format.includes("-") ? "-" : false;
+          var newFormat = simbolDate ? format.replace(simbolDate, "").replace(simbolDate, "") : format;
+
+          if (newFormat.length > 6) {
+            resp = format.replace("DD", day).replace("MM", month).replace("AAAA", year);
+          } else {
+            resp = format.replace("DD", day).replace("MM", month).replace("AA", year.slice(-2));
+          }
+        } else {
+          resp = day + "/" + month + "/" + year;
+        }
       }
+
       return resp;
     },
     formatDateStringMonthYear: function formatDateStringMonthYear(date) {
@@ -90,26 +104,68 @@ define([], function () {
       }
       return resp;
     },
-    formatFechaNumber: function formatFechaNumber(date) {
-      //"dd/MM/yyyy" to yyyyMMdd
+    formatFechaNumber: function formatFechaNumber(date, format) {
+      //si format = undefined -> "dd/MM/yyyy" to yyyyMMdd
+      // every format to yyymmdd
+
+      var today = new Date();
       var response = 0;
+      var simbolDate = date.includes("/") ? "/" : date.includes("-") ? "-" : false;
+
       if (Number.isInteger(date)) {
-        response = date;
-      } else if (date) {
-        var _date$split = date.split("/"),
-            _date$split2 = _slicedToArray(_date$split, 3),
-            d = _date$split2[0],
-            m = _date$split2[1],
-            y = _date$split2[2];
+        response = Number(date);
+      } else if (date && simbolDate) {
+        var d = "";
+        var m = "";
+        var y = "";
+
+        if (format) {
+          var copyFormat = format.replace(simbolDate, "").replace(simbolDate, "");
+          var newDate = date.split(simbolDate);
+          var newFormat = "";
+
+          if (copyFormat.startsWith("A") && copyFormat.length > 6) {
+            newFormat = copyFormat.substring(0, 1) + copyFormat.substring(4, 5) + copyFormat.substring(6, 7);
+          } else {
+            newFormat = copyFormat.substring(0, 1) + copyFormat.substring(2, 3) + copyFormat.substring(4, 5);
+          }
+
+          d = newDate[newFormat.indexOf("D")];
+          m = newDate[newFormat.indexOf("M")];
+          y = newDate[newFormat.indexOf("A")];
+
+          if (y.length < 4) {
+            var anio = Number(today.getFullYear().toString().slice(-2));
+
+            if (Number(y) > anio) {
+              y = "19" + y;
+            } else {
+              y = "20" + y;
+            }
+          }
+        } else {
+          var _date$split = date.split(simbolDate);
+
+          var _date$split2 = _slicedToArray(_date$split, 3);
+
+          d = _date$split2[0];
+          m = _date$split2[1];
+          y = _date$split2[2];
+        }
 
         var year = y;
         var month = m.length == 1 ? "0" + m : m;
         var day = d.length == 1 ? "0" + d : d;
+
         response = Number(year + month + day);
+
         if (y == undefined) {
           response = Number(month + day);
         }
+      } else if (!isNaN(date)) {
+        response = Number(date);
       }
+
       return response;
     },
 
@@ -201,7 +257,7 @@ define([], function () {
             var url = URL.createObjectURL(data);
             var fakeAnchor = document.createElement("a");
             fakeAnchor.href = url;
-            fakeAnchor = filename;
+            fakeAnchor.download = filename;
             document.body.appendChild(fakeAnchor);
             fakeAnchor.click();
             setTimeout(function () {

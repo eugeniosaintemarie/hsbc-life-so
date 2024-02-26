@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer", "../services/segurosOnlineService", "../services/loginService", "../services/endososService", "../common/datepicker", "../common/inputvalidation"], function (React, ModalReactBootstrap, DropdownContainer, SegurosOnlineService, LoginService, EndososService, DatePicker, InputValidation) {
+define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer", "../services/segurosOnlineService", "../services/loginService", "../services/endososService", "../common/datepicker", "../common/inputvalidation", "../common/dropdownContent"], function (React, ModalReactBootstrap, DropdownContainer, SegurosOnlineService, LoginService, EndososService, DatePicker, InputValidation, DropDownContent) {
   var FirstLogin = function (_React$Component) {
     _inherits(FirstLogin, _React$Component);
 
@@ -25,35 +25,46 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
       };
 
       _this._handleResults = function (id, result) {
-
         var dataState = _defineProperty({}, id, result);
-
-        if (id === 'producto' && result !== null && result !== '') {
-          dataState.displayForm = true;
-        }
 
         _this.setState(dataState);
       };
 
       _this._disableButton = function () {
-        return _this.state.producto === null || _this.state.birthDate === null && _this.state.producto.id === 'N' || _this.state.codigoPostal === null && _this.state.producto.id === 'L' || _this.state.formaPago === null || _this.state.medioPago === null || _this.state.provincia === null;
+        if ((_this.state.PID === "N" || _this.state.PID === "O") && _this.state.codigoValidacion !== null) {
+          return _this.state.mail === null || _this.state.codigoValidacion.value === "";
+        } else {
+          return _this.state.producto === null || _this.state.codigoPostal === null && _this.state.producto.id === 'L' || _this.state.formaPago === null || _this.state.medioPago === null || _this.state.provincia === null;
+        }
+      };
+
+      _this._disableVerificationButton = function () {
+        return _this.state.mail === null;
+      };
+
+      _this._handleCodeValidation = function () {
+        var params = {
+          PRODUCTO: _this.state.productoSelected,
+          CODMAIL: Number(_this.state.mail.id)
+        };
+
+        var loginService = new LoginService();
+        loginService.sendCodVal(params).then(function (data) {
+          console.log(data);
+        });
       };
 
       _this._handleSubmit = function () {
+        var loginService = new LoginService();
+        var productSelected = _this.state.productoSelected;
 
-        if (!_this._disableButton()) {
-          var loginService = new LoginService();
-          var productSelected = _this._getProductoSelected();
-          if (productSelected.PID === 'N') {
-            var birthDateSplitted = _this.state.birthDate.split('/');
-          }
-
+        if (_this.state.PID === "N" || _this.state.PID === "O") {
           var params = {
             PRODUCTO: productSelected,
-            DATO1: productSelected.PID === 'N' ? birthDateSplitted[2] + birthDateSplitted[1] + birthDateSplitted[0] : _this.state.codigoPostal.value,
-            DATO2: _this.state.medioPago.id,
-            DATO3: _this._fillWithZeros(_this.state.formaPago.id, 4),
-            DATO4: _this._fillWithZeros(_this.state.provincia.id, 2)
+            DATO1: _this.state.codigoValidacion.value,
+            DATO2: "",
+            DATO3: "",
+            DATO4: ""
           };
 
           loginService.verificarPositiveID(params).then(function (response) {
@@ -72,18 +83,67 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
               });
             }
           });
+        } else {
+          if (!_this._disableButton()) {
+            if (productSelected.PID === 'N' || productSelected.PID === 'O') {
+              var birthDateSplitted = _this.state.birthDate.split('/');
+            }
+
+            var _params = {
+              PRODUCTO: productSelected,
+              DATO1: (productSelected.PID === 'N' || productSelected.PID === 'O') ? birthDateSplitted[2] + birthDateSplitted[1] + birthDateSplitted[0] : _this.state.codigoPostal.value,
+              DATO2: _this.state.medioPago.id,
+              DATO3: _this._fillWithZeros(_this.state.formaPago.id, 4),
+              DATO4: _this._fillWithZeros(_this.state.provincia.id, 2)
+            };
+
+            loginService.verificarPositiveID(_params).then(function (response) {
+              if (response === 'pregunta_secreta') {
+                _this.props.onSubmit(response);
+              } else {
+                _this.setState({
+                  showModalSinister: true,
+                  modal: {
+                    component: null,
+                    title: "Primer ingreso",
+                    contentHTML: 'Los datos no son correctos.',
+                    html: true,
+                    size: "md"
+                  }
+                });
+              }
+            });
+          }
         }
       };
 
       _this._getProductoSelected = function () {
-
         var producto = null;
+        var loginService = new LoginService();
 
         if (_this.state.producto) {
           $.each(_this.state.dataCAI.OPTIONS, function (index, prod) {
             if (prod.VALUE === _this.state.producto.id) {
               producto = prod;
             }
+          });
+        }
+
+        if (producto !== null && (producto.PID === "N" || producto.PID === "O")) {
+          loginService.getMails({ PRODUCTO: producto }).then(function (mails) {
+            _this.setState({
+              mailsRegistrados: mails,
+              mail: null,
+              PID: producto.PID,
+              productoSelected: producto,
+              displayForm: true
+            });
+          });
+        } else if (producto !== null) {
+          _this.setState({
+            PID: producto.PID,
+            productoSelected: producto,
+            displayForm: true
           });
         }
 
@@ -117,12 +177,17 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
           hiddenButtonClose: false
         },
         producto: null,
+        productoSelected: null,
         birthDate: null,
         codigoPostal: null,
+        codigoValidacion: null,
         formaPago: null,
         medioPago: null,
         provincia: null,
-        displayForm: false
+        mail: null,
+        mailsRegistrados: null,
+        displayForm: false,
+        PID: null
       };
       return _this;
     }
@@ -133,8 +198,6 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
         if (!this.state.dataCAI) {
           return React.createElement("div", null);
         }
-
-        var productSelected = this._getProductoSelected();
 
         return React.createElement(
           React.Fragment,
@@ -168,7 +231,7 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
                     React.createElement("br", null),
                     React.createElement(
                       "div",
-                      { className: "mb-2" },
+                      { className: "mb-3" },
                       React.createElement(
                         "label",
                         { className: "col-md-2" },
@@ -187,10 +250,89 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
                           onResult: this._handleResults })
                       )
                     ),
-                    this.state.displayForm && (productSelected.PID === 'N' || productSelected.PID === 'L') && React.createElement(
+                    this.state.displayForm && (this.state.PID === 'N' || this.state.PID === 'O') && this.state.mailsRegistrados !== null ? React.createElement(
                       "div",
                       null,
-                      productSelected.PID === 'N' ? React.createElement(
+                      React.createElement(
+                        "div",
+                        { className: "mb-3", style: { paddingLeft: "15px" } },
+                        "Para poder autoregistrarte debemos enviarte un c\xF3digo de validac\xEDon a alguno de los mails que tenemos registrados. Por favor selecciona el mismo del desplegable que se encuentra debajo y oprim\xED el boton \"enviar c\xF3digo de validac\xEDon\":"
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "mb-3 row", style: { paddingLeft: "15px" } },
+                        React.createElement(
+                          "label",
+                          { className: "col-md-2" },
+                          "Mail registrado:"
+                        ),
+                        React.createElement(
+                          "div",
+                          { className: "col-md-7 d-inline-block mb-2" },
+                          React.createElement(DropDownContent, {
+                            list: this.state.mailsRegistrados,
+                            className: "input-background-color form-control",
+                            id: "mail",
+                            name: "mail",
+                            idObject: "CODIGO",
+                            nameObject: "MAIL",
+                            disabled: this.state.mailsRegistrados.length === 0,
+                            placeHolder: this.state.mailsRegistrados.length === 0 ? "Actualmente no tenes un mail registrado" : "",
+                            defaultValue: this.state.mail !== null ? this.state.mail.id : "default",
+                            changeValue: this.state.mail ? undefined : true,
+                            onResult: this._handleResults }),
+                          React.createElement(
+                            "div",
+                            { className: "mt-2", style: { fontSize: "14px" } },
+                            "En caso que no tengas ningun mail registrado o los que figuren no se encuentren vigentes por favor comunicate con el call center para hacer la autoregistraci\xF3n: 0810-333-8432"
+                          )
+                        ),
+                        React.createElement(
+                          "div",
+                          { className: "col" },
+                          React.createElement(
+                            "button",
+                            {
+                              onClick: this._handleCodeValidation,
+                              type: "button",
+                              disabled: this._disableVerificationButton(),
+                              className: "btn btn-sm btn-success"
+                            },
+                            "Enviar c\xF3digo de validac\xEDon"
+                          )
+                        )
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "mb-3", style: { paddingLeft: "15px" } },
+                        "Recibido tu c\xF3digo, por favor ingresalo en el campo que se encuentra debajo:"
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "mb-3" },
+                        React.createElement(
+                          "label",
+                          { className: "col-md-3" },
+                          "C\xF3digo de validac\xEDon:"
+                        ),
+                        React.createElement(
+                          "div",
+                          { className: "col-md-5 d-inline-block" },
+                          React.createElement(InputValidation, {
+                            id: "codigoValidacion",
+                            name: "codigoValidacion",
+                            placeholder: "Ingresa el c\xF3digo que recibiste por mail...",
+                            type: "text",
+                            charactersStr: "",
+                            className: "form-control",
+                            onResult: this._handleResults
+                          })
+                        )
+                      )
+                    ) : this.state.displayForm && this.state.PID === "L" ? React.createElement(
+                      "div",
+                      null,
+                      (this.state.PID === 'N' || this.state.PID === 'O') ? React.createElement(
                         "div",
                         { className: "mb-2" },
                         React.createElement(
@@ -295,8 +437,8 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
                             onResult: this._handleResults })
                         )
                       )
-                    ),
-                    this.state.displayForm && productSelected.PID !== 'N' && productSelected.PID !== 'L' && React.createElement(
+                    ) : "",
+                    this.state.displayForm && this.state.PID !== 'N' && this.state.PID !== 'O' && this.state.PID !== 'L' && React.createElement(
                       "div",
                       { className: "text-danger col-md-8" },
                       React.createElement("br", null),
@@ -341,6 +483,13 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
         );
       }
     }, {
+      key: "componentDidUpdate",
+      value: function componentDidUpdate(prevProps, prevState) {
+        if (prevState.producto !== this.state.producto) {
+          this._getProductoSelected();
+        }
+      }
+    }, {
       key: "componentDidMount",
       value: function componentDidMount() {
         var _this2 = this;
@@ -350,11 +499,9 @@ define(["react", "../common/modalReactBootstrap", "../common/dropdownContainer",
         var endososService = new EndososService();
 
         segurosOnlineService.analizarCAI().then(function (data) {
-
           loginService.getProvincias().then(function (provincias) {
             loginService.getCanalesCobro().then(function (canalesCobro) {
               endososService.getTarjetas().then(function (tarjetas) {
-
                 if (tarjetas.Code === 'NO_ERROR') {
                   _this2.setState({
                     step: '1',

@@ -188,7 +188,7 @@ define(["react", "react-redux", 'react-dom', '../services/userService', "../comm
               'NADAPASI': '',
               'COBPAGAS': [{ 'COBERCOD': 0, 'CONCERES': "", 'COBERORD': 0, 'PAGOSIMP': 0 }],
               'CUIT': _this.props.cuit.value,
-              'TITULAR': _this.props.titular.value,
+              'TITULAR': _this.props.titular.value.substr(0,40),
               'CBU': cbuComp
 
               //SERVICIO ORDEN DE PAGO

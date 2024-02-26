@@ -1,849 +1,246 @@
-:root {
-  --rojohsbc: #db0011;
+*{
+    color: #333333;
 }
-
-html {
-  height: 100%;
+/* COMMON */
+.text-center{
+    text-align: center;
 }
-
-@font-face {
-  font-family: HSBC-Regular;
-  src: url(../fonts/UniversNextforHSBCW02-Rg.woff);
-}
-
-@font-face {
-  font-family: HSBC-Light;
-  src: url(../fonts/UniversNextforHSBCW02-Lt.woff);
-}
-
-@font-face {
-  font-family: HSBC-Bold;
-  src: url(../fonts/UniversNextforHSBCW02-Bd.woff);
-}
-
-body {
-  font-family: HSBC-Regular;
-  height: 100%;
-  /*background: #f5f5f5;*/
-}
-
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: HSBC-Bold;
-}
-
-a,
-.advertencia {
-  font-family: HSBC-Bold;
-  color:red !important;
-  text-decoration: none !important;
-}
-
-a,
-.btn-link {
-  font-family: HSBC-Bold;
-  color: #333 !important;
-  text-decoration: none !important;
-}
-
-p {
-  font-family: HSBC-Light;
-}
-
-a:hover {
-  text-decoration: underline !important;
-}
-
-.link-form-benef {
-  color: #007bff !important;
-  text-decoration: underline !important;
-  border: none;
-  background-color: #fff;
-  padding: 0;
-}
-
-textarea {
-  resize: none;
-}
-
-.modal-header .close {
-  outline: none !important;
-}
-.modal-title {
-  color: var(--rojohsbc);
-  background: transparent;
-  font-family: HSBC-Regular;
-}
-
-.modal-small {
-  max-height: 300px;
-  height: 300px;
-}
-
-.modal-md {
-  min-width: 600px;
-}
-
-.modal-large {
-  min-width: 700px;
-  pointer-events: all;
-}
-
-.modal-large .modal-body {
-  overflow-y: scroll;
-  max-height: 600px;
-  height: 600px;
-  pointer-events: all;
-}
-
-.accordion > .card .card-header {
-  margin-bottom: -1px;
-  text-align: left;
-  font-family: HSBC-Bold;
-}
-
-.main-container {
-  background: #fff;
-  height: auto;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.main-container-login {
-  /*box-shadow: 1px 2px 8px #d7d8d6;*/
-  height: 86%;
-  margin: 1rem auto;
-}
-
-.custom-padding {
-  padding: 5px;
-}
-
-.spinner-border {
-  position: absolute !important;
-  margin-top: 0.5em;
-  margin-left: 2.5rem;
-}
-
-/* Transparent Overlay */
-.spinner-border-fullscreen {
-  content: "";
-  display: block;
-  position: fixed;
-  z-index: 998;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(
-    rgba(230, 230, 230, 0.8),
-    rgba(230, 230, 230, 0.8)
-  );
-
-  background: -webkit-radial-gradient(
-    rgba(230, 230, 230, 0.8),
-    rgba(230, 230, 230, 0.8)
-  );
-}
-
-.spinner-border-fullscreen > .spinner-border {
-  position: fixed;
-  z-index: 999;
-  overflow: show;
-  margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  color: #db0011 !important;
-}
-
-.spinner-border-fullscreen > .spinner-text-fullscreen {
-  position: fixed;
-  z-index: 999;
-  overflow: show;
-  margin: auto;
-  height: 1rem;
-  text-align: center;
-  top: 3rem;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  color: #db0011 !important;
-}
-
-.position-spinner {
-  position: initial !important;
-  /* margin: 0 2rem !important;
-  margin-top: 0.5em !important; */
-}
-
-.menu-home .dropdown-toggle::after {
-  display: none !important;
-}
-
-.dropdown-toggle::after {
-  display: none;
-}
-
-.custom-icons {
-  float: right;
-  margin-left: 0.3rem;
-  width: 22px;
-  height: 22px;
-  background-size: cover;
-}
-
-.navbar-toggler-icon {
-  background-image: url("../img/home/hamburger4.svg?color=1729B0");
-}
-
-.icon-payments {
-  background-image: url("../img/home/exchange.svg");
-}
-
-.link {
-  font-weight: bold;
-  font-size: 0.8rem;
-}
-
-.main-container,
-.main-container > div,
-.main-container > div > div {
-  vertical-align: top;
-}
-
-.main-container > div > div {
-  display: inline-block;
-}
-
-table {
-  text-align: center;
-  font-size: 12px;
-}
-
-table th {
-  background-color: #eeeeee;
-}
-
-table .main-header {
-  background-color: lightgrey;
-}
-
-.print-container {
-  margin-bottom: 20px;
-}
-
-.print-container > button {
-  display: inline-block;
-}
-
-.print-container > button:first-child {
-  margin-right: 30px;
-}
-
-i.pi-print {
-  font-size: 24px;
-  vertical-align: middle;
-}
-
-div.main-bar > div {
-  display: inline-block;
-  margin-right: 20px;
-  margin-bottom: 20px;
-}
-
-h5 {
-  background-color: #eeeeee;
-  padding: 15px;
-  margin-bottom: 0 !important;
-  min-height: 50px;
-}
-
-ul.list-group > li {
-  border-radius: 0 !important;
-  cursor: pointer;
-}
-
+/* HEADER */
 .navbar {
-  box-shadow: 4px 2px 4px #d7d8d6;
+    box-shadow: 2px 4px 5px 0px rgb(0 0 0 / 20%);
+    background-color: white;
+    margin-bottom: 0px;
+    box-shadow: 0px 3px 4px #00000029;
+    z-index: 2;
 }
-
 .navbar-brand {
-  margin-right: 0;
-  margin-left: 2rem;
-}
-
-.navbar-brand img {
-  width: 177px;
-}
-
-.header-customer {
-  background: rgba(255, 255, 255, 0.6);
-  margin: 0px;
-  padding: 12px;
-}
-
-.main-bar > div {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.remove-left-padding {
-  padding-left: 0 !important;
-}
-
-.advertencia {
-  color:red
-}
-
-.red {
-  display: block;
-  height: 1px;
-  border: 0;
-  border-top: 5px solid red;
-  margin: 1em 0;
-  padding: 0;
-}
-
-nav > div > * {
-  vertical-align: top !important;
-}
-
-/**START STYLES LOGIN **/
-
-.banner {
-  width: 100%;
-}
-
-#login-right-panel {
-  padding: 0px;
-  margin-left: -10px;
-}
-
-.row-subbanner {
-  margin-top: 0.1rem;
-}
-
-.form-container {
-  /*border: 0.2mm solid lightgray;*/
-  padding: 20px;
-  padding-top: 0px;
-  padding-bottom: 5px;
-  margin: 0.5rem;
-  margin-top: 0px;
-  text-align: left;
-  width: 100%;
-}
-
-.form-container label {
-  font-weight: 500;
-}
-
-.form-container .form-group {
-  margin-bottom: 0.65rem;
-}
-
-.form-container .form-title {
-  background: transparent;
-  color: #d01;
-  font-size: 1.1rem;
-  font-family: HSBC-Bold;
-  margin-bottom: 12px !important;
-  min-height: auto;
-  padding: 6px;
-  padding-top: 10px;
-  text-align: center;
-}
-
-.form-container .col-form-label {
-  font-size: 0.85rem;
-}
-
-.form-container input {
-  border-radius: 3px;
-}
-
-.subtitle-inside {
-  color: var(--rojohsbc);
-}
-
-#titleLogin {
-  padding-bottom: 0;
-  margin-bottom: 6px !important;
-  color: #ED1C24;
-}
-
-#typeBrowser {
-  font-family: HSBC-Regular;
-  text-align: center;
-  font-style: italic;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-em {
-  font-size: 0.75rem;
-}
-.container-search {
-  margin: 1rem;
-}
-.btn {
-  border-radius: 0px;
-  padding: 10px 14px;
-  outline: none !important;
-}
-
-.btn-hsbc {
-  background-color: #db0011;
-  border: 1px solid #db0011 !important;
-  box-shadow: none !important;
-  color: #fff;
-  border-radius: 0px;
-  padding: 10px 14px;
-  outline: none !important;
-  transition: background-color 450ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-.btn-hsbc-yellow {
-  background-color: #fd9a06;
-  border: 1px solid #fd9a06 !important;
-  box-shadow: none !important;
-  color: #fff;
-  border-radius: 0px;
-  padding: 10px 14px;
-  outline: none !important;
-  transition: background-color 450ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-.btn-detail-prima,
-.btn-download {
-  padding: 2px 4px;
-}
-.table-detail-prima td {
-  font-size: 0.8rem;
-  text-align: left;
-}
-.table-detail-prima td:first-child {
-  font-family: HSBC-Bold;
-}
-.table-detail-prima td:last-child {
-  padding-right: 90px;
-}
-td.td-btn-download {
-  margin: 0 auto;
-  padding: 10px !important;
-}
-.btn-download {
-  font-size: 0.7rem !important;
-}
-
-.table-payments td {
-  font-size: 0.7rem;
-}
-
-.table-payments td:first-child {
-  font-family: HSBC-Bold;
-}
-.table-payments td:last-child {
-  font-size: 0.6rem;
-}
-
-.btn-hsbc:hover {
-  color: #fff;
-  background-color: #af000d;
-}
-
-.btn-hsbc.disabled {
-  background: #ddd !important;
-  border-color: #ddd !important;
-  cursor: not-allowed;
-}
-
-.btn-hsbc:active {
-  outline: none !important;
-  background-color: #af000d !important;
-}
-
-#footer-login {
-  bottom: 0;
-  min-height: 180px;
-  margin-top: 2rem;
-}
-
-.footer-login-text {
-  font-size: 0.6rem;
-}
-.title-table {
-  font-size: 0.65rem;
-  font-family: HSBC-Regular;
-}
-.title-table em {
-  font-size: 0.62rem;
-}
-
-.container-footer {
-  bottom: 0;
-  position: absolute;
-  text-align: center;
-  width: 100%;
-  height: 100%;
-}
-.cursor {
-  cursor: pointer;
-}
-
-#services-list li {
-  display: inline-block;
-  color: #000;
-  margin: 2px;
-}
-
-#services-list li a {
-  color: #000;
-  font-weight: 500;
-}
-
-.separator {
-  margin: 5px;
-}
-
-input {
-  transition: border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  border-width: 0.1em !important;
-  border-color: #9e9e9e;
-}
-
-input:focus {
-  background-color: #fff;
-  outline: 0;
-  box-shadow: none !important;
-}
-
-.input-invalid {
-  border-color: #c62828 !important;
-}
-
-.alert-danger {
-  background-color: transparent;
-  border-color: transparent;
-  border-radius: 3px;
-  color: #c62828;
-  font-size: 0.7rem;
-  padding: 1px;
-  margin: 1px;
-}
-
-.paginador {
-  padding: 2px;
-  display: flex;
-  justify-content: space-between;
-}
-.paginator-btn {
-  background: none;
-  border: 0;
-  padding: 0 6px;
-  color: #317e9d;
-}
-th.cell-select-all {
-  text-align: center;
-  padding-bottom: 2px;
-}
-.cell-select-all label {
-  padding: 0 10px;
-}
-
-.checklist-table {
-  transform: scale(1.3);
-}
-.check-all {
-  transform: scale(1.6);
-}
-h5.nomina {
-  padding: 0;
-  background: none;
-  font-size: 1.1rem;
-  font-style: italic;
-}
-
-.custom-file-input:lang(en) ~ .custom-file-label::after {
-  content: "  ";
-  background-image: url("../img/addPayroll/search.svg");
-  background-repeat: no-repeat;
-  padding-left: 20px;
-  padding-right: 20px;
-  background-position: center;
-  background-size: 30px 30px;
-}
-/**END STYLES LOGIN**/
-
-/**BEGIN STYLES HOME**/
-
-.home-container {
-  background: transparent;
-}
-
-.home-container .col-md-12 {
-  padding: 5px;
-}
-
-.home-container .col-md-12 .DDJJleyenda{
-  padding: 16px;
-}
-
-.header-customer .title {
-  background: transparent;
-  font-family: HSBC-Light;
-  margin-bottom: 0px;
-  margin-bottom: 0px;
-  min-height: auto;
-  padding: 0px;
-  font-size: 1rem;
-}
-
-body {
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-.backFixed {
-  background-image: url(../img/home/seguros_1240x400.jpg);
-}
-
-.dropdown-item.active,
-.dropdown-item:active {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #000;
-}
-
-.myproducts-navbar,
-.manager-container {
-  box-shadow: 1px 2px 8px #d7d8d6;
-}
-
-.myproducts-list {
-  font-size: 0.8rem;
-}
-
-.product-name {
-  font-size: 1.25rem;
-}
-
-.manager-container {
-  min-height: 500px;
-  min-width: 100%;
-  width: fit-content;
-}
-
-.title-myproducts {
-  font-family: HSBC-Bold !important;
-  text-align: left;
-  padding-left: 100px !important;
-}
-
-.panel-actions {
-  margin-bottom: 20px;
-  float: right;
-}
-
-.profile-container h5 {
-  margin-bottom: 15px !important;
-  margin-left: -10px;
-}
-
-.container-buttons-contact {
-  float: right;
-}
-
-.icon-inside-button {
-  margin-left: 8px;
-}
-
-.custom-padding-card-body {
-  padding: 5px;
-}
-.media-body {
-  font-family: HSBC-Regular;
-  font-weight: 700;
-}
-.btn-download-account-state {
-  margin: 5px 0;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.input-size {
-  font-size: 12px;
-  height: 28px;
-  padding: 3px;
-}
-
-.font-size-sm {
-  font-size: 9px !important;
-}
-
-.font-size-ddben-beneficiary {
-  font-size: 12px !important;
-}
-
-.form-height {
-  height: 60px;
-}
-
-.gj-icon-sm {
-  font-size: 12px !important;
-}
-.dp-ddben .gj-icon {
-  top: 5px !important;
-}
-
-/**END STYLES HOME**/
-
-.menu-active {
-  position: absolute;
-  width: 5px;
-  background-color: red;
-  height: 100%;
-  left: 0;
-  top: 0;
-}
-
-.alert-benef {
-  position: absolute;
-  width: 30px;
-  background-color: #4f3b7d;
-  height: 100%;
-  left: 0;
-  top: 0;
-  box-shadow: inset -1px -1px 0 0 #997d97, inset 1px 1px 0 0 #ffffff;
-  background-image: url("../img/appointBeneficiary/gift.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 20px 20px;
-}
-
-.hide {
-  display: none;
-}
-
-.input-empty {
-  background-color: #ccc;
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-  background-color: #db0011;
-  border-color: #db0011;
-}
-.pNewIndividualBeneficiary {
-  font-family: HSBC-Regular;
-  text-transform: uppercase;
-  font-size: small;
-}
-.processOkTitle {
-  font-size: 1.2rem;
-  font-weight: bolder;
-}
-
-@media (max-width: 1200px) {
-  .table-excel {
-    width: 100%;
-  }
-  .table-excel thead {
-    display: none;
-  }
-  .table-excel tr:nth-of-type(odd) {
-    background-color: #eee;
-  }
-  .table-excel tbody td {
-    display: block;
-    text-align: right;
-  }
-  .table-excel tbody td:before {
-    content: attr(data-th);
-    display: block;
-    float: left;
+    height: auto;
+}
+/* TEXTS */
+.hsbc-title-red{
+    color: #DB0011;
+    font-size: 24px;
     font-weight: bold;
-    color: var(--rojohsbc);
-  }
+    text-align: center;
+}
+.hsbc-subtitle{
+    font-size: 18px;
+    text-align: center;
+}
+.hsbc-title-step{
+    color: #166A48;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.hsbc-text-help{
+    color: #000000;
+    font-size: 12px;
+}
+.hsbc-text-help img{
+    width: 26px;
+    height: 26px;
+    margin-right: 16px;
+}
+.hsbc-text-help-red{
+    color: #DB0011;
+    font-size: 12px;
+    text-decoration: underline;
+    display: flex;
+    padding-left: 5px;
+}
+.hsbc-text-help-red img{
+    width: 12px;
+    margin-right: 6px;
+}
+.hsbc-text-normal{
+    font-size: 14px;
+}
+/* FOOTER */
+footer iframe {
+    width: 100%;
+    border: none;
+}
+.footer-legales{
+    height: 103px;
+    min-height: 480px;
 }
 
-/*Begin ABMNominee Styles */
-
-.disappear {
-  width: 0;
-  height: 0;
-  display: none;
+.footer-2 {
+    width: 100%;
+    z-index: -1;
+    position: inherit;
+}
+/* FORM */
+.hsbc-form-left{
+    width: 378px;
+    height: 100%;
+    background-color: #FFFFFF;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 5px;
+    z-index: 1;
+    padding-bottom: 30px;
+    min-height: 400px;
+}
+.hsbc-form-right{
+    width: 295px;
+    height: 100%;
+    background-color: #FAFAFA;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 5px;
+    /* z-index: -1; */
+    margin-left: -8px;
+    padding: 0px 20px;
+    min-height: 400px;
+}
+.hsbc-form-content{
+    padding: 10px 15px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.hsbc-label{
+    font-size: 12px;
+    margin-bottom: 0px;
+    margin-left: 5px;
+}
+.hsbc-input{
+    width: 318px;
+    border: 1px solid #97A2AF;
+    border-radius: 6px;
+    font-size: 14px;
+    height: 100%;
+}
+.hsbc-input:focus,.hsbc-input:focus-visible{
+    border: 1.5px solid #E0001A;
+    outline: none;
+}
+.hsbc-input-icon{
+    position: relative;
+    width: 20px;
+}
+.hsbc-btn-red {
+    background: #DB0011;
+    border: #DB0011;
+    border-radius: 6px;
+    width: 318px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    color: white;
+    justify-content: center;
+    font-size: 18px;
+}
+.hsbc-btn-red:active{
+    color: white;
+    background-color: #730014;
+    outline: none;
 }
 
-.simple_row {
-  height: 5rem;
+.hsbc-btn-red:focus{
+    color: white;
+    background-color: #730014;
+    outline: none;
+    box-shadow: none;
 }
 
-.double_row {
-  height: 10rem;
+.hsbc-btn-red:hover{
+    color: white;
+    background: #ba1110;
 }
 
-.act-search {
-  border-left: 1px solid #ced4da;
-  position: absolute;
-  top: 32px;
-  right: 6px;
-  height: 26px;
-  background-color: white;
-  border-radius: 0 0.25rem 0.25rem 0;
-  border-bottom: 0;
-  border-top: 0;
-  border-right: 0;
-  padding: 0 6px;
+.hsbc-btn-red:disabled{
+    background: #35475a;
+    border: #35475a;
+}
+/* STEPPER */
+.hsbc-stepper {
+    z-index: 1;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: -1px;
+}
+.hsbc-stepper-progress{
+    width: 70%;
+    height: 8px;
+    background: #7ED4AF;
+    border-radius: 5px 0px 0px 0px;
+    margin-right: 0px;
+}
+.hsbc-stepper-progress-step2{
+    width: 10093%;
+    height: 8px;
+    background: #7ED4AF;
+    margin-right: 0px;
+    border-radius: 0px 5px 0px 0px;
 }
 
-/*Finish ABMNominee Styles */
+.hsbc-stepper-progress-left {
+    width: 63%;
+    height: 8px;
+    background: #B1B1B1;
+    border-radius: 0px 5px 0px 0px;
+}
+/* DIVIDER */
+.hsbc-divider{
+    border: 1px solid #707070;
+    width: 90%;
+    margin: auto;
+}
+  
 
-.file-name-input-file {
-  /* position: absolute; */
-  height: 28px;
-  width: 100%;
-  top: 31px;
-  right: 5px;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  padding-left: 3px;
-  text-align: left;
-  font-size: 12px;
-  padding-top: 4px;
-  color: #495057;
+@media screen and (max-width: 768px) {
+    .hsbc-form-left{
+        height: 382px;
+        width: 100%;
+    }
+    .hsbc-form-right{
+        margin-left: 0px;
+        margin-top: -5px;
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+    .hsbc-title-red{
+        font-size: 22px;
+    }
+    .hsbc-subtitle{
+        font-size: 16px;
+    }
+    .hsbc-text-help,.hsbc-text-help-red{
+        font-size: 13px;
+    }
+    /* FOOTER */
+    .footer-legales{
+        min-height: 1050px;
+    }
 }
 
-.btn-hide {
-  background: transparent;
-  border: 1px solid transparent !important;
-}
+/* ZOCALO SEGUROS */
 
-.btn-confirm-certificate {
-  left: 5.6rem;
-  position: inherit;
-  top: 0.8rem;
+#zocalo{border-top:1px solid #4A4A49; margin-top:50px;}
+#zocalo .rotulo{min-height:95px; display:flex; flex-direction:row; justify-content:flex-start; flex-wrap:nowrap; align-items:center;}
+#zocalo .rotulo div{padding:5px 10px; text-align:center; width:17%; font-size:13px;}
+#zocalo .rotulo div:last-child{text-align:right; padding-right:0px; width:32%;}
+#zocalo .rotulo div.nro-ssn span{font-weight:700;}
+#zocalo .rotulo div.telefono{font-weight:700; color:#29ABE2; font-size:14px;}
+#zocalo .rotulo div.web{font-weight:700; color:#29ABE2; font-size:14px;}
+#zocalo .rotulo div.web a{text-decoration:none; color:#29ABE2;}
+#zocalo .rotulo div.nro-ssn{border-right: 1px solid #4A4A49;}
+#zocalo .rotulo div.telefono{border-right: 1px solid #4A4A49;}
+#zocalo .rotulo div.departamento{width: 19% !important;}
+ @media(max-width:959px){
+   #zocalo .rotulo{display:block;}
+   #zocalo .rotulo div{width:100%;}
+   #zocalo .rotulo div:last-child{text-align:center;}
 }
-
-.confirm-btn-modal {
-  width: 51.65px;
-  margin-right: 1rem;
-}
-
-.contrasenia-modal {
-  min-width: 629px;
-}
+#zocalo .detalle p{margin-bottom:10px;}
+#zocalo .detalle .entidades{background-color:#EDF0EF; padding:20px;}
+#zocalo .detalle .entidades a{font-weight:700; text-decoration:none;}
+#zocalo .detalle .atencion{padding:20px;}
+#zocalo .detalle .atencion p:first-child{font-weight:700;}
+#zocalo .emisora{padding:20px 10px;}
+#zocalo .emisora p{margin-bottom:10px;}

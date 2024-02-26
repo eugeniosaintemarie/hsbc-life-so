@@ -6,7 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../common/messageComponent", "./mainBar", "../components/nomina", "../components/moreInformation", "../components/paySheet", "../components/printAccountStatus", "../components/printedByMail", "../components/abmNomina/abmNominaMain", "../components/saldoCuentas", "../components/nominaSeg", "../components/rescateMain", "../components/copyPolicy", "../components/addPayroll", "../components/beneficiarios/appointBeneficiary", "../components/accountState", "../components/payments", "../components/siniestros", "../components/rescates", "../components/endosos/endosoManager", "../segurosOnline/home", "../services/userService", "../components/beneficiarios/ddbenCrudMenu", "../components/retiroNomina/additionRequest", "../components/retiroNomina/fileUploading", "../components/retiroNomina/employeesList", "../components/retiroNomina/additionManager", "../components/adhecionVidaColectivo/fileUpload", "../components/adhecionVidaColectivo/additionRequestColectivo", "../components/adhecionVidaColectivo/additionManagerColectivo", "../components/adhecionVidaColectivo/payrollQuery", "../components/beneficiarios/queryBeneficiary", "../components/adhecionVidaColectivo/additionPdfColectivo", "../components/altasTempranas.js", "../components/dropRequest"], function (React, MessageComponent, MainBar, Nomina, MoreInformation, PaySheet, PrintAccountStatus, PrintedByMail, AbmNomina, SaldoCuentas, NominaSeg, RescateMain, CopyPolicy, AddPayroll, AppointBeneficiary, AccountState, Payments, Siniestros, Rescates, EndosoManager, Home, UserService, DdbenCrudMenu, AdditionRequest, FileUploading, EmployeesList, AdditionManager, FileUpload, AdditionRequestColectivo, AdditionManagerColectivo, PayrollQuery, QueryBeneficiary, AdditionPdfColectivo, AltasTempranas, DropRequest) {
+define(["react", "../common/messageComponent", "./mainBar", "../components/nomina", "../components/moreInformation", "../components/paySheet", "../components/printAccountStatus", "../components/printedByMail", "../components/abmNomina/abmNominaMain", "../components/saldoCuentas", "../components/nominaSeg", "../components/rescateMain", "../components/copyPolicy", "../components/addPayroll", "../components/beneficiarios/appointBeneficiary", "../components/accountState", "../components/payments", "../components/siniestros", "../components/rescates", "../components/endosos/endosoManager", "../segurosOnline/home", "../services/userService", "../components/beneficiarios/ddbenCrudMenu", "../components/retiroNomina/additionRequest", "../components/retiroNomina/fileUploading", "../components/retiroNomina/employeesList", "../components/retiroNomina/additionManager", "../components/adhecionVidaColectivo/fileUpload", "../components/adhecionVidaColectivo/additionRequestColectivo", "../components/adhecionVidaColectivo/additionFormModify", "../components/adhecionVidaColectivo/additionManagerColectivo", "../components/adhecionVidaColectivo/payrollQuery", "../components/beneficiarios/queryBeneficiary", "../components/adhecionVidaColectivo/additionPdfColectivo", "../components/altasTempranas.js", "../components/dropRequest"], function (React, MessageComponent, MainBar, Nomina, MoreInformation, PaySheet, PrintAccountStatus, PrintedByMail, AbmNomina, SaldoCuentas, NominaSeg, RescateMain, CopyPolicy, AddPayroll, AppointBeneficiary, AccountState, Payments, Siniestros, Rescates, EndosoManager, Home, UserService, DdbenCrudMenu, AdditionRequest, FileUploading, EmployeesList, AdditionManager, FileUpload, AdditionRequestColectivo, AdditionFormModify, AdditionManagerColectivo, PayrollQuery, QueryBeneficiary, AdditionPdfColectivo, AltasTempranas, DropRequest) {
   var Manager = function (_React$Component) {
     _inherits(Manager, _React$Component);
 
@@ -57,6 +57,12 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
       _this._handleButtonAdditionManagerColectivo = function () {
         if (_this.props.showAdditionRequestColectivo == true) {
           _this.props.handleShowAdditionManagerColectivo();
+        }
+      };
+
+      _this._handleButtonAdditionFormModify = function () {
+        if (_this.props.showAdditionRequestColectivo) {
+          _this.props.handleShowAdditionFormModify();
         }
       };
 
@@ -148,13 +154,15 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
             showAdhesion = _props.showAdhesion,
             showAdditionRequest = _props.showAdditionRequest,
             showAdditionRequestColectivo = _props.showAdditionRequestColectivo,
+            showAdditionFormModify = _props.showAdditionFormModify,
             showListaEmpleadosRetiro = _props.showListaEmpleadosRetiro,
             showConsultaNomina = _props.showConsultaNomina,
             showConsultaBeneficiary = _props.showConsultaBeneficiary,
             showAdditionManager = _props.showAdditionManager,
             showAdditionManagerColectivo = _props.showAdditionManagerColectivo,
             showColectiveLifeAdhesion = _props.showColectiveLifeAdhesion,
-            showDropRequest = _props.showDropRequest;
+            showDropRequest = _props.showDropRequest,
+            showConstAltasTempranas = _props.showConstAltasTempranas;
 
 
         var withoutProducts = Object.keys(product).length === 0;
@@ -234,9 +242,15 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
               handleShowListaEmpleadosRetiro: this.props.handleShowListaEmpleadosRetiro,
               showAdditionManager: this._handleButtonAdditionManager,
               showAdditionManagerColectivo: this._handleButtonAdditionManagerColectivo,
+              showAdditionFormModify: this._handleButtonAdditionFormModify,
               handleShowDdbenCrudMenu: this._handleButtonModifyBeneficiary,
               showDdbenCrudMenu: this.props.showDdbenCrudMenu,
-              handleShowDropRequest: this.props.handleShowDropRequest
+              handleShowDropRequest: this.props.handleShowDropRequest,
+              handleShowConstAltasTempranas: this.props.handleShowConstAltasTempranas,
+              handleShowAdditionRequestColectivo: this.props.handleShowAdditionRequestColectivo,
+              handleShowAdditionFormModify: this.props.handleShowAdditionFormModify,
+              handleShowAppointBeneficiary: this.props.handleShowAppointBeneficiary,
+              showAppointBeneficiary: this.props.showAppointBeneficiary
             }),
             !showPaySheet && !showMore && !showEndoso && React.createElement("div", { className: "print-container" }),
             showAddPayroll && React.createElement(AddPayroll, { product: this.props.product.detalle, handleShowMain: this.props.handleShowMain, user: this.props.user }),
@@ -251,7 +265,8 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
             showAdditionManager && React.createElement(AdditionManager, { product: this.props.product.detalle, handleShowAdditionRequest: this.props.handleShowAdditionRequest,
               user: this.props.user, handleSetRequestNumber: this._handleSetRequestNumber,
               recoverPayrollEmployees: this._handleSetRecoverPayrollEmployee() }),
-            showAdditionRequestColectivo ? React.createElement(AdditionRequestColectivo, { product: this._handleSetRecoverPayrollEmployee(), handleShowAdditionManagerColectivo: this._handleButtonAdditionManagerColectivo, handleSetRequestNumber: this._handleSetRequestNumber }) : "",
+            showAdditionRequestColectivo ? React.createElement(AdditionRequestColectivo, { product: this._handleSetRecoverPayrollEmployee(), handleShowAdditionManagerColectivo: this._handleButtonAdditionManagerColectivo, handleShowAdditionFormModify: this._handleButtonAdditionFormModify, handleSetRequestNumber: this._handleSetRequestNumber }) : "",
+            showAdditionFormModify && React.createElement(AdditionFormModify, { product: this._handleSetRecoverPayrollEmployee(), handleShowAdditionRequestColectivo: this.props.handleShowAdditionRequestColectivo, user: this.props.user, recoverPayrollEmployees: this._handleSetRecoverPayrollEmployee(), handleSetRequestNumber: this._handleSetRequestNumber }),
             showAdditionManagerColectivo && React.createElement(AdditionManagerColectivo, { product: this._handleSetRecoverPayrollEmployee(), handleShowAdditionRequestColectivo: this.props.handleShowAdditionRequestColectivo,
               user: this.props.user, handleSetRequestNumber: this._handleSetRequestNumber, recoverPayrollEmployees: this._handleSetRecoverPayrollEmployee() }),
             showColectiveLifeAdhesion && React.createElement(FileUpload, { product: this.props.product.cup, handleShowMain: this.props.handleShowMain, user: this.props.user }),
@@ -277,6 +292,7 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
               }),
               showAccountState && React.createElement(AccountState, { product: this.props.product.detalle }),
               showDropRequest && React.createElement(DropRequest, { handleShowDropRequest: (this.props.handleShowDropRequest, this.props.product) }),
+              showConstAltasTempranas && React.createElement(AltasTempranas, { isTomador: true, goToNomina: this.props.handleShowConstAltasTempranas, asegurados: [], product: this.props.product, nroPoliza: this.props.product.numeroDePoliza, tipoDocumento: this.props.user.TIPODOCU, nroDocu: this.props.user.NUMEDOCU, nroEndoso: this.state.nroEndoso, endoso: this._handleEndoso }),
               showPrintedByMail && React.createElement(PrintedByMail, null),
               showNominaSeg && React.createElement(NominaSeg, { handleShowMain: this.props.handleShowMain }),
               showSaldoCuentas && React.createElement(SaldoCuentas, { handleShowMain: this.props.handleShowMain }),
@@ -292,7 +308,7 @@ define(["react", "../common/messageComponent", "./mainBar", "../components/nomin
               showPayments && React.createElement(Payments, { product: this.props.product.detalle, search: this._handleSearch }),
               showSiniestros && React.createElement(Siniestros, null),
               showRescates && React.createElement(Rescates, null),
-              !showPrintAccountStatus && !showCopyPolicy && !showPayments && !showSiniestros && !showRescates && !showNomina && !showMore && !showAccountState && !showDropRequest && !showPrintedByMail && !showAbmNomina && !showSaldoCuentas && !showNominaSeg && !showRescateParcial && !showPaySheet && !showAddPayroll && !showConsBeneficiary && !showEndoso && !showAppointBeneficiary && !showDdbenCrudMenu && !showAdhesion && !showAdditionRequest && !showAdditionRequestColectivo && !showAdditionManager && !showAdditionManagerColectivo && !showListaEmpleadosRetiro && !showConsultaNomina && !showConsultaBeneficiary && !showColectiveLifeAdhesion && !showAltasTempranas && React.createElement(
+              !showPrintAccountStatus && !showCopyPolicy && !showPayments && !showSiniestros && !showRescates && !showNomina && !showMore && !showAccountState && !showDropRequest && !showConstAltasTempranas && !showPrintedByMail && !showAbmNomina && !showSaldoCuentas && !showNominaSeg && !showRescateParcial && !showPaySheet && !showAddPayroll && !showConsBeneficiary && !showEndoso && !showAppointBeneficiary && !showDdbenCrudMenu && !showAdhesion && !showAdditionRequest && !showAdditionRequestColectivo && !showAdditionFormModify && !showAdditionManager && !showAdditionManagerColectivo && !showListaEmpleadosRetiro && !showConsultaNomina && !showConsultaBeneficiary && !showColectiveLifeAdhesion && !showAltasTempranas && React.createElement(
                 React.Fragment,
                 null,
                 React.createElement(Home, null)

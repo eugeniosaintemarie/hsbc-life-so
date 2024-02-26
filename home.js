@@ -50,6 +50,7 @@ define(["react", "../services/userService", "../redux/store", "../common/loader"
           this.componentWillMount();
         }
 
+        var isAdhesionWeb = detalle.MAR_ADH === 'S' || detalle.MAR_DBE === 'S';
         var isCollective = currentProduct.TIPOPRODU === 'L' || currentProduct.TIPOPRODU === 'O' || currentProduct.TIPOPRODU === 'X';
 
         return React.createElement(
@@ -86,12 +87,12 @@ define(["react", "../services/userService", "../redux/store", "../common/loader"
                   React.createElement(
                     "th",
                     null,
-                    "P\xF3liza"
+                    isAdhesionWeb ? "Tomador" : "Póliza"
                   ),
                   React.createElement(
                     "th",
                     null,
-                    "Tomador"
+                    isAdhesionWeb ? "CUIT" : "Tomador"
                   )
                 )
               ),
@@ -104,12 +105,12 @@ define(["react", "../services/userService", "../redux/store", "../common/loader"
                   React.createElement(
                     "td",
                     null,
-                    isCollective ? currentProduct.cup.NROPOLIZA : currentProduct.detalle.NROPOLIZA
+                    isAdhesionWeb ? detalle.TOM_APE : isCollective ? currentProduct.cup.NROPOLIZA : currentProduct.detalle.NROPOLIZA
                   ),
                   React.createElement(
                     "td",
                     null,
-                    isCollective ? currentProduct.apellidoRazonSocial : currentProduct.detalle.TOMADOR ? currentProduct.detalle.TOMADOR : currentProduct.detalle.TOMARIES
+                    isAdhesionWeb ? detalle.TOM_NDO : isCollective ? currentProduct.apellidoRazonSocial : currentProduct.detalle.TOMADOR ? currentProduct.detalle.TOMADOR : currentProduct.detalle.TOMARIES
                   )
                 )
               )
@@ -289,6 +290,7 @@ define(["react", "../services/userService", "../redux/store", "../common/loader"
 
         var detalle = currentProduct.detalle ? currentProduct.detalle : currentProduct.cup;
         var isCollective = false;
+        var isAdhesionWeb = detalle.MAR_ADH === 'S' || detalle.MAR_DBE === 'S';
 
         if (currentProduct.TIPOPRODU && (currentProduct.TIPOPRODU === 'L' || currentProduct.TIPOPRODU === 'O' || currentProduct.TIPOPRODU === 'X')) {
           isCollective = true;
@@ -300,6 +302,13 @@ define(["react", "../services/userService", "../redux/store", "../common/loader"
           if (isCollective) {
             this.setState({
               isLoaded: true,
+              detalleRiesgo: null,
+              currentProduct: currentProduct
+            });
+          } else if (isAdhesionWeb) {
+            this.setState({
+              isLoaded: true,
+              detalleRiesgo: null,
               currentProduct: currentProduct
             });
           } else {

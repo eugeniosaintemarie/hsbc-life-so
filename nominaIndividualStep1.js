@@ -26,14 +26,17 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
 
       _this._amountByModifNom = function (modifcode) {
         var lista = [];
+
         _this.state.nominas.NOMINAS.NOMINA.forEach(function (item) {
           if (item.MODIFNOM && item.MODIFNOM == modifcode) lista.push(1);
         });
+
         return lista.length;
       };
 
       _this._handleContinue = function () {
         var date = Utils.formatFechaString(_this.props.grupo.fecvig.toString());
+
         _this.setState({
           showModal: true,
           modal: {
@@ -50,9 +53,13 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
       _this._handleSendMailButton = function () {
         _this._handleModalIsOpen();
         _this.setState({ enviarLoading: true });
-        _this.nominaController.sendMailsNominaAbm(_this.state.nominas.NOMINAS.NOMINA, _this.props.product, _this.props.user, function (errors) {
-          errors.length == 0 ? _this.setState({ processRegBenef: true }) : errors.length != 0 ? _this.setState({ showErrorsMsg: true }) : _this.setState({ showErrorsMsg: false });
-        });
+
+        if (_this.props.desigBenefEnabled) {
+          _this.nominaController.sendMailsNominaAbm(_this.state.nominas.NOMINAS.NOMINA, _this.props.product, _this.props.user, function (errors) {
+            errors.length == 0 ? _this.setState({ processRegBenef: true }) : errors.length != 0 ? _this.setState({ showErrorsMsg: true }) : _this.setState({ showErrorsMsg: false });
+          });
+        }
+
         _this.nominaController.sendNominaAsegurados(_this.state.nominas.NOMINAS.NOMINA, _this.props.grupo, function (sendError, valError) {
           _this.setState({ listSendError: sendError, listErrorAseg: valError });
         }, "ABM");
@@ -64,6 +71,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
 
       _this._handleModalIsOpen = function (e) {
         var current = _this.state.showModal;
+
         _this.setState({
           cantModal: 0,
           showModal: !current
@@ -72,35 +80,42 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
 
       _this._handlerLoadListChecked = function () {
         var lista = [];
+
         for (var index = 0; index < _this.state.nominas.NOMINAS.NOMINA.length; index++) {
           lista.push({ isChecked: false });
         }
+
         _this.setState({ listChecked: lista });
       };
 
       _this._getTipoDoc = function (code) {
         var tipo = "";
+
         _this.state.listTipoDoc.map(function (e) {
           if (Number(e.POV_COD_TDO) == code) {
             tipo = e.POV_DES_TDO;
           }
         });
+
         return tipo;
       };
 
       _this._addNominee = function (newItem) {
         var lista = _this.state.nominas.NOMINAS.NOMINA;
         lista[lista.length] = newItem;
+
         _this.setState({
           nominas: { NOMINAS: { NOMINA: lista } },
           currentView: "table"
         });
+
         _this._handlerLoadListChecked();
       };
 
       _this._addEdited = function (editedItem) {
         var lista = _this.state.nominas.NOMINAS.NOMINA;
         lista[_this.state.idSelectItem] = editedItem;
+
         _this.setState({
           listaBeneficiarios: lista,
           currentForm: "table"
@@ -116,26 +131,31 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
         _this._handleView("newIndividualNominee");
       };
 
-      _this._handleCUILChecker = function (CUIL) {
+      _this._handleDuplicateChecker = function (key, value) {
         var array = _this.state.nominas.NOMINAS.NOMINA;
         var retorno = false;
+
         for (var index = 0; index < array.length; index++) {
-          if (array[index].DOCUMDAT == CUIL && _this.state.isModified == false) {
+          if (array[index][key] == value && _this.state.isModified == false) {
             retorno = true;
           }
-        }
+        };
+
         _this.setState({
           isModified: false
         });
+
         return retorno;
       };
 
       _this._handleModifyNominee = function () {
         var booleanList = [];
+
         var array = _this.state.listChecked.filter(function (item) {
           booleanList.push(item.isChecked);
           if (item.isChecked) return item;
         });
+
         if (array.length == 0) _this.setState({
           showError: true,
           textError: "Seleccioná un beneficiario para modificar"
@@ -144,12 +164,14 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
           textError: "Solo podés modificar un beneficiario por vez"
         });else {
           var id = booleanList.indexOf(true);
+
           _this.setState({
             selectedNominee: _this.state.nominas.NOMINAS.NOMINA[id],
             isModified: true,
             idSelectItem: id,
             showError: false
           });
+
           _this._handleView("modifyIndividualNominee");
         }
       };
@@ -267,6 +289,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
               getTipoDoc: _this._getTipoDoc,
               listNominados: _this.state.nominas.NOMINAS.NOMINA,
               listchecked: _this.state.listChecked,
+              desigBenefEnabled: _this.props.desigBenefEnabled,
               updateLista: function updateLista(lista) {
                 _this.setState({ listChecked: lista });
               }
@@ -357,6 +380,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
       _this._handleAcceptDelete = function (e) {
         var listNomina = _this.state.nominas.NOMINAS.NOMINA;
         var cantDelete = _this.state.cantDown;
+
         Object.keys(_this.state.listChecked).map(function (currency) {
           if (_this.state.listChecked[currency] && _this.state.listChecked[currency].isChecked) {
             listNomina[currency] = undefined;
@@ -365,6 +389,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
         });
 
         var listDeleteUpdate = [];
+
         listNomina.forEach(function (e) {
           if (e != undefined) {
             listDeleteUpdate.push(e);
@@ -372,6 +397,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
         });
 
         var listCheckUpdate = [];
+
         _this.state.listChecked.map(function (e) {
           if (e.isChecked != true) {
             listCheckUpdate.push(e);
@@ -395,6 +421,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
 
       _this._haldleDeleteRow = function () {
         var select = false;
+
         Object.keys(_this.state.listChecked).map(function (currency) {
           if (_this.state.listChecked[currency].isChecked) {
             select = true;
@@ -425,6 +452,7 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
 
       _this._handleModalIsOpen = function (e) {
         var current = _this.state.showModal;
+
         _this.setState({
           showModal: !current,
           showError: false,
@@ -486,7 +514,8 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
           case "newIndividualNominee":
             return React.createElement(NewIndividualNominee, {
               "switch": this._handleView,
-              cuilChecker: this._handleCUILChecker,
+              duplicateChecker: this._handleDuplicateChecker,
+              desigBenefEnabled: this.props.desigBenefEnabled,
               addNominee: this._addNominee,
               product: this.props.product,
               isEdit: false
@@ -494,7 +523,8 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
           case "modifyIndividualNominee":
             return React.createElement(NewIndividualNominee, {
               "switch": this._handleView,
-              cuilChecker: this._handleCUILChecker,
+              duplicateChecker: this._handleDuplicateChecker,
+              desigBenefEnabled: this.props.desigBenefEnabled,
               addNominee: this._addEdited,
               selectedNominee: this.state.selectedNominee,
               product: this.props.product,
@@ -520,16 +550,29 @@ define(["react", "../../common/modalReactBootstrap", "../../common/errormessage"
           _this2.setState({
             listTipoDoc: data
           });
+
           _this2.props.startLoading();
+
           _this2.nominaController.getNomina(_this2.props.grupo, function (response) {
             if (typeof response == "string") {
               _this2.props.stopLoading();
               _this2.props.payrollInError(response);
             } else {
-              _this2.setState({ nominas: response.DATOS });
               _this2.total = response.DATOS.NOMINAS.NOMINA.length;
-              _this2._handlerLoadListChecked();
-              _this2.props.stopLoading();
+
+              if (_this2.total > 0 && _this2.props.desigBenefEnabled) {
+                _this2.nominaController.validateNominaAbm(response.DATOS.NOMINAS.NOMINA).then(function (nomina) {
+                  _this2.setState({ nominas: response.DATOS });
+                  _this2._handlerLoadListChecked();
+
+                  _this2.props.stopLoading();
+                });
+              } else {
+                _this2.setState({ nominas: response.DATOS });
+                _this2._handlerLoadListChecked();
+
+                _this2.props.stopLoading();
+              }
             }
           });
         });

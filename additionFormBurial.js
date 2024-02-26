@@ -22,10 +22,15 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
         if (result.value !== "") {
           _this2.handleVerificationBrand(id, result);
         }
+
+        if (id === "applicantCuilNumber" && !result.isValidate && _this2.formData[id].referencies.current !== null) {
+          _this2.formData[id].referencies.current._onFocus(true);
+        }
       };
 
       _this2._handleFormValidation = function (saveForm) {
         var field = _this2.formData;
+        var formPropData = _this2.props.formInfo ? _this2.props.formInfo : _this2.props.data;
         var validated = true;
         var errorsList = [];
         var emptyFields = true;
@@ -40,10 +45,25 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
               //Se agrega parametro saveForm para utilizar la misma funcion para guardar y enviar el formulario
               if (field[element].value == "" && saveForm != "saveForm") {
                 field[element].referencies.current._onFocus(true);
-                errorsList[0] = "Complete los campos indicados";
+
+                if (errorsList.length !== 0) {
+                  if (!errorsList.includes("Complete los campos indicados")) {
+                    errorsList.push("Complete los campos indicados");
+                  }
+                } else {
+                  errorsList[0] = "Complete los campos indicados";
+                }
+
                 emptyFields = true;
                 validated = false;
               } else {
+                if (element == "applicantCuilNumber" && field[element].value.length !== 11 && formPropData.applicantTypeCCC == "1" && field[element].formatText == undefined) {
+                  errorsList.push("La longitud del CUIL debe ser de 11 digitos");
+                  field[element].referencies.current._onFocus(true);
+                  validated = false;
+                  emptyFields = false;
+                }
+
                 if (field[element].isValidate == false && field[element].value != "") {
                   field[element].referencies.current._onFocus(true);
                   if (field[element].formatText != undefined) {
@@ -116,7 +136,8 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
                 size: "md",
                 title: "Validación de campos",
                 component: _this._handleErrorsList(errorsList, emptyFields)
-              } });
+              }
+            });
 
             return false;
           } else {
@@ -148,7 +169,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
 
       _this2.handlePlus = function (product) {
         if (product == "AP" || product == "EC" || product == "CU") {
-          return _this2.props.listPoliza.CAPITMAX;
+          return _this2.props.grupoPoliza.GCAPIMAX;
         } else if (product == "MS") {
           return _this2.state.policy;
         } else return "";
@@ -204,16 +225,19 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
           relacion = _this2.state.listParentesco.find(function (element) {
             return parseInt(element.GRUPOCOD) == beneficiary.NOMINAS.RELBECOD;
           });
-          if (relacion.GRUPOCOD == "0000000100" || relacion.GRUPOCOD == "0000000101") {
+          var grupoCod = parseInt(relacion.GRUPOCOD);
+
+          if (grupoCod >= 100 && grupoCod <= 109) {
             beneficiary.NOMINAS.GRUPOCOD = relacion.GRUPOCOD;
             _this2.state.listParent.push(beneficiary);
-          } else if (relacion.GRUPOCOD == "0000000002") {
+          } else if (grupoCod >= 2 && grupoCod <= 9) {
             beneficiary.NOMINAS.GRUPOCOD = relacion.GRUPOCOD;
             _this2.state.listSon.push(beneficiary);
-          } else if (relacion.GRUPOCOD == "0000000050") {
+          } else if (grupoCod >= 50 && grupoCod <= 59) {
             beneficiary.NOMINAS.GRUPOCOD = relacion.GRUPOCOD;
             _this2.state.listSpouse.push(beneficiary);
           }
+
           return {
             FAMILIAR: {
               APELLIDO: beneficiary.NOMINAS.APEBENE,
@@ -232,7 +256,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
       };
 
       _this2._handleSendForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         _this2.handleTestBonus(_this2.formData);
 
         _this2._handleFormValidation().then(function (validado) {
@@ -356,7 +380,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
                         "PROVICOD": Number(_this2.formData.applicantProvince.id),
                         "IMPSUELD": 0,
                         "MULTIPLO": 0,
-                        "CAPITASG": _this2.props.listPoliza.CAPITMAX,
+                        "CAPITASG": _this2.props.grupoPoliza.GCAPIMAX,
                         "CONYUGE": _this2.state.listSpouse.length !== 0 ? "S" : "N",
                         "EXPEDNUMC": _this2.state.listSpouse.length !== 0 ? _this2.state.listSpouse[0].NOMINAS.GRUPOCOD : "",
                         "DOCUMTIPC": _this2.state.listSpouse.length !== 0 ? Number(_this2.state.listSpouse[0].NOMINAS.TIPDOCBENE) : 0,
@@ -389,7 +413,8 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
                         "TOM_NDO": _this2.props.product.TOM_NDO,
                         "DES_PRO": _this2.props.product.DES_PRO,
                         "TOM_APE": _this2.props.listPoliza.NOMBYAPE,
-                        "TOM_NOM": ""
+                        "TOM_NOM": "",
+                        "COD_PRO": _this2.props.product.COD_PRO
                       }
                     }, function (callBack) {
                       if (callBack.RESTS == "OK") {
@@ -453,7 +478,7 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
       };
 
       _this2._handleSaveForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         _this2.handleTestBonus(_this2.formData);
         _this2._handleFormValidation("saveForm").then(function (validado) {
           if (validado) {
@@ -601,7 +626,6 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
         loading: false,
         isLoaded: false,
         nameBurial: "",
-        group: [],
         listParentesco: [],
         listParent: [],
         listSon: [],
@@ -725,7 +749,6 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
               {
                 formInfo: this.props.formInfo,
                 applicantData: this.formData,
-                group: this.state.group,
                 nameBurial: this.state.nameBurial,
                 product: this.props.product,
                 docTypeList: this.props.docTypeList,
@@ -733,7 +756,9 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
                 user: this.props.user,
                 onResults: this._handleResults,
                 readOnly: this.props.readOnly,
-                listPoliza: this.props.listPoliza
+                listPoliza: this.props.listPoliza,
+                grupoPoliza: this.props.grupoPoliza,
+                listSubGrupos: this.props.listSubGrupos
               },
               " "
             ),
@@ -754,7 +779,9 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
                 user: this.props.user,
                 onResults: this._handleResults,
                 readOnly: this.props.readOnly,
-                listPoliza: this.props.listPoliza
+                listPoliza: this.props.listPoliza,
+                grupoPoliza: this.props.grupoPoliza,
+                listSubGrupos: this.props.listSubGrupos
               },
               " "
             ),
@@ -885,18 +912,17 @@ define(["react", "loadsh", "../../../common/loader", "../../../common/modalReact
     }, {
       key: "componentDidMount",
       value: function componentDidMount() {
-        var listParentesco = this.props.listPoliza.GRUPOS.GRUPO.filter(function (e) {
-          return parseInt(e.GRUPOCOD) != 1;
-        });
+        var listParentesco = this.props.listSubGrupos;
+
         this.setState({ listParentesco: listParentesco });
+
         if (this.props.product.TPR_DA1 == "P") {
           this.setState({ nameBurial: "Sepelio-Servicio" });
         } else if (this.props.product.TPR_DA1 == "R") {
           this.setState({ nameBurial: "Sepelio-Reintegro" });
         }
-        this.setState({ showPayment: this.props.listPoliza.MDCECOIND });
 
-        this.setState({ group: this.props.listPoliza.GRUPOS.GRUPO });
+        this.setState({ showPayment: this.props.listPoliza.MDCECOIND });
         this.firstFormData = Loadsh.cloneDeep(this.formData);
       }
     }]);

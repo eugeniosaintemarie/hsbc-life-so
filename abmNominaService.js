@@ -83,11 +83,17 @@ define(['react', 'react-dom', './baseService'], function (React, ReactDOM, BaseS
             value: function enviarEmail(param) {
                 return this.call('POST', 'NominaDeAsegurados/enviarEmail', param, 'JSON', true);
             }
+        }, {
+            key: 'getPolDispABM',
+            value: function getPolDispABM(param) {
+                return this.call('POST', 'NominaDeAsegurados/getPolDispABM', param, 'JSON', true);
+            }
         }]);
 
         return AbmNominaService;
     }(BaseService);
 
     ;
+
     return AbmNominaService;
 });

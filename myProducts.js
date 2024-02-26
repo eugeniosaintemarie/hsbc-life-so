@@ -101,7 +101,17 @@ define(["react", "../services/userService", "../services/segurosOnlineService", 
                         product.detalle.RAMOPDES
                       ),
                       React.createElement("br", null),
-                      product.detalle.NROPOLIZA
+                      product.detalle.NROPOLIZA,
+                      product.MAR_ADH === "S" && product.TIP_SOL === "A" && product.COD_EST === "G" ? React.createElement(
+                        React.Fragment,
+                        null,
+                        React.createElement("br", null),
+                        React.createElement(
+                          "p",
+                          { className: "font-italic text-success mb-0" },
+                          "\xA1Adherite a la p\xF3liza de tu empleador! (Invitaci\xF3n)"
+                        )
+                      ) : ""
                     )
                   );
                 })
@@ -146,7 +156,17 @@ define(["react", "../services/userService", "../services/segurosOnlineService", 
                         detalle && detalle.RAMOPDES ? detalle.RAMOPDES : ""
                       ),
                       React.createElement("br", null),
-                      detalle && detalle.NROPOLIZA ? detalle.NROPOLIZA : ""
+                      detalle && detalle.NROPOLIZA ? detalle.NROPOLIZA : "",
+                      productData.MAR_ADH === "S" && productData.TIP_SOL === "A" && productData.COD_EST === "G" ? React.createElement(
+                        React.Fragment,
+                        null,
+                        React.createElement("br", null),
+                        React.createElement(
+                          "p",
+                          { className: "font-italic text-success mb-0" },
+                          "\xA1Adherite a la p\xF3liza de tu empleador! (Invitaci\xF3n)"
+                        )
+                      ) : ""
                     )
                   );
                 })
@@ -192,7 +212,17 @@ define(["react", "../services/userService", "../services/segurosOnlineService", 
                         detalle && detalle.RAMOPDES ? detalle.RAMOPDES : ""
                       ),
                       React.createElement("br", null),
-                      detalle && detalle.NROPOLIZA ? detalle.NROPOLIZA : ""
+                      detalle && detalle.NROPOLIZA ? detalle.NROPOLIZA : "",
+                      productData.MAR_ADH === "S" && productData.TIP_SOL === "A" && productData.COD_EST === "G" ? React.createElement(
+                        React.Fragment,
+                        null,
+                        React.createElement("br", null),
+                        React.createElement(
+                          "p",
+                          { className: "font-italic text-success mb-0" },
+                          "\xA1Adherite a la p\xF3liza de tu empleador! (Invitaci\xF3n)"
+                        )
+                      ) : ""
                     )
                   );
                 })
@@ -250,7 +280,17 @@ define(["react", "../services/userService", "../services/segurosOnlineService", 
                         productData.DES_PRO
                       ),
                       React.createElement("br", null),
-                      productDes
+                      productDes,
+                      productData.MAR_ADH === "S" && productData.TIP_SOL === "A" && productData.COD_EST === "G" ? React.createElement(
+                        React.Fragment,
+                        null,
+                        React.createElement("br", null),
+                        React.createElement(
+                          "p",
+                          { className: "font-italic text-success mb-0" },
+                          "\xA1Adherite a la p\xF3liza de tu empleador! (Invitaci\xF3n)"
+                        )
+                      ) : ""
                     )
                   );
                 })

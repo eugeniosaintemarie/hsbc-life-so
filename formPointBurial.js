@@ -30,6 +30,26 @@ define(["react", "../../../common/inputvalidation", "../../../common/numTelefono
 
       _this._handleResults = function (id, result) {
         var form = {};
+        var formPropData = _this.props.formInfo ? _this.props.formInfo : _this.props.data;
+
+        if (id === "applicantCuilNumber" && formPropData.applicantTypeCCC == "1") {
+          var userDocument = formPropData.applicantCuilNumber;
+
+          if (!result.value.includes(userDocument) && result.value.length > 7) {
+            result.formatText = "El DNI debe estar incluido dentro del CUIL";
+            result.isValidate = false;
+            _this.referencies[id].current.isValidate = false;
+          } else if (result.value.length === 11) {
+            var dni = result.value.substr(2, 8);
+
+            if (!dni.includes(userDocument)) {
+              result.formatText = "El DNI debe estar incluido dentro del CUIL";
+              result.isValidate = false;
+              _this.referencies[id].current.isValidate = false;
+            }
+          }
+        }
+
         _this.setState(_defineProperty({}, id, result));
         result.referencies = _this.referencies[id];
         form = result;
@@ -257,6 +277,8 @@ define(["react", "../../../common/inputvalidation", "../../../common/numTelefono
       value: function render() {
         var readOnly = this.props.readOnly;
 
+        var formPropData = this.props.formInfo ? this.props.formInfo : this.props.data;
+
         return React.createElement(
           "form",
           null,
@@ -281,7 +303,7 @@ define(["react", "../../../common/inputvalidation", "../../../common/numTelefono
                 id: "applicantTypeCCC",
                 name: "applicantTypeCCC",
                 typeValue: "id",
-                defaultValue: this.state.applicantTypeCCC.id,
+                defaultValue: this.state.applicantTypeCCC.id == "1" ? "5" : this.state.applicantTypeCCC.id,
                 onResult: this._handleResults,
                 disabled: Object.keys(this.props.formInfo).length === 0 ? false : true
 
@@ -303,11 +325,11 @@ define(["react", "../../../common/inputvalidation", "../../../common/numTelefono
                 classNameAd: "hide",
                 id: "applicantCuilNumber",
                 name: "applicantCuilNumber",
-                minLength: "8",
+                minLength: formPropData.applicantTypeCCC == "1" ? "11" : "8",
                 maxLength: "11",
                 value: this.state.applicantCuilNumber.value,
                 className: "input-background-color form-control input-size",
-                formatText: "N\xFAmero Documento Solicitante: La longitud tiene que ser mayor a 8.",
+                formatText: formPropData.applicantTypeCCC == "1" ? "La longitud del CUIL debe ser de 11 digitos" : "Número Documento Solicitante: La longitud tiene que ser mayor a 8.",
                 onResult: this._handleResults,
                 onKeyPress: function onKeyPress(e) {
                   if (isNaN(e.key)) {
@@ -315,8 +337,8 @@ define(["react", "../../../common/inputvalidation", "../../../common/numTelefono
                   }
                 },
                 upperCase: true,
-                disabled: Object.keys(this.props.formInfo).length === 0 ? false : true
-
+                disabled: formPropData.applicantTypeCCC == "1" ? false : Object.keys(this.props.formInfo).length === 0 ? false : true,
+                required: formPropData.applicantTypeCCC == "1" ? true : false
               })
             ),
             React.createElement(

@@ -28,7 +28,43 @@ define(["react", "./additionPdfColectivo"], function (React, AdditionPdfColectiv
 
         switch (product.COD_EST) {
           case 'E':
-            return React.createElement(AdditionPdfColectivo, { product: this.props.product, handleSetRequestNumber: this.props.handleSetRequestNumber });
+            if (product.TIP_SOL === "M") {
+              return React.createElement(
+                React.Fragment,
+                null,
+                React.createElement(
+                  "div",
+                  { className: "container-fluid" },
+                  React.createElement(
+                    "div",
+                    { className: "col-md-15" },
+                    React.createElement(
+                      "div",
+                      { className: "col-md-15 p-3" },
+                      React.createElement(
+                        "span",
+                        { className: "text-body" },
+                        "Hac\xE9 click para modificar tu p\xF3liza."
+                      )
+                    ),
+                    React.createElement(
+                      "div",
+                      { className: "col-md-8" },
+                      React.createElement(
+                        "button",
+                        {
+                          className: "btn btn-danger border-dark right",
+                          onClick: this.props.handleShowAdditionFormModify
+                        },
+                        "Modificar p\xF3liza"
+                      )
+                    )
+                  )
+                )
+              );
+            } else {
+              return React.createElement(AdditionPdfColectivo, { product: this.props.product, handleSetRequestNumber: this.props.handleSetRequestNumber });
+            }
           case 'D':
             return React.createElement(
               "div",
@@ -48,36 +84,26 @@ define(["react", "./additionPdfColectivo"], function (React, AdditionPdfColectiv
                 { className: "container-fluid" },
                 React.createElement(
                   "div",
-                  { className: "col-md-12" },
+                  { className: "col-md-15" },
                   React.createElement(
                     "div",
-                    { className: "alert border bg-light row " },
-                    React.createElement("div", { className: "alert-benef" }),
+                    { className: "col-md-15 p-3" },
                     React.createElement(
-                      "div",
-                      { className: "col-md-7 " },
-                      React.createElement(
-                        "small",
-                        { className: "text-body pl-4 " },
-                        "Hac\xE9 click para completar la solicitud."
-                      )
-                    ),
+                      "span",
+                      { className: "text-body" },
+                      product.TIP_SOL === "M" ? "Hacé click para modificar tu póliza." : "Hacé click para completar la solicitud de tu póliza."
+                    )
+                  ),
+                  React.createElement(
+                    "div",
+                    { className: "col-md-8" },
                     React.createElement(
-                      "div",
-                      { className: "col-md-5" },
-                      React.createElement(
-                        "button",
-                        {
-                          className: "btn btn-danger border-dark right p-1 w-75",
-                          onClick: this.props.handleShowAdditionManagerColectivo
-                        },
-                        "Completar solicitud"
-                      ),
-                      React.createElement(
-                        "button",
-                        { type: "button", className: "close", "data-dismiss": "alert" },
-                        "\xD7"
-                      )
+                      "button",
+                      {
+                        className: "btn btn-danger border-dark right",
+                        onClick: product.TIP_SOL === "M" ? this.props.handleShowAdditionFormModify : this.props.handleShowAdditionManagerColectivo
+                      },
+                      product.TIP_SOL === "M" ? "Modificar póliza" : "Completar solicitud"
                     )
                   )
                 )

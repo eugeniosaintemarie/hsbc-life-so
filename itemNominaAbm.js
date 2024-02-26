@@ -13,13 +13,68 @@ define(["react", "../../lib/utils"], function (React, Utils) {
     function ItemNominaAbm(props) {
       _classCallCheck(this, ItemNominaAbm);
 
-      return _possibleConstructorReturn(this, (ItemNominaAbm.__proto__ || Object.getPrototypeOf(ItemNominaAbm)).call(this, props));
+      var _this = _possibleConstructorReturn(this, (ItemNominaAbm.__proto__ || Object.getPrototypeOf(ItemNominaAbm)).call(this, props));
+
+      _this._caseValidationResult = function (e) {
+        switch (e.VALIDACION) {
+          case "OK":
+          case "ADD":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-check text-success" })
+            );
+          case "ERROR":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-times text-danger" })
+            );
+          case "D-ERROR":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-times text-danger" }),
+              "\xA0 El mail se encuentra duplicado en la n\xF3mina"
+            );
+          case "DOCOK":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-check mr-1 text-success" }),
+              "\xA0DNI registrado con ",
+              e.DATOSREGISTRO.MAIL,
+              ", ",
+              React.createElement("br", null),
+              " se enviar\xE1 el mail a dicha casilla de correo y a la ingresada"
+            );
+          case "MAILOK":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-times mr-1 text-danger" }),
+              "\xA0No es posible enviar mail a este usuario,",
+              React.createElement("br", null),
+              " el mail esta registrado con otro DNI"
+            );
+          case "NOMAIL":
+            return React.createElement(
+              "td",
+              null,
+              React.createElement("i", { className: "fas fa-times mr-1 text-danger" }),
+              "\xA0No se ha ingresado un mail"
+            );
+        }
+      };
+
+      return _this;
     }
 
     _createClass(ItemNominaAbm, [{
       key: "render",
       value: function render() {
         var item = this.props.nomina;
+
         return React.createElement(
           "tr",
           null,
@@ -72,6 +127,11 @@ define(["react", "../../lib/utils"], function (React, Utils) {
             "td",
             null,
             item.COBERTURAS.COBERTURA[0].SUMAASEG
+          ),
+          this.props.desigBenefEnabled ? this._caseValidationResult(item) : React.createElement(
+            "td",
+            null,
+            React.createElement("i", { className: "fas fa-check text-success" })
           )
         );
       }

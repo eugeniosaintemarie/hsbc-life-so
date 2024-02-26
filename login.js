@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "react-redux", "../components/loginForm", "../components/loginStep2", "../components/loginChangePass", "../components/loginSecretQuestion", "../common/navBar", "../common/carouselImages", "../common/modalReactBootstrap", "../components/siniestroModal2", "../components/knowMoreLogin", "../components/terminosCondiciones", "../components/preguntasFrecuentes", "../components/forgetPasswordLogin", "../components/registerUserLogin", "../controller/loginController", "../lib/utils", "../segurosOnline/firstLogin", "../components/outService"], function (React, ReactRedux, LoginForm, LoginStep2, LoginChangePass, LoginSecretQuestion, NavBar, CarouselImages, ModalReactBootstrap, SiniestroModal2, KnowMoreLogin, TerminosCondiciones, PreguntasFrecuentes, ForgetPasswordLogin, RegisterUserLogin, LoginController, Utils, FirstLogin, OutService) {
+define(["react", "react-redux", "../components/loginForm", "../components/loginStep2", "../components/loginChangePass", "../components/loginSecretQuestion", "../common/navBar", "../common/carouselImages", "../common/modalReactBootstrap", "../components/siniestroModal2", "../components/knowMoreLogin", "../components/terminosCondiciones", "../components/preguntasFrecuentes", "../components/forgetPasswordLogin", "../components/registerUserLogin", "../controller/loginController", "../lib/utils", "../segurosOnline/firstLogin", "../common/inputvalidation", "../components/outService"], function (React, ReactRedux, LoginForm, LoginStep2, LoginChangePass, LoginSecretQuestion, NavBar, CarouselImages, ModalReactBootstrap, SiniestroModal2, KnowMoreLogin, TerminosCondiciones, PreguntasFrecuentes, ForgetPasswordLogin, RegisterUserLogin, LoginController, Utils, FirstLogin, InputValidation, OutService) {
   var Login = function (_React$Component) {
     _inherits(Login, _React$Component);
 
@@ -87,17 +87,9 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
       _this._handleClickTerminos = function (e) {
         e.preventDefault();
 
-        _this.setState({
-          showModalSinister: true,
-          modal: {
-            component: React.createElement(TerminosCondiciones, null),
-            title: "Sobre los Términos y Condiciones",
-            contentHTML: '',
-            html: false,
-            size: "lg",
-            dialogClassName: ""
-          }
-        });
+        var url = 'https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_term_cond_seg_online.pdf';
+
+        window.open(url);
       };
 
       _this._handleClickPreguntas = function (e) {
@@ -183,7 +175,6 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
         _this.setState({
           isSubmitting: true
         });
-
         _this.loginController.loginPaso1(_this.state.email.value, _this.state.password.value, function (promise, requestURL) {
           var path = requestURL.split("pages");
           var paramsPath = path[1].split("?");
@@ -493,7 +484,8 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
           size: "md",
           dialogClassName: "",
           responseModal: null,
-          hiddenButtonClose: false
+          hiddenButtonClose: false,
+          footerText: ""
         },
         step: 'step1',
         //Campos Form
@@ -520,51 +512,21 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
             null,
             React.createElement(NavBar, null),
             React.createElement(
+              "h3",
+              { className: "text-md-center hsbc-title-red titlePadding", id: "titleLogin" },
+              "\xA1Te damos la bienvenida a HSBC Seguros Online!"
+            ),
+            React.createElement(
+              "h2",
+              { className: "hsbc-subtitle subTitlePadding" },
+              "Ac\xE1 podr\xE1s encontrar informaci\xF3n y realizar todas las gestiones de tu p\xF3liza"
+            ),
+            React.createElement(
               "div",
-              { className: "container main-container main-container-login" },
+              { className: "container" },
               this.state.step === 'FirstLogin' ? this._caseLogin() : React.createElement(
                 "div",
-                { className: "col-md-12" },
-                React.createElement(
-                  "div",
-                  { className: "col-md-7", id: "login-left-panel" },
-                  React.createElement(CarouselImages, {
-                    arrayImages: [{
-                      link: "https://www.hsbc.com.ar/seguros/vida-ahorro/",
-                      img: "https://www.argentina.hsbc.com.ar/seguros-online/images/imgSOLC01.jpg"
-                    }, {
-                      link: "https://www.hsbc.com.ar/seguros/vida-family/",
-                      img: "https://www.argentina.hsbc.com.ar/seguros-online/images/imgSOLC02.jpg"
-                    }, {
-                      link: "https://www.hsbc.com.ar/seguros/retiro/",
-                      img: "https://www.argentina.hsbc.com.ar/seguros-online/images/imgSOLC03.jpg"
-                    }, {
-                      link: "https://www.hsbc.com.ar/seguros/vida-temporario/",
-                      img: "https://www.argentina.hsbc.com.ar/seguros-online/images/imgSOLC04.jpg"
-                    }]
-                  }),
-                  React.createElement(
-                    "div",
-                    { className: "row row-subbanner" },
-                    React.createElement(
-                      "div",
-                      { className: "col-md-6" },
-                      React.createElement("img", {
-                        className: "banner cursor",
-                        onClick: this._handleClickSinister,
-                        src: "../img/login/botonSiniestros.png"
-                      })
-                    ),
-                    React.createElement(
-                      "div",
-                      { className: "col-md-6" },
-                      React.createElement("img", {
-                        className: "banner",
-                        src: "../img/login/botonClientes.png"
-                      })
-                    )
-                  )
-                ),
+                { className: "d-block d-md-flex justify-content-center" },
                 React.createElement(ModalReactBootstrap, {
                   title: this.state.modal.title,
                   show: this.state.showModalSinister,
@@ -578,61 +540,154 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
                   hiddenButtonClose: this.state.modal.hiddenButtonClose }),
                 React.createElement(
                   "div",
-                  { className: "col-md-5", id: "login-right-panel" },
+                  { id: "login-left-panel", className: "hsbc-form-left" },
+                  React.createElement(
+                    "div",
+                    { className: "hsbc-stepper" },
+                    React.createElement("div", { className: this.state.step == "step1" ? "hsbc-stepper-progress" : "hsbc-stepper-progress-step2" }),
+                    React.createElement("div", { className: this.state.step == "step1" ? "hsbc-stepper-progress-left" : "" })
+                  ),
                   this._caseLogin()
                 ),
                 React.createElement(
                   "div",
-                  { id: "footer-login", className: "col-md-12" },
+                  { className: "hsbc-form-right ml-0 rightPanelPadding", id: "login-right-panel" },
                   React.createElement(
-                    "div",
-                    { className: "container-footer" },
+                    "form",
+                    { className: "container" },
                     React.createElement(
-                      "ul",
-                      { id: "services-list" },
+                      "div",
+                      { className: "p-1 " },
+                      "Accesos Directos: "
+                    ),
+                    React.createElement("p", null),
+                    React.createElement(
+                      "div",
+                      { className: "container col-md-12 text-md-left d-flex center-align-icon" },
                       React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                          "a",
-                          { href: "#", onClick: this._handleClickTerminos },
-                          "T\xE9rminos y Condiciones"
-                        ),
-                        React.createElement(
-                          "span",
-                          { className: "separator" },
-                          "|"
-                        )
+                        "div",
+                        { className: "d-block" },
+                        React.createElement("img", { src: "https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_servicio_al_cliente.svg", alt: "Icon" })
                       ),
                       React.createElement(
-                        "li",
-                        null,
+                        "div",
+                        { className: "col-md-9" },
                         React.createElement(
-                          "a",
-                          { href: "#", onClick: this._handleClickPreguntas },
-                          "Preguntas frecuentes"
-                        ),
-                        React.createElement(
-                          "span",
-                          { className: "separator" },
-                          "|"
-                        )
-                      ),
-                      React.createElement(
-                        "li",
-                        null,
-                        React.createElement(
-                          "a",
-                          { href: "https://www.segurosonline.zurich.com.ar/Cliente/Default.asp" },
-                          "Tus p\xF3lizas patrimoniales "
+                          "u",
+                          {
+                            href: "#",
+                            type: "submit",
+                            className: "hsbc-text-normal smallFont",
+                            onClick: this._handleClickSinister },
+                          "Denunciar Siniestro"
                         )
                       )
                     ),
+                    React.createElement("p", null),
                     React.createElement(
-                      "p",
-                      { className: "footer-login-text" },
-                      "Seguros emitidos por HSBC Seguros de Vida (Argentina) S.A. sus operaciones son independientes de otras compa\xF1\xEDas del grupo HSBC. Los accionistas limitan su responsabilidad al capital aportado. HSBC Seguros de Vida (Argentina) S.A. comercializa seguros \xFAnicamente a residentes de la Rep\xFAblica Argentina. Direcci\xF3n de la aseguradora: Hip\xF3lito Bouchard 557 PISO 20 CABA (C1106ABG) Tel\xE9fono: 0800 333 0003. Mail de la aseguradora: contactenos@hsbc.com.ar. CUIT de la aseguradora: 30-66322131-7. Inscripci\xF3n ante la SSN mediante Nro 0516. Seguros emitidos por HSBC Seguros de Retiro (Argentina) S.A. sus operaciones son independientes de otras compa\xF1\xEDas del grupo HSBC. Los accionistas limitan su responsabilidad al capital aportado. HSBC Seguros de Retiro (Argentina) S.A. comercializa seguros \xFAnicamente a residentes de la Rep\xFAblica Argentina. Direcci\xF3n de la aseguradora: Hip\xF3lito Bouchard 557 PISO 20 CABA (C1106ABG) Tel\xE9fono: 0800 333 0003. Mail de la aseguradora: contactenos@hsbc.com.ar. CUIT de la aseguradora: 30-64310365-2. Inscripci\xF3n ante la SSN mediante Nro 0443. N\xFAmero CAC: 0800-333-0003. L\xEDnea gratuita Centro de Atenci\xF3n al Cliente HSBC 0800-333-0003. Direcci\xF3n General de Defensa y Protecci\xF3n al Consumidor. Para consultas y/o denuncias ingrese aqu\xED. Sepa los derechos que existen sobre sus Datos Personales (Disposici\xF3n DNPDP 10/2008). - Ley 2.817 (C.A.B.A.): Modos de rescisi\xF3n de contratos realizados v\xEDa telef\xF3nica, electr\xF3nica o similar."
+                      "div",
+                      { className: "container col-md-12 text-md-left d-flex center-align-icon" },
+                      React.createElement(
+                        "div",
+                        { className: "d-block" },
+                        React.createElement("img", { src: "https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_lupa.svg", alt: "Icon" })
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "col-md-9" },
+                        React.createElement(
+                          "u",
+                          {
+                            href: "#",
+                            type: "submit",
+                            className: "hsbc-text-normal smallFont",
+                            onClick: this._handleClickKnowMore },
+                          "Conoc\xE9 m\xE1s HSBC Life"
+                        )
+                      )
+                    ),
+                    React.createElement("p", null),
+                    React.createElement(
+                      "div",
+                      { className: "container col-md-12 text-md-left d-flex center-align-icon" },
+                      React.createElement(
+                        "div",
+                        { className: "d-block" },
+                        React.createElement("img", { src: "https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_atencion_al_cliente.svg", alt: "Icon" })
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "col-md-9" },
+                        React.createElement(
+                          "span",
+                          { className: "hsbc-text-normal smallFont" },
+                          "Atencion al cliente ",
+                          React.createElement(
+                            "p",
+                            { className: "marginZero" },
+                            React.createElement(
+                              "strong",
+                              null,
+                              "0800-333-0003"
+                            )
+                          ),
+                          " lunes a viernes 8 a 20hs"
+                        )
+                      )
+                    ),
+                    React.createElement("p", null),
+                    React.createElement(
+                      "div",
+                      { className: "container smallFont col-md-12 text-md-left d-flex center-align-icon" },
+                      React.createElement(
+                        "div",
+                        { className: "d-block" },
+                        React.createElement("img", { src: "https://argentina.hsbc.com.ar/OBD%20VIDA/images/hsbc_vida_correo_de_contacto.svg", alt: "Icon" })
+                      ),
+                      React.createElement(
+                        "div",
+                        { className: "col-md-9" },
+                        React.createElement(
+                          "span",
+                          { className: "hsbc-text-normal smallFont" },
+                          "Contactanos ",
+                          React.createElement(
+                            "strong",
+                            null,
+                            "contactenos@hsbc.com.ar"
+                          )
+                        )
+                      )
+                    ),
+                    React.createElement("p", null),
+                    React.createElement("div", { className: "hsbc-divider" }),
+                    React.createElement("p", null),
+                    React.createElement(
+                      "div",
+                      null,
+                      React.createElement(
+                        "a",
+                        { href: "#", className: "offset-1 hsbc-text-normal smallFont", onClick: this._handleClickTerminos },
+                        "T\xE9rminos y Condiciones"
+                      )
                     )
+                  )
+                )
+              )
+            ),
+            React.createElement(
+              "div",
+              { className: "col-md-12 myFooter" },
+              React.createElement(
+                "footer",
+                null,
+                React.createElement(
+                  "div",
+                  { "class": "col-md-12 footer-2 p-0" },
+                  React.createElement(
+                    "div",
+                    { "class": "container" },
+                    React.createElement("iframe", { src: "https://argentina.hsbc.com.ar/OBD VIDA/footer/footer-legales.html", name: "SubHtml", scrolling: "no", "class": "footer-legales" })
                   )
                 )
               )
@@ -660,6 +715,7 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
     }, {
       key: "componentDidMount",
       value: function componentDidMount() {
+
         var params = {
           IDE_SIT: 0,
           CLI_TIP: "SOF",
@@ -696,6 +752,9 @@ define(["react", "react-redux", "../components/loginForm", "../components/loginS
     return {
       login: function login() {
         return dispatch({ type: "LOGIN" });
+      },
+      logout: function logout() {
+        return dispatch({ type: "LOGOUT" });
       }
     };
   }

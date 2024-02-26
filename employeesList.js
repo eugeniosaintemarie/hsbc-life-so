@@ -67,7 +67,7 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
               if (data) {
                 var filename = 'nomina de asegurados.pdf';
                 var fileManager = new FileManager();
-                var resultDownload = fileManagerPDF(data, filename);
+                var resultDownload = fileManager.downloadPDF(data, filename);
                 if (!resultDownload) {
                   _this.setState({
                     showModalSuccess: true,

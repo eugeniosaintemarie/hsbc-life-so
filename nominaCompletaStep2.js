@@ -6,7 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", "../../controller/nominaController", "../../common/errorExcel", "../../common/buttonLoading", "loadsh", "./processOkPayroll", "./processErrorScreen", "../../lib/utils", "./profeModal", "../../redux/store", "../../controller/vidaColectivoController"], function (React, InputFile2, ModalReactBootstrap, NominaController, ErrorExcel, ButtonLoading, Loadsh, ProcessOkPayroll, ProcessErrorScreen, Utils, ProfeModal, Store, VidaColectivoController) {
+define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", "../../controller/nominaController", "../../common/errorExcel", "../../common/buttonLoading", "loadsh", "./processOkPayroll", "./processErrorScreen", "../../lib/utils", "./profeModal", "../../redux/store", "../../controller/vidaColectivoController", "../nominas/paginatedView", "../../common/progressBar.js"], function (React, InputFile2, ModalReactBootstrap, NominaController, ErrorExcel, ButtonLoading, Loadsh, ProcessOkPayroll, ProcessErrorScreen, Utils, ProfeModal, Store, VidaColectivoController, PaginatedView, ProgressBar) {
   var NominaCompletaStep2 = function (_React$Component) {
     _inherits(NominaCompletaStep2, _React$Component);
 
@@ -16,6 +16,22 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
       var _this = _possibleConstructorReturn(this, (NominaCompletaStep2.__proto__ || Object.getPrototypeOf(NominaCompletaStep2)).call(this, props));
 
       _this.FORM_NAME = "nominaCompletaStep2";
+
+      _this._handleNextPage = function () {
+        _this.setState(function (prevState) {
+          return {
+            currentPage: prevState.currentPage + 1
+          };
+        });
+      };
+
+      _this._handlePreviousPage = function () {
+        _this.setState(function (prevState) {
+          return {
+            currentPage: prevState.currentPage - 1
+          };
+        });
+      };
 
       _this._showModalProcessOK = function () {
         _this.setState({
@@ -45,8 +61,33 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
         });
       };
 
+      _this._handleMaxValidation = function () {
+
+        _this.setState({
+          enviarLoading: false,
+          isLoading: false,
+          showModal: true,
+          modal: {
+            component: null,
+            contentHTML: "<div><p><strong>La cantidad de nominados ingresados supera los 2000, por favor particionar la nomina de modo que tenga como máximo 2000 personas</strong></p></div>",
+            html: true,
+            title: "Formato de la Nomina",
+            size: "md",
+            accept: _this._displayNone()
+          }
+        });
+      };
+
       _this._handleButtonProcess = function () {
-        _this.nominaController.handleXLS(_this.fileExcel, function (list) {
+
+        _this.setState({
+          processButtonEnabled: false,
+          isLoading: true
+        });
+
+        _this.nominaController.handleXLSValidated(_this.fileExcel, function (list) {
+          var cont = 0;
+
           _this.nominaController.validateFieldWithFormats(list, _this.props.camposNomina, function (listErrores) {
             listErrores.concat(_this.state.listError);
             _this.setState({
@@ -57,8 +98,120 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
             _this.setState({
               listExcel: listOK
             });
+
+            cont++;
+
+            _this._getPage(_this.state.page, _this.state.rows);
+
+            if (cont === listOK.length) {
+              _this._handleValDesigBenef(listOK[0]);
+            }
           });
+        }, _this._handleMaxValidation);
+      };
+
+      _this._handleExcelPasteFunction = function () {
+        navigator.clipboard.readText().then(function (text) {
+          _this.convertExcelCopy(text);
         });
+      };
+
+      _this._excelJson = function (excelText) {
+        var allTextLines = excelText.split(/\r\n|\n/);
+        var headers = allTextLines[0].split(/\t/);
+        var lines = [];
+
+        for (var i = 1; i < allTextLines.length; i++) {
+          var data = allTextLines[i].split(/\t/);
+
+          if (data.length == headers.length) {
+            var row = {};
+
+            for (var j = 0; j < headers.length; j++) {
+              row[headers[j]] = data[j];
+            }
+
+            lines.push(row);
+          }
+        }
+
+        return lines;
+      };
+
+      _this.convertExcelCopy = function (text) {
+        var json = _this._excelJson(text);
+
+        json = json.map(function (registro) {
+          var newField = {};
+
+          for (var key in registro) {
+            newField[key.toUpperCase()] = registro[key];
+          }
+
+          return newField;
+        });
+
+        _this._getPage(_this.state.page, _this.state.rows);
+
+        if (json.length <= 2000) {
+          // this.nominaController.fechaDeExcel(json[0].FECHA_DE_NACIMIENTO, "DD/MM/AAAA");
+          _this.setState({
+            listExcel: json,
+            isCopyFromExcel: true
+          });
+
+          _this._getPage(_this.state.page, _this.state.rows);
+
+          _this.nominaController.validateFieldWithFormats(json, _this.props.camposNomina, function (listErrores) {
+            listErrores.concat(_this.state.listError);
+
+            _this.setState({
+              listError: listErrores
+            });
+
+            _this._showModalProcessOK();
+          }, function (listOK) {
+            _this.setState({
+              listExcel: listOK
+            });
+
+            _this._getPage(_this.state.page, _this.state.rows);
+
+            _this._handleValDesigBenef(listOK[0]);
+          });
+        } else {
+          _this.setState({
+            enviarLoading: false,
+            isLoading: false,
+            showModal: true,
+            modal: {
+              component: null,
+              contentHTML: "<div><p><strong>La cantidad de nominados ingresados supera los 2000, por favor particionar la nomina de modo que tenga como máximo 2000 personas</strong></p></div>",
+              html: true,
+              title: "Formato de la Nomina",
+              size: "md",
+              accept: _this._displayNone()
+            }
+          });
+        }
+      };
+
+      _this._handleValDesigBenef = function (itemExcel) {
+        var product = _this.props.product.detalle ? _this.props.product.detalle : _this.props.product.cup;
+
+        _this.nominaController.validateDesigBenef(itemExcel.CUIL, function (res) {
+          if (res.VALIDACION === "NODESIGNA") {
+            _this.setState({
+              desigBenefEnabled: false
+            });
+          } else {
+            _this.setState({
+              desigBenefEnabled: true
+            });
+          }
+
+          _this._getPage(_this.state.page, _this.state.rows);
+        }, product);
       };
 
       _this.ageValidate = function (list) {
@@ -66,7 +219,7 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
         var notNomina = [];
         list.map(function (field, i) {
           Object.keys(field).map(function (e) {
-            if (e === 'FECHA DE NACIMIENTO') {
+            if (e === 'FECHA DE NACIMIENTO' || e === 'FECHA_DE_NACIMIENTO') {
               var formattedDate = _this.fechaDeExcel(field[e], "DD/MM/AAAA");
               var ageFormat = Utils.fAgeCalc2(formattedDate);
               age.push(ageFormat);
@@ -159,27 +312,55 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
         });
 
         _this.setState({ ACTIVIDADES: list });
-
-        _this._handleModalSetActivities(); //abre modal
+        if (list.length !== 0) {
+          _this._handleModalSetActivities(); //abre modal
+        } else {
+          _this._handleModalValidateButton(); //valida directamente si no hay actividades en el excel
+        }
       };
 
       _this._handleSendMailButton = function () {
         _this._handleModalIsOpen();
         var product = _this.props.product.detalle ? _this.props.product.detalle : _this.props.product.cup;
         var listToSend = [];
+        var copyListExcel = [];
+
         _this.state.listExcel.map(function (item) {
-          if (item.VALIDACION != "MAILOK" && item.VALIDACION != "NOEXIST") listToSend.push(item);
+          if (item.VALIDACION != "MAILOK" && item.VALIDACION != "NOEXIST" && item.VALIDACION != "D-ERROR") {
+            listToSend.push(item);
+          }
+
+          if (item.VALIDACION != "D-ERROR") {
+            copyListExcel.push(item);
+          }
         });
-        if (listToSend.length > 0) _this.setState({ enviarLoading: true });
-        _this.nominaController.sendNomina(listToSend, product, function (errors) {
-          if (errors.length == 0 && listToSend.length != 0) _this.setState({ processRegBenef: true });else if (errors.length != 0 && listToSend.length != 0) _this.setState({ showErrorsMsg: true });
-        }, _this.props.user, "ABM");
-        _this.nominaController.sendNominaAsegurados(_this.state.listExcel, _this.props.grupo, function (sendError, valError) {
+
+        if (listToSend.length > 0) {
+          _this.setState({ enviarLoading: true });
+        }
+
+        if (_this.state.desigBenefEnabled) {
+          _this.nominaController.sendNomina(listToSend, product, function (errors) {
+            if (errors.length == 0 && listToSend.length != 0) {
+              _this.setState({ processRegBenef: true, count: _this.state.count + 1 });
+            } else if (errors.length != 0 && listToSend.length != 0) _this.setState({ showErrorsMsg: true });
+          }, _this.props.user, "ABM");
+        }
+
+        _this.nominaController.sendNominaAsegurados(copyListExcel, _this.props.grupo, function (sendError, valError) {
           _this.setState({ listSendError: sendError, listErrorAseg: valError });
         }, "EXCEL");
       };
 
       _this._tableExcel = function () {
+        var _this$state = _this.state,
+            currentPage = _this$state.currentPage,
+            itemsPerPage = _this$state.itemsPerPage;
+
+        var startIndex = currentPage * itemsPerPage;
+        var endIdex = startIndex + itemsPerPage;
+        var visibleItems = _this.state.listExcel.slice(startIndex, endIdex);
+
         return React.createElement(
           "div",
           null,
@@ -199,25 +380,35 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                     e.nombre
                   );
                 }),
-                _this.state.validation ? React.createElement(
+                _this.state.validation ? _this.state.desigBenefEnabled && _this.state.desigBenefEnabled !== null ? React.createElement(
                   "th",
                   null,
-                  "Validaci\xF3n"
+                  "Mail para designar beneficiarios"
+                ) : React.createElement(
+                  "th",
+                  null,
+                  "Resultado"
                 ) : ""
               )
             ),
             React.createElement(
               "tbody",
               null,
-              _this.state.listExcel.map(function (registro) {
+              _this.state.paginaShow.map(function (registro) {
                 return React.createElement(
                   "tr",
                   { key: registro.__rowNum__ },
                   _this.props.camposNomina.map(function (campo) {
                     var key = Object.keys(registro).find(function (key) {
-                      return key.toUpperCase().trim() === campo.nombre.toUpperCase().trim();
+                      if (key.toUpperCase().trim() === campo.nombre.toUpperCase().trim()) {
+                        return key.toUpperCase().trim();
+                      } else if (key == "FECHA_DE_NACIMIENTO" && campo.nombre.toUpperCase().trim() !== "MAIL") {
+                        return key.toUpperCase().trim();
+                      }
                     });
+
                     var valorKey = registro[key];
+
                     if (key === undefined) {
                       return React.createElement(
                         "td",
@@ -225,7 +416,20 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                         "-"
                       );
                     }
-                    if (key.toUpperCase().substr(0, 5) == "FECHA") valorKey = _this._getFecha(valorKey);
+
+                    if (key.toUpperCase().substr(0, 5) == "FECHA" && !_this.state.isCopyFromExcel) {
+                      if (key === "FECHA_DE_NACIMIENTO") {
+                        valorKey = Utils.formatFechaString(valorKey, campo.formato.texto);
+                      } else {
+                        valorKey = _this._getFecha(valorKey);
+                      }
+                    }
+
+                    if (key.toUpperCase().substr(0, 5) == "FECHA" && _this.state.isCopyFromExcel) {
+                      if (key === "FECHA_DE_NACIMIENTO") {
+                        valorKey = Utils.formatFechaString(valorKey, campo.formato.texto);
+                      }
+                    }
 
                     return React.createElement(
                       "td",
@@ -243,7 +447,14 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                   ) : ""
                 );
               })
-            )
+            ),
+            React.createElement(PaginatedView, {
+              setrows: _this._handlerRows,
+              activepage: _this.state.page,
+              selectpage: _this._handlerPages,
+              rows: _this.state.rows,
+              total: _this.state.listExcel.length
+            })
           )
         );
       };
@@ -369,37 +580,157 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
 
       _this._handleModalValidateButton = function () {
         var excelData = _this.state.listExcel.map(function (item) {
-          var obj = _this._getActEquiv(item.ACTIVIDAD);
-          return Object.assign({}, item, {
-            ACTIVIDAD: obj.newVal.value,
-            PROFECOD: obj.newVal.id
-          });
+          if (item.ACTIVIDAD !== undefined) {
+            var obj = _this._getActEquiv(item.ACTIVIDAD);
+            return Object.assign({}, item, {
+              ACTIVIDAD: obj.newVal.value,
+              PROFECOD: obj.newVal.id
+            });
+          } else {
+            return Object.assign({}, item, {
+              ACTIVIDAD: "",
+              PROFECOD: ""
+            });
+          }
         });
 
         var product = _this.props.product.detalle ? _this.props.product.detalle : _this.props.product.cup;
+
         _this.setState({
           validation: true
         });
-        _this.nominaController.validateNominaAsegurados(excelData, function () {
-          _this.setState({
-            listExcel: excelData
+
+        var listToSendCopy = excelData.map(function (object) {
+          var objectCopy = Object.assign({}, object);
+          var fecNacKey = "FECHA DE NACIMIENTO";
+          var fecNacVal = objectCopy[fecNacKey];
+          var fechaNacimiento = !isNaN(fecNacVal) ? fecNacVal : _this._getFecha(fecNacVal);
+
+          var campoFecha = _this.props.camposNomina.find(function (campo) {
+            return campo.nombre.includes("Fecha");
           });
-        }, product);
+
+          objectCopy.FECHA_DE_NACIMIENTO = Utils.formatFechaNumber(fechaNacimiento, campoFecha.formato.texto);
+
+          delete objectCopy["FECHA DE NACIMIENTO"];
+
+          return objectCopy;
+        });
+
+        if (_this.state.desigBenefEnabled) {
+          _this._handleValidation(listToSendCopy, product);
+        } else {
+          _this._handleValidateFields(listToSendCopy);
+        }
+
         _this._handleModalIsOpen();
       };
 
       _this._handleValidateButton = function () {
         //llama a este si no es producto ap
         var product = _this.props.product.detalle ? _this.props.product.detalle : _this.props.product.cup;
+
         _this.setState({
           validation: true
         });
+
         var listExcelClon = Loadsh.cloneDeep(_this.state.listExcel);
-        _this.nominaController.validateNominaAsegurados(listExcelClon, function () {
-          _this.setState({
-            listExcel: listExcelClon
+
+        var listExcelCopy = listExcelClon.map(function (object) {
+          var objectCopy = Object.assign({}, object);
+          var fecNacKey = "FECHA DE NACIMIENTO";
+          var fecNacVal = objectCopy[fecNacKey];
+
+          var fechaNacimiento = !isNaN(fecNacVal) ? fecNacVal : _this._getFecha(fecNacVal);
+
+          var campoFecha = _this.props.camposNomina.find(function (campo) {
+            return campo.nombre.includes("Fecha");
           });
-        }, product);
+
+          objectCopy.FECHA_DE_NACIMIENTO = Utils.formatFechaNumber(fechaNacimiento, campoFecha.formato.texto);
+
+          delete objectCopy["FECHA DE NACIMIENTO"];
+
+          return objectCopy;
+        });
+
+        if (_this.state.desigBenefEnabled) {
+          _this._handleValidation(_this.state.isCopyFromExcel ? listExcelClon : listExcelCopy, product);
+        } else {
+          _this._handleValidateFields(_this.state.isCopyFromExcel ? listExcelClon : listExcelCopy);
+        }
+      };
+
+      _this._handleValidateFields = function (listExcel) {
+        var listEmails = listExcel.map(function (campo) {
+          if (campo.MAIL !== undefined) {
+            return campo.MAIL.trim();
+          }
+        });
+
+        var mails = [];
+        var cont = 0;
+
+        for (var i = 0; i < listEmails.length; i++) {
+          for (var j = i + 1; j < listEmails.length; j++) {
+            if (listEmails[i] === listEmails[j]) {
+              mails.push(listEmails[i]);
+            }
+          }
+        }
+
+        listExcel.map(function (campo) {
+          if (campo.MAIL === undefined) {
+            campo.VALIDACION = "NOMAIL";
+          } else if (mails.includes(campo.MAIL.trim())) {
+            campo.VALIDACION = "D-ERROR";
+          } else if (campo.SUELDO === undefined && campo.SUMASEG != undefined || campo.SUELDO === 0 || campo.SUELDO < 10000) {
+            campo.VALIDACION = "S-ERROR";
+          } else if (!("VALIDACION" in campo)) {
+            campo.VALIDACION = "OK";
+          }
+        });
+
+        listExcel.map(function (item) {
+          if (item.VALIDACION == "MAILOK" || item.VALIDACION == "NOEXIST" || item.VALIDACION == "D-ERROR") {
+            cont++;
+          }
+        });
+
+        _this.setState({
+          listExcel: listExcel,
+          enviarDisabled: cont === listExcel.length
+        });
+
+        _this._getPage(_this.state.page, _this.state.rows, listExcel);
+      };
+
+      _this._handleValidation = function (listExcel, product) {
+        var validatedListExcel = [];
+        var startIndex = 0;
+        var cont = 0;
+
+        var processNextPart = function processNextPart() {
+          var listPart = listExcel.slice(startIndex, startIndex + 500);
+
+          _this.nominaController.validateNominaAsegurados(listPart, function () {
+            cont++;
+
+            if (cont === listPart.length) {
+              validatedListExcel = validatedListExcel.concat(listPart);
+              startIndex = startIndex + 500;
+              cont = 0;
+
+              processNextPart();
+            }
+
+            if (validatedListExcel.length === listExcel.length) {
+              _this._handleValidateFields(validatedListExcel);
+            }
+          }, product);
+        };
+
+        processNextPart();
       };
 
       _this._setActivities = function (data) {
@@ -429,31 +760,40 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
       };
 
       _this._caseValidationResult = function (e) {
-        // HF 20221005 ABMSO INI
-        return React.createElement(
-          "td",
-          { "data-th": "Validaci\xF3n" },
-          React.createElement("i", { className: "fas fa-check text-success" })
-        );
-        // HF 20221005 ABMSO FIN
+        var dataTh = _this.state.desigBenefEnabled ? "Mail para designar beneficiarios" : "Resultado";
+
         switch (e.VALIDACION) {
           case "OK":
           case "ADD":
             return React.createElement(
               "td",
-              { "data-th": "Mail para designar beneficiarios" },
+              { "data-th": dataTh },
               React.createElement("i", { className: "fas fa-check text-success" })
             );
           case "ERROR":
             return React.createElement(
               "td",
-              null,
+              { "data-th": dataTh },
               React.createElement("i", { className: "fas fa-times text-danger" })
+            );
+          case "D-ERROR":
+            return React.createElement(
+              "td",
+              { "data-th": dataTh },
+              React.createElement("i", { className: "fas fa-times text-danger" }),
+              "\xA0 El mail se encuentra duplicado en la n\xF3mina"
+            );
+          case "S-ERROR":
+            return React.createElement(
+              "td",
+              { "data-th": dataTh },
+              React.createElement("i", { className: "fas fa-times text-danger" }),
+              "\xA0 Los valores expresados en el campo sueldo no son v\xE1lidos, el mismo debe tener un valor mayor o igual a 5 cifras(sin contemplar los decimales)"
             );
           case "DOCOK":
             return React.createElement(
               "td",
-              { "data-th": "Mail para designar beneficiarios" },
+              { "data-th": dataTh },
               React.createElement("i", { className: "fas fa-check mr-1 text-success" }),
               "\xA0DNI registrado con ",
               e.DATOSREGISTRO.MAIL,
@@ -464,7 +804,7 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
           case "MAILOK":
             return React.createElement(
               "td",
-              { "data-th": "Mail para designar beneficiarios" },
+              { "data-th": dataTh },
               React.createElement("i", { className: "fas fa-times mr-1 text-danger" }),
               "\xA0No es posible enviar mail a este usuario,",
               React.createElement("br", null),
@@ -473,7 +813,7 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
           case "NOMAIL":
             return React.createElement(
               "td",
-              { "data-th": "Mail para designar beneficiarios" },
+              { "data-th": dataTh },
               React.createElement("i", { className: "fas fa-times mr-1 text-danger" }),
               "\xA0No se ha ingresado un mail"
             );
@@ -505,9 +845,53 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
               {
                 className: "ml-3 btn btn-hsbc mt-2",
                 onClick: _this._handleButtonProcess,
-                disabled: !_this.state.filename
+                disabled: _this.state.filename === "" ? !_this.state.filename : !_this.state.processButtonEnabled
               },
-              "Procesar"
+              "  ",
+              _this.state.isLoading ? "Procesando" : "Procesar",
+              _this.state.isLoading ? React.createElement("i", { className: "spinner-border spinner-border-sm position-spinner ml-3 md-5" }) : ""
+            )
+          ),
+          React.createElement(
+            "div",
+            null,
+            React.createElement(
+              "h4",
+              { className: "subtitle-inside " },
+              "Tambien podes copiar la informacion de tu Excel"
+            ),
+            React.createElement(
+              "span",
+              null,
+              "Para hacerlo siga estos sencillos pasos"
+            ),
+            React.createElement(
+              "p",
+              null,
+              "1. Selecciona las filas que deseas importar a tu Excel y copialas"
+            ),
+            React.createElement(
+              "p",
+              null,
+              "2. Presion\xE1 ",
+              React.createElement(
+                "strong",
+                null,
+                "Generar Grilla"
+              ),
+              " y se generar\xE1 la de tu n\xF3mina automaticamente"
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "col-md-6" },
+            React.createElement(
+              "button",
+              {
+                onClick: _this._handleExcelPasteFunction,
+                className: "btn btn-hsbc"
+              },
+              "Generar Grilla"
             )
           ),
           React.createElement(
@@ -580,20 +964,79 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
         );
       };
 
+      _this._handlerPages = function (e) {
+        var pageNumber = Number(e.target.value);
+
+        if (_this.state.rows === 100 && e.target.textContent === ">>") {
+          pageNumber--;
+
+          _this.setState({
+            page: pageNumber
+          });
+
+          _this._getPage(pageNumber.toString(), _this.state.rows);
+        } else {
+          _this.setState({
+            page: pageNumber
+          });
+
+          _this._getPage(pageNumber.toString(), _this.state.rows);
+        }
+      };
+
+      _this._handlerRows = function (e) {
+        _this.setState({
+          rows: Number(e.target.value),
+          page: 1
+        });
+
+        _this._getPage(1, e.target.value);
+      };
+
+      _this._getPage = function (pag, amount, list) {
+        if (pag > 0) {
+          var lista = void 0;
+
+          if (list !== undefined) {
+            lista = list.slice((pag - 1) * amount, (pag - 1) * amount + amount);
+          } else {
+            lista = _this.state.listExcel.slice((pag - 1) * amount, (pag - 1) * amount + amount);
+          }
+
+          _this.setState({
+            paginaShow: lista,
+            rows: Number(amount),
+            page: Number(pag)
+          });
+        }
+      };
+
       _this.state = {
         listExcel: [],
         listError: [],
+        listDesigBenef: [],
         filename: "",
         showModal: false,
         validation: false,
         processRegBenef: false,
+        count: 0,
         showErrorsMsg: false,
+        isCopyFromExcel: false,
         listSendError: null,
+        desigBenefEnabled: null,
+        canSendTrue: true,
         //mailNull: false,
         listErrorAseg: { LISTAERRORES: { LISTAERROR: [] }, CANTERR: -1 },
         displayNone: "",
         modalButtonEnabled: false,
+        isLoading: false,
+        processButtonEnabled: true,
+        enviarDisabled: true,
         listPoliza: null,
+        paginaShow: [],
+        selected: 0,
+        rows: 100,
+        page: 1,
         modal: {
           component: null,
           contentHTML: "",
@@ -631,6 +1074,9 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
         }
         return fecha;
       }
+
+      // Paginado
+
     }, {
       key: "render",
       value: function render() {
@@ -647,24 +1093,24 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
             {
               className: "subtitle-inside font-weight-normal " + this.state.displayNone
             },
-            "Descargue el instructivo de carga de N\xF3minas, haciendo click",
+            "Descarga el instructivo de carga de N\xF3minas, haciendo click",
             " ",
             React.createElement(
               "a",
               {
-                href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/SOABMNomInstructivo.pdf",
+                href: "/seguros-gateway/getPDF/SOABMNomInstructivo.pdf",
                 target: "_blank"
               },
               "aqu\xED"
             ),
             " "
           ),
-          this.state.listError.length === 0 && this.state.listExcel.length === 0 ? this._selectFileScreen() : this.state.listError.length > 0 ? this._screenInvalidFile() : this.state.listErrorAseg.CANTERR > 0 ? this._errorTable(this.state.listErrorAseg.LISTAERRORES.LISTAERROR) : this.state.listSendError != null ? React.createElement(ProcessErrorScreen, {
+          this.state.listError.length === 0 && this.state.listExcel.length === 0 ? this._selectFileScreen() : this.state.listError.length > 0 ? this._screenInvalidFile() : this.state.listErrorAseg !== undefined && this.state.listErrorAseg.CANTERR > 0 ? this._errorTable(this.state.listErrorAseg.LISTAERRORES.LISTAERROR) : this.state.listSendError != null ? React.createElement(ProcessErrorScreen, {
             title: "Informe nómina completa",
             "switch": this.props.switch,
             error: this.state.listSendError,
             displayNone: this._displayNone
-          }) : this.state.listErrorAseg.CANTERR == 0 ? React.createElement(ProcessOkPayroll, {
+          }) : this.state.listErrorAseg !== undefined && this.state.listErrorAseg.CANTERR == 0 ? React.createElement(ProcessOkPayroll, {
             "switch": this.props.switch,
             displayNone: this._displayNone
           }) : this._tableExcel(),
@@ -687,7 +1133,7 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                 { className: "btn btn-light", onClick: this._handleBack },
                 "Cancelar"
               )
-            ) : this.state.listErrorAseg.LISTAERRORES.LISTAERROR.length > 0 ? React.createElement(
+            ) : this.state.listErrorAseg !== undefined && this.state.listErrorAseg.LISTAERRORES.LISTAERROR.length > 0 ? React.createElement(
               "div",
               { className: "col-12 mt-4" },
               React.createElement(
@@ -718,13 +1164,13 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                   )
                 )
               )
-            ) : this.state.listErrorAseg.CANTERR == 0 || this.state.listSendError != null ? "" : React.createElement(
+            ) : this.state.listErrorAseg != undefined && this.state.listErrorAseg.CANTERR == 0 || this.state.listSendError != null ? "" : React.createElement(
               React.Fragment,
               null,
               React.createElement(
                 ButtonLoading,
                 {
-                  disabled: this.state.enviarLoading,
+                  disabled: this.state.enviarLoading ? this.state.enviarLoading : this.state.enviarDisabled,
                   className: "btn btn btn-danger border-dark right mt-2 mr-3",
                   onClick: this._handleModalSendMailButton,
                   loading: this.state.enviarLoading
@@ -735,6 +1181,11 @@ define(["react", "../../common/inputFile2", "../../common/modalReactBootstrap", 
                 "button",
                 { className: "btn btn-light", onClick: this._handleBack },
                 "Cancelar"
+              ),
+              React.createElement(
+                "div",
+                { className: "container mt-5" },
+                this.state.enviarLoading && React.createElement(ProgressBar, { width: "1.5rem", height: "1.5rem", nominaLenght: this.state.listExcel.length, progress: this.state.count })
               )
             ) : ""
           ),

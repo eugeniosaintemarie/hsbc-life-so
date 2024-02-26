@@ -81,9 +81,9 @@ define(["react", "../../common/modalReactBootstrap", "../../common/tablaCamposNo
         var selectView = "";
         if (_this.state.cantModal < camposFilter.length) {
 
-          if (camposFilter[_this.state.cantModal].nombre == "sueldo" || camposFilter[_this.state.cantModal].nombre == "Suma asegurada") {
-            selectView = selectView + "style=display:none";
-          }
+          /*if(camposFilter[this.state.cantModal].nombre=="sueldo" || camposFilter[this.state.cantModal].nombre=="Suma asegurada"){
+            selectView = selectView + "style=display:none"
+          }*/
           camposFilter[_this.state.cantModal].formato.options.forEach(function (optionValue) {
             options += "<option value='" + JSON.stringify(optionValue) + "'> " + optionValue.texto + "</option>";
           });
@@ -136,12 +136,12 @@ define(["react", "../../common/modalReactBootstrap", "../../common/tablaCamposNo
           React.createElement(
             "small",
             { className: "subtitle-inside font-weight-normal" },
-            "Descargue el instructivo de carga de N\xF3minas, haciendo click",
+            "Descarga el instructivo de carga de N\xF3minas, haciendo click",
             " ",
             React.createElement(
               "a",
               {
-                href: "https://www.segurosonline.hsbc.com.ar/oficina-gateway/getPDF/SOABMNomInstructivo.pdf",
+                href: "/seguros-gateway/getPDF/SOABMNomInstructivo.pdf",
                 target: "_blank"
               },
               "aqu\xED"
@@ -161,6 +161,19 @@ define(["react", "../../common/modalReactBootstrap", "../../common/tablaCamposNo
               funcionResults: this._handleCamposNomina,
               camposNomina: this.state.camposNomina
             })
+          ),
+          React.createElement(
+            "div",
+            null,
+            React.createElement(
+              "p",
+              null,
+              React.createElement(
+                "strong",
+                null,
+                "La cantidad maxima de personas a ingresar por nomina es de 2000. En caso de superar esta cantidad te pedimos por favor particiones la nomina"
+              )
+            )
           ),
           React.createElement(
             "div",

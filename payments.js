@@ -99,7 +99,7 @@ define(["react", "react-redux", "../services/userService", "../services/segurosO
             }).then(function (data) {
               var filename = pago.RECIBNUM + ".pdf";
               var fileManager = new FileManager();
-              var downloadResult = fileManagerPDF(data, filename);
+              var downloadResult = fileManager.downloadPDF(data, filename);
 
               if (!downloadResult) {
                 _this2.setState({
@@ -139,7 +139,7 @@ define(["react", "react-redux", "../services/userService", "../services/segurosO
         }).then(function (data) {
           var filename = payment.NROPOLIZA + ".pdf";
           var fileManager = new FileManager();
-          var downloadResult = fileManagerPDF(data, filename);
+          var downloadResult = fileManager.downloadPDF(data, filename);
 
           if (!downloadResult) {
             _this3.setState({
@@ -578,7 +578,7 @@ define(["react", "react-redux", "../services/userService", "../services/segurosO
             var filename = "comprobante-pago.pdf";
             var fileManager = new FileManager();
 
-            fileManagerPDF(data, filename);
+            fileManager.downloadPDF(data, filename);
           } else {
             _this6.setState({
               showModalSuccess: true,

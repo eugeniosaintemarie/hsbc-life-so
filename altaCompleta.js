@@ -168,6 +168,44 @@ define(["react", "../common/inputFile2", "../common/presentadoAnte"], function (
             { className: "subtitle-inside" },
             "Ingres\xE1 la n\xF3mina para Constancia de cobertura altas tempranas"
           ),
+          React.createElement(
+            "div",
+            { className: "mb-2 mt-2" },
+            React.createElement(
+              "div",
+              { "class": "form-check form-check-inline" },
+              React.createElement("input", {
+                "class": "form-check-input",
+                type: "radio",
+                name: "vigencia",
+                id: "vigActual",
+                onChange: this.props.handleCheckbox,
+                checked: this.props.disableCheck ? this.props.disableCheck : this.props.checkVigAct
+              }),
+              React.createElement(
+                "label",
+                { "class": "form-check-label", "for": "si" },
+                "Vigencia mes en curso"
+              )
+            ),
+            this.props.disableCheck ? "" : React.createElement(
+              "div",
+              { "class": "form-check form-check-inline ml-4" },
+              React.createElement("input", {
+                "class": "form-check-input",
+                type: "radio",
+                name: "vigencia",
+                id: "vigAdelantado",
+                onChange: this.props.handleCheckbox
+              }),
+              React.createElement(
+                "label",
+                { "class": "form-check-label", "for": "si" },
+                "Vigencia mes adelantado"
+              )
+            )
+          ),
+          React.createElement("br", null),
           this.props.showSuccessMsg ? React.createElement(
             "div",
             null,

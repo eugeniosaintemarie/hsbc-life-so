@@ -29,6 +29,7 @@ define(["react", "../common/inputvalidation", "../common/presentadoAnte", "../co
       _this._handleResults = function (id, result) {
         var data = _defineProperty({}, id, result);
         var form = Object.keys(_this.state.form);
+
         form = form.find(function (el) {
           return el === id;
         });
@@ -50,6 +51,7 @@ define(["react", "../common/inputvalidation", "../common/presentadoAnte", "../co
 
         if (cuil != "" && cuil.length == 11 && apellido != undefined && nombre != undefined) {
           var jsonNomina = { TIPDOCU: 5, CUIL: cuil, NOMBRE: nombre, APELLIDO: apellido, ESTADO: estado };
+
           _this.props._handleButtonAgregar(jsonNomina);
           _this.setState({ validation: true });
           _this._nuevoButton();
@@ -157,6 +159,43 @@ define(["react", "../common/inputvalidation", "../common/presentadoAnte", "../co
             "h4",
             { className: "subtitle-inside" },
             "Ingres\xE1 la n\xF3mina para Constancia de cobertura altas tempranas"
+          ),
+          React.createElement(
+            "div",
+            { className: "mb-3 mt-2" },
+            React.createElement(
+              "div",
+              { "class": "form-check form-check-inline" },
+              React.createElement("input", {
+                "class": "form-check-input",
+                type: "radio",
+                name: "vigencia",
+                id: "vigActual",
+                onChange: this.props.handleCheckbox,
+                checked: this.props.disableCheck ? this.props.disableCheck : this.props.checkVigAct
+              }),
+              React.createElement(
+                "label",
+                { "class": "form-check-label", "for": "si" },
+                "Vigencia mes en curso"
+              )
+            ),
+            this.props.disableCheck ? "" : React.createElement(
+              "div",
+              { "class": "form-check form-check-inline ml-4" },
+              React.createElement("input", {
+                "class": "form-check-input",
+                type: "radio",
+                name: "vigencia",
+                id: "vigAdelantado",
+                onChange: this.props.handleCheckbox
+              }),
+              React.createElement(
+                "label",
+                { "class": "form-check-label", "for": "si" },
+                "Vigencia mes adelantado"
+              )
+            )
           ),
           React.createElement(
             React.Fragment,
@@ -325,7 +364,21 @@ define(["react", "../common/inputvalidation", "../common/presentadoAnte", "../co
                     },
                     "Cancelar"
                   )
-                ) : "" : ""
+                ) : React.createElement(
+                  "button",
+                  {
+                    className: "ml-3 btn btn-hsbc mt-2",
+                    onClick: this.props.showAltaIndividual
+                  },
+                  "Volver"
+                ) : React.createElement(
+                  "button",
+                  {
+                    className: "ml-3 btn btn-hsbc mt-2",
+                    onClick: this.props.showAltaIndividual
+                  },
+                  "Volver"
+                )
               )
             )
           )

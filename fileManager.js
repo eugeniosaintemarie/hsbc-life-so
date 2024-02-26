@@ -28,7 +28,7 @@ define(['react'], function (React) {
             var url = URL.createObjectURL(data);
             var fakeAnchor = document.createElement("a");
             fakeAnchor.href = url;
-            fakeAnchor = filename;
+            fakeAnchor.download = filename;
             document.body.appendChild(fakeAnchor);
             fakeAnchor.click();
             setTimeout(function () {

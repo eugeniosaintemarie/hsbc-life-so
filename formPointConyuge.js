@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(["react", "../../common/inputvalidation", "../../common/inputValidationAcOff", "../../common/dropdownContent", "../../common/datepicker", "../../common/datepickerAcOff", "../../common/modalReactBootstrap", "../../controller/vidaColectivoController"], function (React, InputValidation, InputValidationAcOff, DropDownContent, DatePicker, DatePickerAcOff, ModalReactBootstrap, VidaColectivoController) {
+define(["react", "../../common/inputvalidation", "../../common/inputValidationAcOff", "../../common/dropdownContent", "../../common/datepicker", "../../common/datepickerAcOff", "../../common/modalReactBootstrap", "../../controller/vidaColectivoController", "../../lib/utils"], function (React, InputValidation, InputValidationAcOff, DropDownContent, DatePicker, DatePickerAcOff, ModalReactBootstrap, VidaColectivoController, Utils) {
   var FormPointConyuge = function (_React$Component) {
     _inherits(FormPointConyuge, _React$Component);
 
@@ -23,9 +23,10 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
         result.referencies = _this.referencies[id];
         form = result;
         _this.props.onResults(id, form);
-        if (id === "applicantEmailConyuge" && _this.state.applicantEmailConyuge.value) {
+        if (id === "applicantEmailConyuge" && _this.state.applicantEmailConyuge.value && _this.props.isModify === undefined) {
           _this._handleCheckEmail();
         }
+
         if (id == "formConyuge") {
           if (result.id == 2) {
             _this.state.noCheck = false; /**se utiliza para cambiar el check a no si antes ya habia guardado que si */
@@ -33,8 +34,13 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
             _this.state.noCheck = true;
           }
         }
+
         if (id === "applicantCUILConyuge" && result.value.length > 10) {
           _this.handleVerificationCuil(result.value);
+        }
+
+        if (!_this.state.disableElementos && _this.state.formValues) {
+          _this.state.formValues.conyugeModify = "";
         }
       };
 
@@ -67,7 +73,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
         }
       };
 
-      var _ref = _this.props.formInfo ? _this.props.formInfo : "",
+      var _ref = _this.props.formInfo ? _this.props.formInfo : _this.props.recSolData ? _this.props.recSolData : "",
           _ref$formConyuge = _ref.formConyuge,
           formConyuge = _ref$formConyuge === undefined ? "" : _ref$formConyuge,
           _ref$applicantCUILCon = _ref.applicantCUILConyuge,
@@ -101,7 +107,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
           required: true
         },
         applicantDateBirthConyuge: {
-          value: applicantDateBirthConyuge,
+          value: !isNaN(applicantDateBirthConyuge) ? Utils.formatFechaString(applicantDateBirthConyuge) : applicantDateBirthConyuge,
           isValidate: false,
           required: true
         },
@@ -115,6 +121,8 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
         checkEmail: false,
         noCheck: false,
         validationConyuge: false,
+        disableElementos: false,
+        formValues: false,
         modal: {
           component: null,
           contentHTML: "",
@@ -164,7 +172,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
               onClick: this._newConyuge,
               checked: this.props.check ? true : null,
               type: "radio"
-            }, _defineProperty(_React$createElement, "checked", this.state.formConyuge.id == "1" ? true : false), _defineProperty(_React$createElement, "onResult", this._handleResults), _defineProperty(_React$createElement, "name", "formConyuge"), _defineProperty(_React$createElement, "id", "1"), _React$createElement)),
+            }, _defineProperty(_React$createElement, "checked", this.state.formValues && this.state.formValues.conyugeModify === "S" ? true : this.state.formConyuge.id == "1" ? true : false), _defineProperty(_React$createElement, "onResult", this._handleResults), _defineProperty(_React$createElement, "name", "formConyuge"), _defineProperty(_React$createElement, "id", "1"), _defineProperty(_React$createElement, "disabled", this.state.disableElementos), _React$createElement)),
             React.createElement(
               "label",
               { className: "form-check-label", htmlFor: "flexRadioDefault1" },
@@ -179,7 +187,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
               className: "form-check-input",
               checked: this.props.check ? true : null,
               type: "radio"
-            }, _defineProperty(_React$createElement2, "checked", this.state.formConyuge.id == "2" ? true : false), _defineProperty(_React$createElement2, "onResult", this._handleResults), _defineProperty(_React$createElement2, "name", "formConyuge"), _defineProperty(_React$createElement2, "id", "2"), _React$createElement2)),
+            }, _defineProperty(_React$createElement2, "checked", this.state.formValues && this.state.formValues.conyugeModify === "N" ? true : this.state.formConyuge.id == "2" ? true : false), _defineProperty(_React$createElement2, "onResult", this._handleResults), _defineProperty(_React$createElement2, "name", "formConyuge"), _defineProperty(_React$createElement2, "id", "2"), _defineProperty(_React$createElement2, "disabled", this.state.disableElementos), _React$createElement2)),
             React.createElement(
               "label",
               { className: "form-check-label", htmlFor: "flexRadioDefault2" },
@@ -219,7 +227,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
                     onResult: this._handleResults,
                     formatText: "Nombre Solicitante: La longitud tiene que ser mayor a 2, no debe tener caracteres especiales, no debe tener espacios dobles, no puede tener 3 o m\xE1s letras consecutivas iguales, no puede ser Otros, Desconocido, No posee, No aplica o Sin nombre.",
                     upperCase: true,
-                    disabled: readOnly,
+                    disabled: this.state.disableElementos ? this.state.disableElementos : readOnly,
                     required: true
                   })
                 ),
@@ -247,7 +255,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
                     onResult: this._handleResults,
                     formatText: "Apellido Solicitante: La longitud tiene que ser mayor a 2, no debe tener caracteres especiales, no debe tener espacios dobles, no puede tener 3 o m\xE1s letras consecutivas iguales, no puede ser Otros, Desconocido, No posee, No aplica o Sin nombre.",
                     upperCase: true,
-                    disabled: readOnly,
+                    disabled: this.state.disableElementos ? this.state.disableElementos : readOnly,
                     required: true
                   })
                 ),
@@ -272,7 +280,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
                       value: this.state.applicantDateBirthConyuge.value,
                       className: "input-background-color form-control input-size",
                       onResult: this._handleResults,
-                      disabled: readOnly,
+                      disabled: this.state.disableElementos ? this.state.disableElementos : readOnly,
                       maxDate: this.props.fecha,
                       required: true,
                       valueIsObject: true
@@ -303,7 +311,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
                     formatText: "Correo Electr\xF3nico Contratante: La informaci\xF3n ingresada no corresponde al formato de correo electr\xF3nico v\xE1lido.",
                     onResult: this._handleResults,
                     upperCase: true,
-                    disabled: readOnly,
+                    disabled: this.state.disableElementos ? this.state.disableElementos : readOnly,
                     required: true
                   })
                 )
@@ -339,10 +347,23 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
                       }
                     },
                     upperCase: true,
-                    disabled: readOnly,
+                    disabled: this.state.disableElementos ? this.state.disableElementos : readOnly,
                     required: true
                   })
-                )
+                ),
+                this.props.isModify !== undefined && this.props.isModify ? React.createElement(
+                  "div",
+                  { className: "form-group col-9 font-size-20 font-weight-bold", style: { "padding-left": "2rem", "padding-top": "0.2rem" } },
+                  React.createElement(
+                    "p",
+                    { className: "font-italic", style: { "font-size": "0.84rem", "white-space": "nowrap" } },
+                    "Beneficiarios designados / Derechohabientes / Herederos Legales. ",
+                    React.createElement("br", null),
+                    "Si tu conyuge/conviviente desea designar beneficiarios deber\xE1 escribir un ",
+                    React.createElement("br", null),
+                    "correo eletr\xF3nico a contactenos@hsbc.com.ar"
+                  )
+                ) : ""
               ),
               this.state.checkEmail ? React.createElement(
                 "div",
@@ -387,6 +408,7 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
           var e = { target: { id: 2 } };
           this.setState({ formConyuge: { id: 2, referencies: undefined } });
           this.props.handlerIsConyuge(e);
+
           var result = { id: "2", referencies: undefined };
 
           this.setState({ formConyuge: result });
@@ -394,6 +416,19 @@ define(["react", "../../common/inputvalidation", "../../common/inputValidationAc
           this.props.onResults("formConyuge", result);
 
           this.state.noCheck = false; /**se utiliza para cambiar el check a no si antes ya habia guardado que si */
+        }
+
+        if (this.props.recSolData !== undefined) {
+          var formValues = Object.assign({}, this.props.recSolData);
+
+          if (this.props.disableElements !== undefined) {
+            this.setState({ disableElementos: this.props.disableElements });
+          }
+
+          this.setState({
+            formValues: formValues,
+            noCheck: formValues.conyugeModify === "S" ? true : false
+          });
         }
       }
     }]);

@@ -58,7 +58,6 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
         result.referencies = _this.referencies[id];
         form = result;
         _this.props.onResults(id, form);
-        console.log("objeto en handleresult", _defineProperty({}, id, result.value));
         _this.setState(_defineProperty({}, id, result.value));
         _this.handleSetTotal();
       };
@@ -137,7 +136,7 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
           value: 0
         },
         checkValue: false,
-        bonusMonthly: _this.props.listPoliza.CAPITMAX * _this.props.listPoliza.TASA / 1000,
+        bonusMonthly: _this.props.grupoPoliza.GCAPIMAX * _this.props.listPoliza.TASA / 1000,
         sumSpouse: 0,
         sumParent: 0,
         sumSons: 0,
@@ -148,6 +147,9 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
         sumSpouseCheck: true,
         sumParentCheck: true,
         sumSonsCheck: true,
+        isGroupConyuge: false,
+        isGroupHjos: false,
+        isGroupPadresOrSuegros: false,
         modal: {
           component: "",
           title: "",
@@ -174,13 +176,8 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
 
         var _props = this.props,
             readOnly = _props.readOnly,
-            nameBurial = _props.nameBurial,
-            group = _props.group;
+            nameBurial = _props.nameBurial;
 
-
-        var grpCony = group[1] && group[1].GRUPOCOD == "0000000050" || group[2] && group[2].GRUPOCOD == "0000000050" || group[3] && group[3].GRUPOCOD == "0000000050" ? true : false;
-        var grpHijM = group[1] && group[1].GRUPOCOD == "0000000002" || group[2] && group[2].GRUPOCOD == "0000000002" || group[3] && group[3].GRUPOCOD == "0000000002" ? true : false;
-        var grpPaSu = group[1] && (group[1].GRUPOCOD == "0000000100" || group[1].GRUPOCOD == "0000000101") || group[2] && (group[2].GRUPOCOD == "0000000100" || group[2].GRUPOCOD == "0000000101") || group[3] && (group[3].GRUPOCOD == "0000000100" || group[3].GRUPOCOD == "0000000101") ? true : false;
 
         return React.createElement(
           "div",
@@ -239,7 +236,7 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
                 "Titular"
               )
             ),
-            grpCony ? React.createElement(
+            this.state.isGroupConyuge ? React.createElement(
               "div",
               { className: "ml-5 d-flex justify-content-left" },
               React.createElement(
@@ -287,7 +284,7 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
                 )
               )
             ) : "",
-            grpHijM ? React.createElement(
+            this.state.isGroupHjos ? React.createElement(
               "div",
               { className: "ml-5 d-flex justify-content-left" },
               React.createElement(
@@ -335,7 +332,7 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
                 )
               )
             ) : "",
-            grpPaSu ? React.createElement(
+            this.state.isGroupPadresOrSuegros ? React.createElement(
               "div",
               { className: "ml-5 d-flex justify-content-left" },
               React.createElement(
@@ -467,6 +464,10 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
     }, {
       key: "componentDidMount",
       value: function componentDidMount() {
+        var _this3 = this;
+
+        var subGrupos = this.props.listSubGrupos;
+
         this._getTotalParentescos();
 
         if (this.props.formInfo.applicantConyuge != undefined) {
@@ -488,6 +489,18 @@ define(["react", "../../../common/inputvalidation", "../../../common/inputvalida
             this.state.sumParent = this.props.formInfo.applicantParent;
           }
         }
+
+        subGrupos.map(function (grupo) {
+          var subGrupoCod = parseInt(grupo.GRUPOCOD);
+
+          if (subGrupoCod >= 2 && subGrupoCod <= 9) {
+            _this3.setState({ isGroupHjos: true });
+          } else if (subGrupoCod >= 50 && subGrupoCod <= 59) {
+            _this3.setState({ isGroupConyuge: true });
+          } else if (subGrupoCod >= 100 && subGrupoCod <= 109) {
+            _this3.setState({ isGroupPadresOrSuegros: true });
+          }
+        });
       }
     }]);
 

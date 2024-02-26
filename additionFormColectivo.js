@@ -19,8 +19,13 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
 
       _this2._handleResults = function (id, result) {
         _this2.formData[id] = result;
+
         if (result.value !== "") {
           _this2.handleVerificationBrand(id, result);
+        }
+
+        if (id === "applicantCuilNumber" && !result.isValidate && _this2.formData[id].referencies.current !== null) {
+          _this2.formData[id].referencies.current._onFocus(true);
         }
       };
 
@@ -36,6 +41,7 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
 
       _this2._handleFormValidation = function (saveForm) {
         var field = _this2.formData;
+        var formPropData = _this2.props.formInfo ? _this2.props.formInfo : _this2.props.data;
         var validated = true;
         var errorsList = [];
         var emptyFields = true;
@@ -55,11 +61,26 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
                   validated = false;
                   emptyFields = false;
                 }
+
+                if (element == "applicantCuilNumber" && field[element].value.length !== 11 && formPropData.applicantTypeCCC == "1" && field[element].formatText == undefined) {
+                  errorsList.push("La longitud del CUIL debe ser de 11 digitos");
+                  field[element].referencies.current._onFocus(true);
+                  validated = false;
+                  emptyFields = false;
+                }
               }
               //Se agrega parametro saveForm para utilizar la misma funcion para guardar y enviar el formulario
               if (field[element].value == "" && saveForm != "saveForm") {
                 field[element].referencies.current._onFocus(true);
-                errorsList[0] = "Complete los campos indicados";
+
+                if (errorsList.length !== 0) {
+                  if (!errorsList.includes("Complete los campos indicados")) {
+                    errorsList.push("Complete los campos indicados");
+                  }
+                } else {
+                  errorsList[0] = "Complete los campos indicados";
+                }
+
                 emptyFields = true;
                 validated = false;
               } else {
@@ -148,9 +169,7 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
             var fechaNacimientoConyu = field["applicantDateBirthConyuge"].value;
             var dateNacimientoConyu = Utils.formatPolizaDate(Utils.formatFechaNumber(fechaNacimientoConyu));
             var aniosAhoraConyu = Utils.fAgeCalc(dateNacimientoConyu);
-            var grupo = _this.props.listPoliza.GRUPOS.GRUPO.find(function (e) {
-              return parseInt(e.GRUPOCOD) == 50;
-            });
+            var grupo = _this.props.listSubGrupos[0];
 
             var fecha = fechaNacimientoConyu.split("/");
             var dia = parseInt(fecha[0], 10);
@@ -183,13 +202,11 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
             }
           }
 
-          if (saveForm === "saveForm") {
+          if (saveForm === "saveForm" && _this.props.isConyuge && _this.state.notConyuge) {
             var fechaNacimientoConyu = field["applicantDateBirthConyuge"].value;
             var dateNacimientoConyu = Utils.formatPolizaDate(Utils.formatFechaNumber(fechaNacimientoConyu));
             var aniosAhoraConyu = Utils.fAgeCalc(dateNacimientoConyu);
-            var grupo = _this.props.listPoliza.GRUPOS.GRUPO.find(function (e) {
-              return parseInt(e.GRUPOCOD) == 50;
-            });
+            var grupo = _this.props.listSubGrupos[0];
 
             var fecha = fechaNacimientoConyu.split("/");
             var dia = parseInt(fecha[0], 10);
@@ -234,7 +251,8 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
                 size: "md",
                 title: "Validación de campos",
                 component: _this._handleErrorsList(errorsList, emptyFields)
-              } });
+              }
+            });
             return false;
           } else {
             return true;
@@ -273,16 +291,16 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
         } else if (product == "EC") {
           return _this2.formData.applicantPlus.value;
         } else if (product == "CU") {
-          return _this2.props.listPoliza.CAPITMAX;
+          return _this2.props.grupoPoliza.GCAPIMAX;
         }
       };
 
       _this2.handlePlus = function (product) {
         if (product == "AP" || product == "CU") {
           if (_this2.props.listPoliza.MONENCOD === 1) {
-            return "$ " + _this2.props.listPoliza.CAPITMAX;
+            return "$ " + _this2.props.grupoPoliza.GCAPIMAX;
           } else if (_this2.props.listPoliza.MONENCOD === 2) {
-            return "U$S " + _this2.props.listPoliza.CAPITMAX;
+            return "U$S " + _this2.props.grupoPoliza.GCAPIMAX;
           }
         } else if (product == "MS") {
           return _this2.formData.salary.id;
@@ -406,7 +424,7 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
       };
 
       _this2._handleSendForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         if (_this2.formData.formConyuge && _this2.formData.formConyuge.id == 2) {
           _this2.handleEraseData();
         }
@@ -621,7 +639,7 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
       };
 
       _this2._handleSaveForm = function () {
-        _this2.props.product.CAPITMAX = _this2.props.listPoliza.CAPITMAX;
+        _this2.props.product.GCAPIMAX = _this2.props.grupoPoliza.GCAPIMAX;
         if (_this2.formData.formConyuge && _this2.formData.formConyuge.id == 2) {
           _this2.handleEraseData();
         }
@@ -802,11 +820,13 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
                       out = true;
                       _this2.setState({ showDdjjS: true });
                       _this2.setState({ showDdjj: true });
-                      _this2.setState({ leyenda: React.createElement(
+                      _this2.setState({
+                        leyenda: React.createElement(
                           "b",
                           null,
                           "Ten\xE9 en cuenta que adicionalmente nuestro equipo te va a solicitar realizar un examen m\xE9dico para completar tu adhesi\xF3n web."
-                        ) });
+                        )
+                      });
                       requisitoEnvio = "3";
                     }
                 }
@@ -814,7 +834,8 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
             } else {
               _this2.setState({
                 showDdjj: false,
-                showDdjjS: false });
+                showDdjjS: false
+              });
               requisitoEnvio = "";
               out = true;
             }
@@ -991,7 +1012,9 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
                 cuitList: this.props.cuitList,
                 onResults: this._handleResults,
                 readOnly: this.props.readOnly,
-                fecha: fechaActual[0]
+                fecha: fechaActual[0],
+                grupoPoliza: this.props.grupoPoliza,
+                listSubGrupos: this.props.listSubGrupos
               })
             ) : "",
             React.createElement(
@@ -1009,7 +1032,9 @@ define(["react", "loadsh", "../../common/loader", "./formPointColectivo", "./for
               applicantData: this.formData,
               onResults: this._handleResults,
               readOnly: this.props.readOnly,
-              listPoliza: this.props.listPoliza
+              listPoliza: this.props.listPoliza,
+              grupoPoliza: this.props.grupoPoliza,
+              listSubGrupos: this.props.listSubGrupos
             }),
             React.createElement(
               "h5",
