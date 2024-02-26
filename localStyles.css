@@ -182,17 +182,17 @@ input:-webkit-autofill:active {
 
 @font-face {
   font-family: HSBC-Regular;
-  src: url(../hsbc-so/fonts/UniversNextforHSBCW02-Rg.woff);
+  src: url(../hsbc-life-so/fonts/UniversNextforHSBCW02-Rg.woff);
 }
 
 @font-face {
   font-family: HSBC-Light;
-  src: url(../hsbc-so/fonts/UniversNextforHSBCW02-Lt.woff);
+  src: url(../hsbc-life-so/fonts/UniversNextforHSBCW02-Lt.woff);
 }
 
 @font-face {
   font-family: HSBC-Bold;
-  src: url(../hsbc-so/fonts/UniversNextforHSBCW02-Bd.woff);
+  src: url(../hsbc-life-so/fonts/UniversNextforHSBCW02-Bd.woff);
 }
 
 body {
