@@ -205,7 +205,7 @@ define(["react", "../../redux/store", "../../controller/retiroNominaController",
             var url = URL.createObjectURL(blob);
 
             downloadLink.href = url;
-            downloadLink.download = "ReporteVC-" + ramo + ".csv";
+            downloadLink = "ReporteVC-" + ramo + ".csv";
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
